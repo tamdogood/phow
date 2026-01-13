@@ -33,9 +33,7 @@ class BaseTool(ABC):
         pass
 
     @abstractmethod
-    async def process_stream(
-        self, query: str, context: ToolContext
-    ) -> AsyncIterator[str]:
+    async def process_stream(self, query: str, context: ToolContext) -> AsyncIterator[str]:
         """Process a user query and stream the response."""
         pass
 

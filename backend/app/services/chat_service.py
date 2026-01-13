@@ -21,9 +21,7 @@ class ChatService:
         """Get existing conversation or create a new one."""
         if conversation_id:
             # Verify conversation exists and belongs to session
-            if await self.conversation_repo.verify_ownership(
-                conversation_id, session_id
-            ):
+            if await self.conversation_repo.verify_ownership(conversation_id, session_id):
                 return conversation_id
 
         # Create new conversation
@@ -68,9 +66,7 @@ class ChatService:
         Event types: 'chunk', 'done', 'error'
         """
         # Get or create conversation
-        conv_id = await self.get_or_create_conversation(
-            session_id, conversation_id, tool_id
-        )
+        conv_id = await self.get_or_create_conversation(session_id, conversation_id, tool_id)
 
         # Save user message
         await self.save_message(conv_id, "user", message)
@@ -105,14 +101,10 @@ class ChatService:
             error_msg = f"Error processing message: {str(e)}"
             yield (error_msg, "error")
 
-    async def list_conversations(
-        self, session_id: str, limit: int = 50
-    ) -> list[dict[str, Any]]:
+    async def list_conversations(self, session_id: str, limit: int = 50) -> list[dict[str, Any]]:
         """List all conversations for a session."""
         return await self.conversation_repo.get_by_session(session_id, limit)
 
-    async def get_messages(
-        self, conversation_id: str
-    ) -> list[dict[str, Any]]:
+    async def get_messages(self, conversation_id: str) -> list[dict[str, Any]]:
         """Get all messages in a conversation."""
         return await self.message_repo.get_by_conversation(conversation_id)

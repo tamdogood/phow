@@ -51,9 +51,7 @@ class LocationService:
         """
         return await self.maps_client.get_place_details(place_id)
 
-    async def analyze_location(
-        self, address: str, business_type: str
-    ) -> dict[str, Any]:
+    async def analyze_location(self, address: str, business_type: str) -> dict[str, Any]:
         """
         Comprehensive location analysis with caching.
         This method orchestrates multiple API calls.
@@ -67,24 +65,16 @@ class LocationService:
 
         # Parallel API calls for efficiency
         # Get nearby competitors (cached)
-        competitors = await self.get_nearby_places(
-            lat, lng, radius=1000, keyword=business_type
-        )
+        competitors = await self.get_nearby_places(lat, lng, radius=1000, keyword=business_type)
 
         # Get nearby transit (cached)
-        transit = await self.get_nearby_places(
-            lat, lng, radius=500, place_type="transit_station"
-        )
+        transit = await self.get_nearby_places(lat, lng, radius=500, place_type="transit_station")
 
         # Get nearby restaurants/cafes (cached)
-        food_places = await self.get_nearby_places(
-            lat, lng, radius=500, place_type="restaurant"
-        )
+        food_places = await self.get_nearby_places(lat, lng, radius=500, place_type="restaurant")
 
         # Get nearby retail (cached)
-        retail = await self.get_nearby_places(
-            lat, lng, radius=500, place_type="store"
-        )
+        retail = await self.get_nearby_places(lat, lng, radius=500, place_type="store")
 
         return {
             "location": location,

@@ -4,9 +4,7 @@ from ..services.location_service import LocationService
 
 
 @celery_app.task(name="analyze_location_batch")
-def analyze_location_batch(
-    addresses: List[str], business_type: str
-) -> List[Dict[str, Any]]:
+def analyze_location_batch(addresses: List[str], business_type: str) -> List[Dict[str, Any]]:
     """
     Background task to analyze multiple locations in batch.
 
@@ -29,9 +27,7 @@ def analyze_location_batch(
                 data = await location_service.analyze_location(address, business_type)
                 results.append({"address": address, "data": data, "success": True})
             except Exception as e:
-                results.append(
-                    {"address": address, "error": str(e), "success": False}
-                )
+                results.append({"address": address, "error": str(e), "success": False})
 
     # Run async code in celery worker
     loop = asyncio.new_event_loop()

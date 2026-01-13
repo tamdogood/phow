@@ -14,6 +14,7 @@ async def chat(
     chat_service: ChatService = Depends(get_chat_service),
 ):
     """Handle chat request with streaming response."""
+
     async def generate():
         try:
             async for content, event_type in chat_service.process_message(

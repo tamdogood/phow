@@ -56,6 +56,7 @@ Before submitting code, ensure:
 - ✅ Code follows existing patterns in the file
 - ✅ Changes are minimal and focused
 - ✅ No unnecessary abstractions or layers
+- ✅ Code is formatted with Black (`black app/`)
 
 ### 5. Anti-Patterns to Avoid
 - ❌ Creating new utility functions when existing ones suffice
@@ -123,6 +124,10 @@ uvicorn app.main:app --reload --port 8000    # Start FastAPI server
 
 # Celery worker (for background tasks)
 celery -A app.workers.celery_app worker --loglevel=info
+
+# Code formatting with Black
+black app/                                    # Format all Python files
+black --check app/                            # Check formatting without changes
 ```
 
 ### Docker (from root)

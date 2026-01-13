@@ -202,6 +202,32 @@ See `.env.example` for all configuration options:
 - **Required**: LLM API keys, Google Maps API key, Supabase credentials
 - **Optional**: Redis URL, Celery broker, cache TTL
 
+## Code Formatting
+
+This project uses [Black](https://black.readthedocs.io/) for code formatting.
+
+### Install Black
+```bash
+pip install -r requirements.txt
+```
+
+### Format Code
+```bash
+# Format all Python files
+black app/
+
+# Check formatting without making changes
+black --check app/
+
+# Format a specific file
+black app/main.py
+```
+
+### Configuration
+Black is configured in `pyproject.toml`:
+- Line length: 100 characters
+- Target Python version: 3.11+
+
 ## Testing
 
 ```bash

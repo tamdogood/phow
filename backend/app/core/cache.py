@@ -64,6 +64,7 @@ def cached(ttl: int | None = None, key_prefix: str = ""):
         async def get_location(address: str):
             ...
     """
+
     def decorator(func: Callable):
         @wraps(func)
         async def wrapper(*args, **kwargs):
@@ -86,4 +87,5 @@ def cached(ttl: int | None = None, key_prefix: str = ""):
             return result
 
         return wrapper
+
     return decorator

@@ -39,9 +39,7 @@ class LLMService:
                 max_tokens=4096,
             )
 
-    def _format_messages(
-        self, messages: list[dict], system: str | None = None
-    ) -> list:
+    def _format_messages(self, messages: list[dict], system: str | None = None) -> list:
         """Convert dict messages to LangChain message objects."""
         lc_messages = []
 
@@ -61,9 +59,7 @@ class LLMService:
 
         return lc_messages
 
-    async def chat(
-        self, messages: list[dict], system: str | None = None
-    ) -> str:
+    async def chat(self, messages: list[dict], system: str | None = None) -> str:
         """Generate a chat completion."""
         lc_messages = self._format_messages(messages, system)
         response = await self.llm.ainvoke(lc_messages)

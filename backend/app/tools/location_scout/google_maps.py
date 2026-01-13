@@ -102,9 +102,7 @@ class GoogleMapsClient:
                 return data["result"]
             return None
 
-    async def analyze_location(
-        self, address: str, business_type: str
-    ) -> dict[str, Any]:
+    async def analyze_location(self, address: str, business_type: str) -> dict[str, Any]:
         """
         Analyze a location for a specific business type.
         Returns comprehensive data about the area.
@@ -117,24 +115,16 @@ class GoogleMapsClient:
         lat, lng = location["lat"], location["lng"]
 
         # Get nearby competitors (same business type)
-        competitors = await self.nearby_search(
-            lat, lng, radius=1000, keyword=business_type
-        )
+        competitors = await self.nearby_search(lat, lng, radius=1000, keyword=business_type)
 
         # Get nearby transit
-        transit = await self.nearby_search(
-            lat, lng, radius=500, place_type="transit_station"
-        )
+        transit = await self.nearby_search(lat, lng, radius=500, place_type="transit_station")
 
         # Get nearby restaurants/cafes (foot traffic indicators)
-        food_places = await self.nearby_search(
-            lat, lng, radius=500, place_type="restaurant"
-        )
+        food_places = await self.nearby_search(lat, lng, radius=500, place_type="restaurant")
 
         # Get nearby retail (complementary businesses)
-        retail = await self.nearby_search(
-            lat, lng, radius=500, place_type="store"
-        )
+        retail = await self.nearby_search(lat, lng, radius=500, place_type="store")
 
         return {
             "location": location,
