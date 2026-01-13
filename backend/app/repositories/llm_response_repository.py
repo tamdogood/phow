@@ -67,12 +67,19 @@ class LLMResponseRepository:
         self, conversation_id: str | None = None
     ) -> dict[str, Any]:
         """Get token usage statistics."""
-        query = self.db.table(self.table).select("provider, model, prompt_tokens, completion_tokens, total_tokens")
+        query = self.db.table(self.table).select(
+            "provider, model, prompt_tokens, completion_tokens, total_tokens"
+        )
         if conversation_id:
             query = query.eq("conversation_id", conversation_id)
         result = query.execute()
 
-        stats = {"total_prompt_tokens": 0, "total_completion_tokens": 0, "total_tokens": 0, "by_provider": {}}
+        stats = {
+            "total_prompt_tokens": 0,
+            "total_completion_tokens": 0,
+            "total_tokens": 0,
+            "by_provider": {},
+        }
         for row in result.data:
             stats["total_prompt_tokens"] += row.get("prompt_tokens") or 0
             stats["total_completion_tokens"] += row.get("completion_tokens") or 0

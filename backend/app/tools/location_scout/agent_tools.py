@@ -165,7 +165,9 @@ async def discover_neighborhood(
     )
 
     # Get retail stores
-    results["nearby_retail"] = await client.nearby_search(lat, lng, radius=500, place_type="store")
+    results["nearby_retail"] = await client.nearby_search(
+        lat, lng, radius=500, place_type="store"
+    )
 
     # Limit results
     results["competitors"] = results["competitors"][:10]
@@ -177,7 +179,8 @@ async def discover_neighborhood(
     results["analysis_summary"] = {
         "competitor_count": len(results["competitors"]),
         "transit_access": len(results["transit_stations"]) > 0,
-        "foot_traffic_indicators": len(results["nearby_food"]) + len(results["nearby_retail"]),
+        "foot_traffic_indicators": len(results["nearby_food"])
+        + len(results["nearby_retail"]),
     }
 
     return results

@@ -56,7 +56,9 @@ class LocationScoutAgent:
     def _get_agent(self):
         """Create or return the LangGraph ReAct agent."""
         if self._agent is None:
-            logger.info("Creating new LangGraph ReAct agent", tools=[t.name for t in self.tools])
+            logger.info(
+                "Creating new LangGraph ReAct agent", tools=[t.name for t in self.tools]
+            )
             self._agent = create_react_agent(self.llm, self.tools)
         return self._agent
 
@@ -106,7 +108,9 @@ class LocationScoutAgent:
         tool_activities: dict[str, dict] = {}  # tool_name -> {id, start_time}
 
         try:
-            async for chunk in agent.astream({"messages": messages}, stream_mode="updates"):
+            async for chunk in agent.astream(
+                {"messages": messages}, stream_mode="updates"
+            ):
                 for node_name, node_output in chunk.items():
                     logger.debug("Agent node update", node=node_name)
 
@@ -119,23 +123,36 @@ class LocationScoutAgent:
                                 for tool_call in msg.tool_calls:
                                     tool_name = tool_call.get("name", "")
                                     tool_args = tool_call.get("args", {})
-                                    logger.info("Tool call started", tool=tool_name, args=tool_args)
+                                    logger.info(
+                                        "Tool call started",
+                                        tool=tool_name,
+                                        args=tool_args,
+                                    )
 
                                     # Track tool activity
                                     if tracking_service and session_id:
-                                        activity_id = await tracking_service.start_tool_activity(
-                                            session_id=session_id,
-                                            tool_id="location_scout",
-                                            tool_name=tool_name,
-                                            input_args=tool_args,
-                                            conversation_id=conversation_id,
+                                        activity_id = (
+                                            await tracking_service.start_tool_activity(
+                                                session_id=session_id,
+                                                tool_id="location_scout",
+                                                tool_name=tool_name,
+                                                input_args=tool_args,
+                                                conversation_id=conversation_id,
+                                            )
                                         )
-                                        tool_activities[tool_name] = {"id": activity_id, "start_time": time.time()}
+                                        tool_activities[tool_name] = {
+                                            "id": activity_id,
+                                            "start_time": time.time(),
+                                        }
 
                                     if tool_name == "geocode_address":
                                         yield f"\n**Looking up address:** {tool_args.get('address', '')}\n"
                                     elif tool_name == "search_nearby_places":
-                                        search_term = tool_args.get("keyword") or tool_args.get("place_type") or "places"
+                                        search_term = (
+                                            tool_args.get("keyword")
+                                            or tool_args.get("place_type")
+                                            or "places"
+                                        )
                                         yield f"\n**Searching for {search_term} nearby...**\n"
                                     elif tool_name == "get_place_details":
                                         yield "\n**Getting detailed information...**\n"
@@ -147,39 +164,72 @@ class LocationScoutAgent:
                                         else:
                                             yield f"\n**Discovering neighborhood: {address}...**\n"
                             elif msg.content:
-                                logger.info("Received final AI response", content_length=len(msg.content))
+                                logger.info(
+                                    "Received final AI response",
+                                    content_length=len(msg.content),
+                                )
                                 last_ai_content = msg.content
 
                         elif isinstance(msg, ToolMessage):
                             tool_name = msg.name
-                            logger.info("Tool call completed", tool=tool_name, content_length=len(str(msg.content)))
+                            logger.info(
+                                "Tool call completed",
+                                tool=tool_name,
+                                content_length=len(str(msg.content)),
+                            )
 
                             # Extract location data for the frontend map
                             if tool_name == "discover_neighborhood":
                                 try:
-                                    tool_result = msg.content if isinstance(msg.content, dict) else json.loads(msg.content)
-                                    if "location" in tool_result and "error" not in tool_result:
+                                    tool_result = (
+                                        msg.content
+                                        if isinstance(msg.content, dict)
+                                        else json.loads(msg.content)
+                                    )
+                                    if (
+                                        "location" in tool_result
+                                        and "error" not in tool_result
+                                    ):
                                         location_data = {
                                             "type": "location_data",
                                             "location": tool_result["location"],
-                                            "competitors": tool_result.get("competitors", [])[:5],
-                                            "transit_stations": tool_result.get("transit_stations", [])[:3],
-                                            "nearby_food": tool_result.get("nearby_food", [])[:5],
-                                            "nearby_retail": tool_result.get("nearby_retail", [])[:5],
-                                            "analysis_summary": tool_result.get("analysis_summary", {}),
+                                            "competitors": tool_result.get(
+                                                "competitors", []
+                                            )[:5],
+                                            "transit_stations": tool_result.get(
+                                                "transit_stations", []
+                                            )[:3],
+                                            "nearby_food": tool_result.get(
+                                                "nearby_food", []
+                                            )[:5],
+                                            "nearby_retail": tool_result.get(
+                                                "nearby_retail", []
+                                            )[:5],
+                                            "analysis_summary": tool_result.get(
+                                                "analysis_summary", {}
+                                            ),
                                         }
                                         yield f"\n<!--LOCATION_DATA:{json.dumps(location_data)}-->\n"
-                                        logger.info("Yielded location data for map", lat=tool_result["location"]["lat"])
+                                        logger.info(
+                                            "Yielded location data for map",
+                                            lat=tool_result["location"]["lat"],
+                                        )
                                 except (json.JSONDecodeError, TypeError, KeyError) as e:
-                                    logger.warning("Could not extract location data", error=str(e))
+                                    logger.warning(
+                                        "Could not extract location data", error=str(e)
+                                    )
 
                             # Complete tool activity tracking
                             if tracking_service and tool_name in tool_activities:
                                 activity = tool_activities.pop(tool_name)
-                                latency_ms = int((time.time() - activity["start_time"]) * 1000)
+                                latency_ms = int(
+                                    (time.time() - activity["start_time"]) * 1000
+                                )
                                 await tracking_service.complete_tool_activity(
                                     activity_id=activity["id"],
-                                    output_data={"result_length": len(str(msg.content))},
+                                    output_data={
+                                        "result_length": len(str(msg.content))
+                                    },
                                     latency_ms=latency_ms,
                                 )
 
@@ -200,7 +250,9 @@ class LocationScoutAgent:
                         error_message=str(e),
                         latency_ms=latency_ms,
                     )
-            logger.error("Error in agent stream", error=str(e), error_type=type(e).__name__)
+            logger.error(
+                "Error in agent stream", error=str(e), error_type=type(e).__name__
+            )
             raise
 
 

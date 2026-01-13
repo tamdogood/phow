@@ -4,7 +4,9 @@ from ..services.location_service import LocationService
 
 
 @celery_app.task(name="analyze_location_batch")
-def analyze_location_batch(addresses: List[str], business_type: str) -> List[Dict[str, Any]]:
+def analyze_location_batch(
+    addresses: List[str], business_type: str
+) -> List[Dict[str, Any]]:
     """
     Background task to analyze multiple locations in batch.
 

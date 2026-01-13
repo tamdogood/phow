@@ -29,7 +29,9 @@ class GoogleMapsClient:
             if data["status"] == "OK" and data["results"]:
                 result = data["results"][0]
                 location = result["geometry"]["location"]
-                logger.info("Geocoding successful", lat=location["lat"], lng=location["lng"])
+                logger.info(
+                    "Geocoding successful", lat=location["lat"], lng=location["lng"]
+                )
                 return {
                     "lat": location["lat"],
                     "lng": location["lng"],
@@ -48,7 +50,14 @@ class GoogleMapsClient:
         keyword: str | None = None,
     ) -> list[dict[str, Any]]:
         """Search for nearby places."""
-        logger.info("Nearby search", lat=lat, lng=lng, radius=radius, place_type=place_type, keyword=keyword)
+        logger.info(
+            "Nearby search",
+            lat=lat,
+            lng=lng,
+            radius=radius,
+            place_type=place_type,
+            keyword=keyword,
+        )
         params = {
             "location": f"{lat},{lng}",
             "radius": radius,
@@ -118,7 +127,9 @@ class GoogleMapsClient:
             logger.warning("Place details not found", status=data["status"])
             return None
 
-    async def analyze_location(self, address: str, business_type: str) -> dict[str, Any]:
+    async def analyze_location(
+        self, address: str, business_type: str
+    ) -> dict[str, Any]:
         """
         Analyze a location for a specific business type.
         Returns comprehensive data about the area.
@@ -131,13 +142,19 @@ class GoogleMapsClient:
         lat, lng = location["lat"], location["lng"]
 
         # Get nearby competitors (same business type)
-        competitors = await self.nearby_search(lat, lng, radius=1000, keyword=business_type)
+        competitors = await self.nearby_search(
+            lat, lng, radius=1000, keyword=business_type
+        )
 
         # Get nearby transit
-        transit = await self.nearby_search(lat, lng, radius=500, place_type="transit_station")
+        transit = await self.nearby_search(
+            lat, lng, radius=500, place_type="transit_station"
+        )
 
         # Get nearby restaurants/cafes (foot traffic indicators)
-        food_places = await self.nearby_search(lat, lng, radius=500, place_type="restaurant")
+        food_places = await self.nearby_search(
+            lat, lng, radius=500, place_type="restaurant"
+        )
 
         # Get nearby retail (complementary businesses)
         retail = await self.nearby_search(lat, lng, radius=500, place_type="store")

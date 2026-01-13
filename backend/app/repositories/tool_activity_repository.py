@@ -56,7 +56,11 @@ class ToolActivityRepository:
         latency_ms: int | None = None,
     ) -> dict[str, Any]:
         """Mark a tool activity as failed."""
-        data = {"status": "failed", "error_message": error_message, "completed_at": "now()"}
+        data = {
+            "status": "failed",
+            "error_message": error_message,
+            "completed_at": "now()",
+        }
         if latency_ms is not None:
             data["latency_ms"] = latency_ms
 
@@ -93,12 +97,20 @@ class ToolActivityRepository:
 
     async def get_stats(self, tool_id: str | None = None) -> dict[str, Any]:
         """Get tool activity statistics."""
-        query = self.db.table(self.table).select("tool_id, tool_name, status, latency_ms")
+        query = self.db.table(self.table).select(
+            "tool_id, tool_name, status, latency_ms"
+        )
         if tool_id:
             query = query.eq("tool_id", tool_id)
         result = query.execute()
 
-        stats = {"total_calls": 0, "completed": 0, "failed": 0, "avg_latency_ms": 0, "by_tool": {}}
+        stats = {
+            "total_calls": 0,
+            "completed": 0,
+            "failed": 0,
+            "avg_latency_ms": 0,
+            "by_tool": {},
+        }
         latencies = []
 
         for row in result.data:
