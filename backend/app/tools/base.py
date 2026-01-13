@@ -1,0 +1,45 @@
+from abc import ABC, abstractmethod
+from pydantic import BaseModel
+from typing import AsyncIterator
+
+
+class ToolContext(BaseModel):
+    """Context passed to tools during processing."""
+
+    session_id: str
+    conversation_id: str
+    business_type: str | None = None
+
+
+class ToolResponse(BaseModel):
+    """Response from a tool."""
+
+    message: str
+    data: dict | None = None
+    follow_up_questions: list[str] | None = None
+
+
+class BaseTool(ABC):
+    """Base class for all tools."""
+
+    tool_id: str
+    name: str
+    description: str
+    icon: str = "🔧"
+
+    @abstractmethod
+    async def process(self, query: str, context: ToolContext) -> ToolResponse:
+        """Process a user query and return a response."""
+        pass
+
+    @abstractmethod
+    async def process_stream(
+        self, query: str, context: ToolContext
+    ) -> AsyncIterator[str]:
+        """Process a user query and stream the response."""
+        pass
+
+    @abstractmethod
+    def get_system_prompt(self) -> str:
+        """Return the system prompt for this tool."""
+        pass
