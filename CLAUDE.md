@@ -24,6 +24,89 @@ PHOW is an AI-powered analytics platform for small business owners. The MVP feat
 - **Caching Decorator**: `@cached()` for automatic Redis caching
 - **Retry Logic**: Tenacity for API resilience
 
+## Coding Principles & Rules
+
+**CRITICAL: Follow these principles for all code changes**
+
+### 1. Succinctness & Minimalism
+- **Write only what's necessary** - Avoid verbose code, unnecessary abstractions, or over-engineering
+- **Prefer existing patterns** - Reuse existing code patterns rather than creating new ones
+- **Remove redundant code** - If functionality already exists elsewhere, use it instead of duplicating
+- **One-liners over multi-liners** - When appropriate, use concise Python/TypeScript idioms
+
+### 2. Code Quality Standards
+- **DRY (Don't Repeat Yourself)** - Never duplicate logic; extract to shared functions/services
+- **Single Responsibility** - Each function/class should do one thing well
+- **No dead code** - Remove unused imports, variables, functions, and comments
+- **No commented-out code** - Delete it; git history preserves it if needed
+- **No placeholder TODOs** - Either implement it or remove the comment
+
+### 3. When Making Changes
+- **Minimal diffs** - Make the smallest change necessary to achieve the goal
+- **Edit existing code** - Prefer modifying existing files over creating new ones
+- **Reuse existing utilities** - Check `core/`, `lib/`, and `services/` before creating new helpers
+- **Follow existing patterns** - Match the style and structure of similar code in the codebase
+
+### 4. Code Review Checklist
+Before submitting code, ensure:
+- ✅ No duplicate logic exists elsewhere
+- ✅ All imports are used
+- ✅ No unused variables or functions
+- ✅ No commented-out code blocks
+- ✅ Code follows existing patterns in the file
+- ✅ Changes are minimal and focused
+- ✅ No unnecessary abstractions or layers
+
+### 5. Anti-Patterns to Avoid
+- ❌ Creating new utility functions when existing ones suffice
+- ❌ Adding multiple layers of abstraction for simple operations
+- ❌ Writing verbose error handling when simple try/except works
+- ❌ Adding extensive comments explaining obvious code
+- ❌ Creating wrapper functions that only call another function
+- ❌ Adding "future-proof" code that isn't needed now
+
+### 6. Examples
+
+**❌ Bad (verbose, redundant):**
+```python
+def get_user_data(user_id: str):
+    # First, let's validate the user_id
+    if user_id is None:
+        return None
+    if user_id == "":
+        return None
+    # Now let's fetch the user
+    user = db.query("SELECT * FROM users WHERE id = ?", user_id)
+    # Return the user data
+    return user
+```
+
+**✅ Good (succinct, clean):**
+```python
+def get_user_data(user_id: str):
+    if not user_id:
+        return None
+    return db.query("SELECT * FROM users WHERE id = ?", user_id)
+```
+
+**❌ Bad (unnecessary abstraction):**
+```python
+class UserDataFetcher:
+    def __init__(self, db):
+        self.db = db
+    
+    def fetch(self, user_id):
+        return self.db.query("SELECT * FROM users WHERE id = ?", user_id)
+
+fetcher = UserDataFetcher(db)
+user = fetcher.fetch(user_id)
+```
+
+**✅ Good (direct, simple):**
+```python
+user = db.query("SELECT * FROM users WHERE id = ?", user_id)
+```
+
 ## Development Commands
 
 ### Frontend (from `frontend/`)
