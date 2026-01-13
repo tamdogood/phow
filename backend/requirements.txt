@@ -29,6 +29,7 @@ sse-starlette>=2.0.0
 # Utilities
 tenacity>=8.2.0  # Retry logic
 structlog>=24.1.0  # Better logging
+numpy<2  # Required for torch/transformers compatibility
 
 # Development Tools
 black>=24.0.0  # Code formatter

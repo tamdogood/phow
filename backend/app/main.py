@@ -4,18 +4,29 @@ from fastapi.middleware.cors import CORSMiddleware
 from .api.routes import chat_router, tools_router
 from .core.tool_registry import ToolRegistry
 from .core.cache import get_cache
+from .core.logging import setup_logging, get_logger
 from .tools.location_scout import LocationScoutTool
+
+logger = get_logger("main")
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Handle startup and shutdown events."""
+    setup_logging()
+    logger.info("Starting PHOW API")
+
     # Startup: Register tools
     ToolRegistry.register(LocationScoutTool())
+    logger.info("Registered tools", tools=ToolRegistry.list_tools())
+
     yield
+
     # Shutdown: Close Redis connection
+    logger.info("Shutting down PHOW API")
     cache = get_cache()
     await cache.close()
+    logger.info("Closed Redis connection")
 
 
 # Create FastAPI app

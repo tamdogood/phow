@@ -1,6 +1,9 @@
 import httpx
 from typing import Any
 from ...core.config import get_settings
+from ...core.logging import get_logger
+
+logger = get_logger("google_maps")
 
 
 class GoogleMapsClient:
@@ -14,22 +17,26 @@ class GoogleMapsClient:
 
     async def geocode(self, address: str) -> dict[str, Any] | None:
         """Convert an address to coordinates."""
+        logger.info("Geocoding address", address=address)
         async with httpx.AsyncClient() as client:
             response = await client.get(
                 f"{self.BASE_URL}/geocode/json",
                 params={"address": address, "key": self.api_key},
             )
             data = response.json()
+            logger.debug("Geocode API response", status=data["status"])
 
             if data["status"] == "OK" and data["results"]:
                 result = data["results"][0]
                 location = result["geometry"]["location"]
+                logger.info("Geocoding successful", lat=location["lat"], lng=location["lng"])
                 return {
                     "lat": location["lat"],
                     "lng": location["lng"],
                     "formatted_address": result["formatted_address"],
                     "place_id": result.get("place_id"),
                 }
+            logger.warning("Geocoding failed", status=data["status"])
             return None
 
     async def nearby_search(
@@ -41,6 +48,7 @@ class GoogleMapsClient:
         keyword: str | None = None,
     ) -> list[dict[str, Any]]:
         """Search for nearby places."""
+        logger.info("Nearby search", lat=lat, lng=lng, radius=radius, place_type=place_type, keyword=keyword)
         params = {
             "location": f"{lat},{lng}",
             "radius": radius,
@@ -57,9 +65,10 @@ class GoogleMapsClient:
                 params=params,
             )
             data = response.json()
+            logger.debug("Nearby search API response", status=data["status"])
 
             if data["status"] == "OK":
-                return [
+                results = [
                     {
                         "name": place["name"],
                         "place_id": place["place_id"],
@@ -72,10 +81,14 @@ class GoogleMapsClient:
                     }
                     for place in data["results"]
                 ]
+                logger.info("Nearby search successful", result_count=len(results))
+                return results
+            logger.warning("Nearby search returned no results", status=data["status"])
             return []
 
     async def get_place_details(self, place_id: str) -> dict[str, Any] | None:
         """Get detailed information about a place."""
+        logger.info("Getting place details", place_id=place_id)
         fields = [
             "name",
             "rating",
@@ -97,9 +110,12 @@ class GoogleMapsClient:
                 },
             )
             data = response.json()
+            logger.debug("Place details API response", status=data["status"])
 
             if data["status"] == "OK":
+                logger.info("Place details retrieved successfully")
                 return data["result"]
+            logger.warning("Place details not found", status=data["status"])
             return None
 
     async def analyze_location(self, address: str, business_type: str) -> dict[str, Any]:

@@ -1,14 +1,16 @@
 """Location Scout Agent using LangChain with tool calling capabilities."""
 
 import json
-from typing import AsyncIterator
-from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+import time
+from typing import AsyncIterator, Any
+from langchain_core.messages import HumanMessage, SystemMessage, AIMessage, ToolMessage
 from langgraph.prebuilt import create_react_agent
 
 from .agent_tools import LOCATION_SCOUT_TOOLS
-from .prompts import SYSTEM_PROMPT
 from ...core.llm import get_llm_service
+from ...core.logging import get_logger
+
+logger = get_logger("agent.location_scout")
 
 
 AGENT_SYSTEM_PROMPT = """You are a location analysis expert helping small business owners evaluate potential locations for their business. You have access to Google Maps tools to gather real data about locations.
@@ -54,120 +56,152 @@ class LocationScoutAgent:
     def _get_agent(self):
         """Create or return the LangGraph ReAct agent."""
         if self._agent is None:
-            # Create the agent with tools
-            self._agent = create_react_agent(
-                model=self.llm,
-                tools=self.tools,
-                state_modifier=AGENT_SYSTEM_PROMPT,
-            )
+            logger.info("Creating new LangGraph ReAct agent", tools=[t.name for t in self.tools])
+            self._agent = create_react_agent(self.llm, self.tools)
         return self._agent
 
-    async def process(self, query: str, conversation_history: list[dict] | None = None) -> str:
-        """Process a query using the agent with tools."""
-        agent = self._get_agent()
-
-        # Build message history
-        messages = []
+    def _build_messages(
+        self, query: str, conversation_history: list[dict] | None = None
+    ) -> list:
+        """Build message list with system prompt."""
+        messages = [SystemMessage(content=AGENT_SYSTEM_PROMPT)]
         if conversation_history:
             for msg in conversation_history:
                 if msg["role"] == "user":
                     messages.append(HumanMessage(content=msg["content"]))
                 elif msg["role"] == "assistant":
                     messages.append(AIMessage(content=msg["content"]))
-
-        # Add current query
         messages.append(HumanMessage(content=query))
+        return messages
 
-        # Run the agent
+    async def process(
+        self, query: str, conversation_history: list[dict] | None = None
+    ) -> str:
+        """Process a query using the agent with tools."""
+        logger.info("Processing query", query=query[:100])
+        agent = self._get_agent()
+        messages = self._build_messages(query, conversation_history)
+        logger.debug("Built messages", message_count=len(messages))
+
         result = await agent.ainvoke({"messages": messages})
-
-        # Extract the final response
-        final_message = result["messages"][-1]
-        return final_message.content
+        response = result["messages"][-1].content
+        logger.info("Agent completed", response_length=len(response))
+        return response
 
     async def process_stream(
-        self, query: str, conversation_history: list[dict] | None = None
+        self,
+        query: str,
+        conversation_history: list[dict] | None = None,
+        tracking_service: Any | None = None,
+        session_id: str | None = None,
+        conversation_id: str | None = None,
     ) -> AsyncIterator[str]:
         """Process a query using the agent with streaming."""
+        logger.info("Processing query (streaming)", query=query[:100])
         agent = self._get_agent()
+        messages = self._build_messages(query, conversation_history)
+        logger.debug("Built messages", message_count=len(messages))
 
-        # Build message history
-        messages = []
-        if conversation_history:
-            for msg in conversation_history:
-                if msg["role"] == "user":
-                    messages.append(HumanMessage(content=msg["content"]))
-                elif msg["role"] == "assistant":
-                    messages.append(AIMessage(content=msg["content"]))
+        last_ai_content = None
+        tool_activities: dict[str, dict] = {}  # tool_name -> {id, start_time}
 
-        # Add current query
-        messages.append(HumanMessage(content=query))
+        try:
+            async for chunk in agent.astream({"messages": messages}, stream_mode="updates"):
+                for node_name, node_output in chunk.items():
+                    logger.debug("Agent node update", node=node_name)
 
-        # Track what we've yielded
-        current_tool_call = None
-        streamed_content = []
+                    if "messages" not in node_output:
+                        continue
 
-        # Stream the agent execution
-        async for event in agent.astream_events(
-            {"messages": messages},
-            version="v2",
-        ):
-            kind = event["event"]
+                    for msg in node_output["messages"]:
+                        if isinstance(msg, AIMessage):
+                            if msg.tool_calls:
+                                for tool_call in msg.tool_calls:
+                                    tool_name = tool_call.get("name", "")
+                                    tool_args = tool_call.get("args", {})
+                                    logger.info("Tool call started", tool=tool_name, args=tool_args)
 
-            # Handle tool calls - show the user what tool is being called
-            if kind == "on_tool_start":
-                tool_name = event["name"]
-                tool_input = event.get("data", {}).get("input", {})
-                current_tool_call = tool_name
+                                    # Track tool activity
+                                    if tracking_service and session_id:
+                                        activity_id = await tracking_service.start_tool_activity(
+                                            session_id=session_id,
+                                            tool_id="location_scout",
+                                            tool_name=tool_name,
+                                            input_args=tool_args,
+                                            conversation_id=conversation_id,
+                                        )
+                                        tool_activities[tool_name] = {"id": activity_id, "start_time": time.time()}
 
-                # Format a nice message about what tool is being used
-                if tool_name == "geocode_address":
-                    address = tool_input.get("address", "")
-                    yield f"\n**Looking up address:** {address}\n"
-                elif tool_name == "search_nearby_places":
-                    keyword = tool_input.get("keyword", "")
-                    place_type = tool_input.get("place_type", "")
-                    search_term = keyword or place_type or "places"
-                    yield f"\n**Searching for {search_term} nearby...**\n"
-                elif tool_name == "get_place_details":
-                    yield f"\n**Getting detailed information...**\n"
-                elif tool_name == "discover_neighborhood":
-                    address = tool_input.get("address", "")
-                    business = tool_input.get("business_type", "")
-                    if business:
-                        yield f"\n**Analyzing neighborhood for {business} at {address}...**\n"
-                    else:
-                        yield f"\n**Discovering neighborhood: {address}...**\n"
+                                    if tool_name == "geocode_address":
+                                        yield f"\n**Looking up address:** {tool_args.get('address', '')}\n"
+                                    elif tool_name == "search_nearby_places":
+                                        search_term = tool_args.get("keyword") or tool_args.get("place_type") or "places"
+                                        yield f"\n**Searching for {search_term} nearby...**\n"
+                                    elif tool_name == "get_place_details":
+                                        yield "\n**Getting detailed information...**\n"
+                                    elif tool_name == "discover_neighborhood":
+                                        address = tool_args.get("address", "")
+                                        business = tool_args.get("business_type", "")
+                                        if business:
+                                            yield f"\n**Analyzing neighborhood for {business} at {address}...**\n"
+                                        else:
+                                            yield f"\n**Discovering neighborhood: {address}...**\n"
+                            elif msg.content:
+                                logger.info("Received final AI response", content_length=len(msg.content))
+                                last_ai_content = msg.content
 
-            # Handle tool results - summarize the results
-            elif kind == "on_tool_end":
-                tool_output = event.get("data", {}).get("output", "")
-                if isinstance(tool_output, dict):
-                    # Provide a brief summary of what was found
-                    if (
-                        current_tool_call == "discover_neighborhood"
-                        and "analysis_summary" in tool_output
-                    ):
-                        summary = tool_output["analysis_summary"]
-                        yield f"\n*Found {summary.get('competitor_count', 0)} competitors, "
-                        yield f"transit access: {'Yes' if summary.get('transit_access') else 'No'}, "
-                        yield f"foot traffic indicators: {summary.get('foot_traffic_indicators', 0)}*\n\n"
-                    elif current_tool_call == "search_nearby_places" and isinstance(
-                        tool_output, list
-                    ):
-                        yield f"\n*Found {len(tool_output)} places*\n\n"
-                    elif "error" in tool_output:
-                        yield f"\n*Error: {tool_output['error']}*\n\n"
-                current_tool_call = None
+                        elif isinstance(msg, ToolMessage):
+                            tool_name = msg.name
+                            logger.info("Tool call completed", tool=tool_name, content_length=len(str(msg.content)))
 
-            # Stream the LLM's response
-            elif kind == "on_chat_model_stream":
-                content = event.get("data", {}).get("chunk", {})
-                if hasattr(content, "content") and content.content:
-                    # Only yield if it's actual text content (not tool calls)
-                    if isinstance(content.content, str):
-                        streamed_content.append(content.content)
-                        yield content.content
+                            # Extract location data for the frontend map
+                            if tool_name == "discover_neighborhood":
+                                try:
+                                    tool_result = msg.content if isinstance(msg.content, dict) else json.loads(msg.content)
+                                    if "location" in tool_result and "error" not in tool_result:
+                                        location_data = {
+                                            "type": "location_data",
+                                            "location": tool_result["location"],
+                                            "competitors": tool_result.get("competitors", [])[:5],
+                                            "transit_stations": tool_result.get("transit_stations", [])[:3],
+                                            "nearby_food": tool_result.get("nearby_food", [])[:5],
+                                            "nearby_retail": tool_result.get("nearby_retail", [])[:5],
+                                            "analysis_summary": tool_result.get("analysis_summary", {}),
+                                        }
+                                        yield f"\n<!--LOCATION_DATA:{json.dumps(location_data)}-->\n"
+                                        logger.info("Yielded location data for map", lat=tool_result["location"]["lat"])
+                                except (json.JSONDecodeError, TypeError, KeyError) as e:
+                                    logger.warning("Could not extract location data", error=str(e))
+
+                            # Complete tool activity tracking
+                            if tracking_service and tool_name in tool_activities:
+                                activity = tool_activities.pop(tool_name)
+                                latency_ms = int((time.time() - activity["start_time"]) * 1000)
+                                await tracking_service.complete_tool_activity(
+                                    activity_id=activity["id"],
+                                    output_data={"result_length": len(str(msg.content))},
+                                    latency_ms=latency_ms,
+                                )
+
+            if last_ai_content:
+                logger.debug("Streaming final response")
+                yield "\n"
+                yield last_ai_content
+            else:
+                logger.warning("No final AI content received")
+
+        except Exception as e:
+            # Mark any in-progress tool activities as failed
+            if tracking_service:
+                for tool_name, activity in tool_activities.items():
+                    latency_ms = int((time.time() - activity["start_time"]) * 1000)
+                    await tracking_service.fail_tool_activity(
+                        activity_id=activity["id"],
+                        error_message=str(e),
+                        latency_ms=latency_ms,
+                    )
+            logger.error("Error in agent stream", error=str(e), error_type=type(e).__name__)
+            raise
 
 
 def get_location_scout_agent() -> LocationScoutAgent:

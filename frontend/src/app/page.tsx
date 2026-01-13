@@ -1,6 +1,11 @@
 "use client";
 
-import { Chat } from "@/components/chat";
+import dynamic from "next/dynamic";
+import Link from "next/link";
+
+const Chat = dynamic(() => import("@/components/chat").then((mod) => ({ default: mod.Chat })), {
+  ssr: false,
+});
 
 export default function Home() {
   return (
@@ -8,7 +13,9 @@ export default function Home() {
       {/* Header */}
       <header className="border-b px-6 py-4">
         <div className="mx-auto max-w-4xl flex items-center justify-between">
-          <h1 className="text-xl font-bold text-gray-900">PHOW</h1>
+          <Link href="/" className="text-xl font-bold text-gray-900 hover:text-gray-700 transition-colors cursor-pointer">
+            PHOW
+          </Link>
           <span className="text-sm text-gray-500">AI Business Analytics</span>
         </div>
       </header>

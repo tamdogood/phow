@@ -20,9 +20,7 @@ class LocationScoutTool(BaseTool):
 
     async def process(self, query: str, context: ToolContext) -> ToolResponse:
         """Process a location analysis request using the agent."""
-        # Use the agent to process the query
         response = await self.agent.process(query)
-
         return ToolResponse(
             message=response,
             follow_up_questions=[
@@ -34,6 +32,10 @@ class LocationScoutTool(BaseTool):
 
     async def process_stream(self, query: str, context: ToolContext) -> AsyncIterator[str]:
         """Process a location analysis request with streaming using the agent."""
-        # Stream the agent's response
-        async for chunk in self.agent.process_stream(query):
+        async for chunk in self.agent.process_stream(
+            query=query,
+            tracking_service=context.tracking_service,
+            session_id=context.session_id,
+            conversation_id=context.conversation_id,
+        ):
             yield chunk

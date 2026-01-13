@@ -1,14 +1,17 @@
 from abc import ABC, abstractmethod
-from pydantic import BaseModel
-from typing import AsyncIterator
+from pydantic import BaseModel, ConfigDict
+from typing import AsyncIterator, Any
 
 
 class ToolContext(BaseModel):
     """Context passed to tools during processing."""
 
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     session_id: str
     conversation_id: str
     business_type: str | None = None
+    tracking_service: Any | None = None  # TrackingService, avoid circular import
 
 
 class ToolResponse(BaseModel):

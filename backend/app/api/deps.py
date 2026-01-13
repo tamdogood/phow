@@ -1,16 +1,27 @@
+from fastapi import Depends
 from supabase import create_client, Client
 from ..core.config import get_settings
-from ..services import ChatService, LocationService
+from ..services import ChatService, LocationService, TrackingService
 from ..core.cache import get_cache, CacheManager
+
+_supabase_client: Client | None = None
 
 
 def get_supabase() -> Client:
     """Dependency for Supabase client."""
-    settings = get_settings()
-    return create_client(settings.supabase_url, settings.supabase_service_key)
+    global _supabase_client
+    if _supabase_client is None:
+        settings = get_settings()
+        _supabase_client = create_client(settings.supabase_url, settings.supabase_service_key)
+    return _supabase_client
 
 
-def get_chat_service(db: Client = get_supabase()) -> ChatService:
+def get_tracking_service(db: Client = Depends(get_supabase)) -> TrackingService:
+    """Dependency for TrackingService."""
+    return TrackingService(db)
+
+
+def get_chat_service(db: Client = Depends(get_supabase)) -> ChatService:
     """Dependency for ChatService."""
     return ChatService(db)
 
