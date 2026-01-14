@@ -15,6 +15,14 @@ class Settings(BaseSettings):
     # Google Maps
     google_maps_api_key: str = ""
 
+    # Yelp Fusion API
+    yelp_api_key: str = ""
+
+    # Weather & Events APIs (for Social Media Coach)
+    openweathermap_api_key: str = ""
+    eventbrite_api_key: str = ""
+    newsapi_key: str = ""
+
     # Redis
     redis_url: str = "redis://localhost:6379/0"
     cache_ttl: int = 3600  # 1 hour default cache TTL

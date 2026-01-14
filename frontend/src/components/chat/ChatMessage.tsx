@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { MapWidget } from "./MapWidget";
 import { MarketValidatorWidget } from "../tools/MarketValidatorWidget";
 import { CompetitorWidget, PositioningWidget } from "../tools/CompetitorWidget";
+import { SocialMediaCoachWidget } from "../tools/SocialMediaCoachWidget";
 
 interface LocationData {
   type: "location_data";
@@ -117,12 +118,69 @@ interface PositioningData {
   recommendation?: string;
 }
 
+interface SocialContentData {
+  type: "social_content";
+  location?: {
+    lat: number;
+    lng: number;
+    city?: string;
+    state?: string;
+    country?: string;
+    timezone?: string;
+  };
+  weather?: {
+    temperature?: number;
+    feels_like?: number;
+    humidity?: number;
+    description?: string;
+    icon?: string;
+    impact?: {
+      sentiment?: string;
+      opportunities?: string[];
+      content_suggestions?: string[];
+    };
+  };
+  events?: {
+    holidays?: Array<{
+      name: string;
+      date: string;
+      type: string;
+    }>;
+    daily_themes?: Array<{
+      name: string;
+      hashtag: string;
+      description?: string;
+    }>;
+    local_events?: Array<{
+      name: string;
+      date?: string;
+      venue?: string;
+      type?: string;
+    }>;
+  };
+  hashtags?: {
+    trending?: string[];
+    industry?: string[];
+    local?: string[];
+    seasonal?: string[];
+  };
+  posting_times?: {
+    platform?: string;
+    best_times?: Array<{
+      day: string;
+      times: string[];
+    }>;
+    timezone?: string;
+  };
+}
+
 interface ParsedContent {
   text: string;
   locationData: LocationData | null;
   marketData: MarketData | null;
   competitorData: CompetitorData | null;
   positioningData: PositioningData | null;
+  socialContentData: SocialContentData | null;
 }
 
 interface ChatMessageProps {
@@ -137,6 +195,7 @@ function parseContent(content: string): ParsedContent {
   let marketData: MarketData | null = null;
   let competitorData: CompetitorData | null = null;
   let positioningData: PositioningData | null = null;
+  let socialContentData: SocialContentData | null = null;
 
   // Parse location data
   const locationMatch = text.match(/<!--LOCATION_DATA:(.*?)-->/s);
@@ -182,11 +241,22 @@ function parseContent(content: string): ParsedContent {
     }
   }
 
-  return { text, locationData, marketData, competitorData, positioningData };
+  // Parse social content data
+  const socialContentMatch = text.match(/<!--SOCIAL_CONTENT_DATA:(.*?)-->/s);
+  if (socialContentMatch) {
+    try {
+      socialContentData = JSON.parse(socialContentMatch[1]) as SocialContentData;
+      text = text.replace(/<!--SOCIAL_CONTENT_DATA:.*?-->/s, "").trim();
+    } catch {
+      // Ignore parse errors
+    }
+  }
+
+  return { text, locationData, marketData, competitorData, positioningData, socialContentData };
 }
 
 export function ChatMessage({ role, content, isStreaming }: ChatMessageProps) {
-  const { text, locationData, marketData, competitorData, positioningData } = useMemo(
+  const { text, locationData, marketData, competitorData, positioningData, socialContentData } = useMemo(
     () => parseContent(content),
     [content]
   );
@@ -229,6 +299,13 @@ export function ChatMessage({ role, content, isStreaming }: ChatMessageProps) {
       {positioningData && role === "assistant" && (
         <div className="w-full max-w-[90%] mb-2">
           <PositioningWidget data={positioningData} />
+        </div>
+      )}
+
+      {/* Social Media Coach widget */}
+      {socialContentData && role === "assistant" && (
+        <div className="w-full max-w-[90%] mb-2">
+          <SocialMediaCoachWidget data={socialContentData} />
         </div>
       )}
 

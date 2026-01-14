@@ -26,6 +26,11 @@ const DEFAULT_HINTS: Record<string, string[]> = {
     "Analyze coffee shop competition in Capitol Hill, Seattle",
     "Show me the market positioning for gyms in Miami Beach",
   ],
+  social_media_coach: [
+    "What should I post today for my coffee shop in Austin?",
+    "Give me content ideas for my restaurant this week",
+    "What hashtags should I use for my bakery in Seattle?",
+  ],
 };
 
 export function QuickHints({ toolId, onSelectHint, disabled, hints }: QuickHintsProps) {
