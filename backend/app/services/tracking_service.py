@@ -1,6 +1,5 @@
 """Service for tracking LLM responses and tool activities."""
 
-import time
 from typing import Any
 from supabase import Client
 from ..repositories import LLMResponseRepository, ToolActivityRepository
@@ -118,9 +117,7 @@ class TrackingService:
                 error_message=error_message,
                 latency_ms=latency_ms,
             )
-            logger.warning(
-                "Tool activity failed", activity_id=activity_id, error=error_message
-            )
+            logger.warning("Tool activity failed", activity_id=activity_id, error=error_message)
         except Exception as e:
             logger.error("Failed to log tool failure", error=str(e))
 
@@ -137,55 +134,3 @@ class TrackingService:
         llm_stats = await self.llm_repo.get_usage_stats(conversation_id)
         tool_stats = await self.tool_repo.get_stats()
         return {"llm": llm_stats, "tools": tool_stats}
-
-
-class ToolActivityTracker:
-    """Context manager for tracking tool activities."""
-
-    def __init__(
-        self,
-        tracking_service: TrackingService,
-        session_id: str,
-        tool_id: str,
-        tool_name: str,
-        input_args: dict | None = None,
-        conversation_id: str | None = None,
-    ):
-        self.tracking_service = tracking_service
-        self.session_id = session_id
-        self.tool_id = tool_id
-        self.tool_name = tool_name
-        self.input_args = input_args
-        self.conversation_id = conversation_id
-        self.activity_id: str | None = None
-        self.start_time: float = 0
-
-    async def __aenter__(self) -> "ToolActivityTracker":
-        self.start_time = time.time()
-        self.activity_id = await self.tracking_service.start_tool_activity(
-            session_id=self.session_id,
-            tool_id=self.tool_id,
-            tool_name=self.tool_name,
-            input_args=self.input_args,
-            conversation_id=self.conversation_id,
-        )
-        return self
-
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
-        latency_ms = int((time.time() - self.start_time) * 1000)
-        if exc_type is not None:
-            await self.tracking_service.fail_tool_activity(
-                activity_id=self.activity_id,
-                error_message=str(exc_val),
-                latency_ms=latency_ms,
-            )
-        return False
-
-    async def complete(self, output_data: dict | None = None):
-        """Manually complete the activity with output data."""
-        latency_ms = int((time.time() - self.start_time) * 1000)
-        await self.tracking_service.complete_tool_activity(
-            activity_id=self.activity_id,
-            output_data=output_data,
-            latency_ms=latency_ms,
-        )

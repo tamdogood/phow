@@ -6,6 +6,8 @@ from .core.tool_registry import ToolRegistry
 from .core.cache import get_cache
 from .core.logging import setup_logging, get_logger
 from .tools.location_scout import LocationScoutTool
+from .tools.market_validator import MarketValidatorTool
+from .tools.competitor_analyzer import CompetitorAnalyzerTool
 
 logger = get_logger("main")
 
@@ -18,6 +20,8 @@ async def lifespan(app: FastAPI):
 
     # Startup: Register tools
     ToolRegistry.register(LocationScoutTool())
+    ToolRegistry.register(MarketValidatorTool())
+    ToolRegistry.register(CompetitorAnalyzerTool())
     logger.info("Registered tools", tools=ToolRegistry.list_tools())
 
     yield

@@ -1,15 +1,13 @@
 """Repository for LLM response tracking."""
 
 from typing import Any
-from supabase import Client
+from .base import BaseRepository
 
 
-class LLMResponseRepository:
+class LLMResponseRepository(BaseRepository):
     """Repository for storing and retrieving LLM responses."""
 
-    def __init__(self, db: Client):
-        self.db = db
-        self.table = "llm_responses"
+    table = "llm_responses"
 
     async def create(
         self,
@@ -63,9 +61,7 @@ class LLMResponseRepository:
         )
         return result.data
 
-    async def get_usage_stats(
-        self, conversation_id: str | None = None
-    ) -> dict[str, Any]:
+    async def get_usage_stats(self, conversation_id: str | None = None) -> dict[str, Any]:
         """Get token usage statistics."""
         query = self.db.table(self.table).select(
             "provider, model, prompt_tokens, completion_tokens, total_tokens"

@@ -5,7 +5,6 @@ import { ChatMessage } from "./ChatMessage";
 import { ChatInput } from "./ChatInput";
 import { sendChatMessage } from "@/lib/api";
 import { getSessionId } from "@/lib/session";
-import { Message } from "@/types";
 
 interface ChatProps {
   toolId: string;

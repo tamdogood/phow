@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from "@react-google-maps/api";
 
 interface LocationData {
@@ -21,8 +21,6 @@ interface MapWidgetProps {
   location: LocationData;
   competitors?: NearbyPlace[];
   transitStations?: NearbyPlace[];
-  nearbyFood?: NearbyPlace[];
-  nearbyRetail?: NearbyPlace[];
 }
 
 const mapContainerStyle = {
@@ -39,36 +37,38 @@ const defaultOptions: google.maps.MapOptions = {
   fullscreenControl: true,
 };
 
+// Generate deterministic offset based on index
+function getOffset(idx: number, scale: number): { lat: number; lng: number } {
+  const angle = (idx * 137.5 * Math.PI) / 180; // Golden angle for even distribution
+  const radius = scale * (0.3 + (idx % 3) * 0.2);
+  return {
+    lat: Math.cos(angle) * radius,
+    lng: Math.sin(angle) * radius,
+  };
+}
+
 export function MapWidget({
   location,
   competitors = [],
   transitStations = [],
-  nearbyFood = [],
-  nearbyRetail = [],
 }: MapWidgetProps) {
   const [selectedMarker, setSelectedMarker] = useState<{
     position: google.maps.LatLngLiteral;
     title: string;
     type: string;
   } | null>(null);
-  const [map, setMap] = useState<google.maps.Map | null>(null);
 
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
   });
 
-  const center = {
+  const center = useMemo(() => ({
     lat: location.lat,
     lng: location.lng,
-  };
+  }), [location.lat, location.lng]);
 
-  const onLoad = useCallback((map: google.maps.Map) => {
-    setMap(map);
-  }, []);
-
-  const onUnmount = useCallback(() => {
-    setMap(null);
-  }, []);
+  const onLoad = useCallback(() => {}, []);
+  const onUnmount = useCallback(() => {}, []);
 
   if (loadError) {
     return (
@@ -114,36 +114,42 @@ export function MapWidget({
         />
 
         {/* Competitor markers */}
-        {competitors.slice(0, 5).map((place, idx) => (
-          <Marker
-            key={`competitor-${idx}`}
-            position={{
-              lat: center.lat + (Math.random() - 0.5) * 0.01,
-              lng: center.lng + (Math.random() - 0.5) * 0.01,
-            }}
-            icon={{
-              url: "https://maps.google.com/mapfiles/ms/icons/orange-dot.png",
-              scaledSize: new google.maps.Size(30, 30),
-            }}
-            title={place.name}
-          />
-        ))}
+        {competitors.slice(0, 5).map((place, idx) => {
+          const offset = getOffset(idx, 0.01);
+          return (
+            <Marker
+              key={`competitor-${idx}`}
+              position={{
+                lat: center.lat + offset.lat,
+                lng: center.lng + offset.lng,
+              }}
+              icon={{
+                url: "https://maps.google.com/mapfiles/ms/icons/orange-dot.png",
+                scaledSize: new google.maps.Size(30, 30),
+              }}
+              title={place.name}
+            />
+          );
+        })}
 
         {/* Transit station markers */}
-        {transitStations.slice(0, 3).map((place, idx) => (
-          <Marker
-            key={`transit-${idx}`}
-            position={{
-              lat: center.lat + (Math.random() - 0.5) * 0.008,
-              lng: center.lng + (Math.random() - 0.5) * 0.008,
-            }}
-            icon={{
-              url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
-              scaledSize: new google.maps.Size(25, 25),
-            }}
-            title={place.name}
-          />
-        ))}
+        {transitStations.slice(0, 3).map((place, idx) => {
+          const offset = getOffset(idx + 10, 0.008);
+          return (
+            <Marker
+              key={`transit-${idx}`}
+              position={{
+                lat: center.lat + offset.lat,
+                lng: center.lng + offset.lng,
+              }}
+              icon={{
+                url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+                scaledSize: new google.maps.Size(25, 25),
+              }}
+              title={place.name}
+            />
+          );
+        })}
 
         {/* Info Window */}
         {selectedMarker && (

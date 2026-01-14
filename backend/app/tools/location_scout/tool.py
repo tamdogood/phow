@@ -1,7 +1,6 @@
 from typing import AsyncIterator
 from ..base import BaseTool, ToolContext, ToolResponse
-from .prompts import SYSTEM_PROMPT
-from .agent import get_location_scout_agent
+from .agent import get_location_scout_agent, AGENT_SYSTEM_PROMPT
 
 
 class LocationScoutTool(BaseTool):
@@ -16,7 +15,7 @@ class LocationScoutTool(BaseTool):
         self.agent = get_location_scout_agent()
 
     def get_system_prompt(self) -> str:
-        return SYSTEM_PROMPT
+        return AGENT_SYSTEM_PROMPT
 
     async def process(self, query: str, context: ToolContext) -> ToolResponse:
         """Process a location analysis request using the agent."""
@@ -30,9 +29,7 @@ class LocationScoutTool(BaseTool):
             ],
         )
 
-    async def process_stream(
-        self, query: str, context: ToolContext
-    ) -> AsyncIterator[str]:
+    async def process_stream(self, query: str, context: ToolContext) -> AsyncIterator[str]:
         """Process a location analysis request with streaming using the agent."""
         async for chunk in self.agent.process_stream(
             query=query,

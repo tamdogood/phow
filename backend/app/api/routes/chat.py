@@ -1,5 +1,5 @@
 import json
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, Depends
 from sse_starlette.sse import EventSourceResponse
 from ...models.chat import ChatRequest
 from ...services import ChatService

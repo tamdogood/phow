@@ -3,6 +3,8 @@
 import { useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { MapWidget } from "./MapWidget";
+import { MarketValidatorWidget } from "../tools/MarketValidatorWidget";
+import { CompetitorWidget, PositioningWidget } from "../tools/CompetitorWidget";
 
 interface LocationData {
   type: "location_data";
@@ -23,28 +25,171 @@ interface LocationData {
   };
 }
 
+interface MarketData {
+  type: "market_data";
+  location?: {
+    lat: number;
+    lng: number;
+    formatted_address?: string;
+  };
+  business_type: string;
+  viability_score: number;
+  viability_level: string;
+  score_breakdown: {
+    demographics_score: number;
+    competition_score: number;
+    foot_traffic_score: number;
+  };
+  demographics_summary: {
+    population?: number;
+    median_income?: number;
+    median_age?: number;
+    college_educated_percent?: number;
+  };
+  competition_summary: {
+    competitor_count?: number;
+    saturation_level?: string;
+    average_rating?: number;
+  };
+  foot_traffic_summary: {
+    level?: string;
+    transit_access?: boolean;
+    nearby_businesses?: number;
+  };
+  risk_factors: string[];
+  opportunities: string[];
+  recommendations: string[];
+  top_competitors: Array<{
+    name: string;
+    rating?: number;
+    reviews?: number;
+    address?: string;
+  }>;
+}
+
+interface CompetitorData {
+  type: "competitor_data";
+  location?: {
+    lat: number;
+    lng: number;
+    formatted_address?: string;
+  };
+  business_type: string;
+  total_found: number;
+  competitors: Array<{
+    name: string;
+    rating?: number;
+    review_count?: number;
+    address?: string;
+    price_level?: number;
+    yelp_price?: string;
+    categories?: string[];
+    source?: string;
+  }>;
+  sources?: {
+    google?: number;
+    yelp?: number;
+  };
+}
+
+interface PositioningData {
+  type: "positioning_data";
+  location?: {
+    lat: number;
+    lng: number;
+    formatted_address?: string;
+  };
+  business_type: string;
+  positioning_data: Array<{
+    name: string;
+    rating: number;
+    price_level: number;
+    review_count: number;
+    quadrant: string;
+  }>;
+  quadrant_analysis: {
+    premium?: number;
+    value?: number;
+    economy?: number;
+    avoid?: number;
+  };
+  market_gaps: string[];
+  recommendation?: string;
+}
+
+interface ParsedContent {
+  text: string;
+  locationData: LocationData | null;
+  marketData: MarketData | null;
+  competitorData: CompetitorData | null;
+  positioningData: PositioningData | null;
+}
+
 interface ChatMessageProps {
   role: "user" | "assistant";
   content: string;
   isStreaming?: boolean;
 }
 
-function parseLocationData(content: string): { text: string; locationData: LocationData | null } {
-  const locationMatch = content.match(/<!--LOCATION_DATA:(.*?)-->/s);
+function parseContent(content: string): ParsedContent {
+  let text = content;
+  let locationData: LocationData | null = null;
+  let marketData: MarketData | null = null;
+  let competitorData: CompetitorData | null = null;
+  let positioningData: PositioningData | null = null;
+
+  // Parse location data
+  const locationMatch = text.match(/<!--LOCATION_DATA:(.*?)-->/s);
   if (locationMatch) {
     try {
-      const locationData = JSON.parse(locationMatch[1]) as LocationData;
-      const text = content.replace(/<!--LOCATION_DATA:.*?-->/s, "").trim();
-      return { text, locationData };
+      locationData = JSON.parse(locationMatch[1]) as LocationData;
+      text = text.replace(/<!--LOCATION_DATA:.*?-->/s, "").trim();
     } catch {
-      return { text: content, locationData: null };
+      // Ignore parse errors
     }
   }
-  return { text: content, locationData: null };
+
+  // Parse market data
+  const marketMatch = text.match(/<!--MARKET_DATA:(.*?)-->/s);
+  if (marketMatch) {
+    try {
+      marketData = JSON.parse(marketMatch[1]) as MarketData;
+      text = text.replace(/<!--MARKET_DATA:.*?-->/s, "").trim();
+    } catch {
+      // Ignore parse errors
+    }
+  }
+
+  // Parse competitor data
+  const competitorMatch = text.match(/<!--COMPETITOR_DATA:(.*?)-->/s);
+  if (competitorMatch) {
+    try {
+      competitorData = JSON.parse(competitorMatch[1]) as CompetitorData;
+      text = text.replace(/<!--COMPETITOR_DATA:.*?-->/s, "").trim();
+    } catch {
+      // Ignore parse errors
+    }
+  }
+
+  // Parse positioning data
+  const positioningMatch = text.match(/<!--POSITIONING_DATA:(.*?)-->/s);
+  if (positioningMatch) {
+    try {
+      positioningData = JSON.parse(positioningMatch[1]) as PositioningData;
+      text = text.replace(/<!--POSITIONING_DATA:.*?-->/s, "").trim();
+    } catch {
+      // Ignore parse errors
+    }
+  }
+
+  return { text, locationData, marketData, competitorData, positioningData };
 }
 
 export function ChatMessage({ role, content, isStreaming }: ChatMessageProps) {
-  const { text, locationData } = useMemo(() => parseLocationData(content), [content]);
+  const { text, locationData, marketData, competitorData, positioningData } = useMemo(
+    () => parseContent(content),
+    [content]
+  );
 
   return (
     <div
@@ -63,6 +208,27 @@ export function ChatMessage({ role, content, isStreaming }: ChatMessageProps) {
             nearbyFood={locationData.nearby_food}
             nearbyRetail={locationData.nearby_retail}
           />
+        </div>
+      )}
+
+      {/* Market Validator widget */}
+      {marketData && role === "assistant" && (
+        <div className="w-full max-w-[90%] mb-2">
+          <MarketValidatorWidget data={marketData} />
+        </div>
+      )}
+
+      {/* Competitor widget */}
+      {competitorData && role === "assistant" && (
+        <div className="w-full max-w-[90%] mb-2">
+          <CompetitorWidget data={competitorData} />
+        </div>
+      )}
+
+      {/* Positioning widget */}
+      {positioningData && role === "assistant" && (
+        <div className="w-full max-w-[90%] mb-2">
+          <PositioningWidget data={positioningData} />
         </div>
       )}
 

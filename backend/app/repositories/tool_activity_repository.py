@@ -1,15 +1,13 @@
 """Repository for tool activity tracking."""
 
 from typing import Any
-from supabase import Client
+from .base import BaseRepository
 
 
-class ToolActivityRepository:
+class ToolActivityRepository(BaseRepository):
     """Repository for storing and retrieving tool activities."""
 
-    def __init__(self, db: Client):
-        self.db = db
-        self.table = "tool_activities"
+    table = "tool_activities"
 
     async def start_activity(
         self,
@@ -81,9 +79,7 @@ class ToolActivityRepository:
         )
         return result.data
 
-    async def get_by_session(
-        self, session_id: str, limit: int = 100
-    ) -> list[dict[str, Any]]:
+    async def get_by_session(self, session_id: str, limit: int = 100) -> list[dict[str, Any]]:
         """Get all tool activities for a session."""
         result = (
             self.db.table(self.table)
@@ -97,9 +93,7 @@ class ToolActivityRepository:
 
     async def get_stats(self, tool_id: str | None = None) -> dict[str, Any]:
         """Get tool activity statistics."""
-        query = self.db.table(self.table).select(
-            "tool_id, tool_name, status, latency_ms"
-        )
+        query = self.db.table(self.table).select("tool_id, tool_name, status, latency_ms")
         if tool_id:
             query = query.eq("tool_id", tool_id)
         result = query.execute()
