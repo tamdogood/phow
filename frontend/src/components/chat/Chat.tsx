@@ -162,17 +162,17 @@ export function Chat({
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="border-b border-gray-200 bg-white px-4 py-3">
+      <div className="border-b border-border/60 bg-card px-4 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             {toolIcon && (
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-xl text-white">
+              <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-xl text-primary-foreground shadow-sm">
                 {toolIcon}
               </div>
             )}
             <div>
-              <h2 className="font-semibold text-gray-900">{toolName}</h2>
-              <p className="text-sm text-gray-500">{toolDescription}</p>
+              <h2 className="font-semibold text-foreground">{toolName}</h2>
+              <p className="text-sm text-muted-foreground">{toolDescription}</p>
             </div>
           </div>
           {onSwitchTool && (
@@ -182,20 +182,20 @@ export function Chat({
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-muted/30">
         {/* Enhanced Welcome Message */}
         {messages.length === 0 && !isLoading && (
           <div className="max-w-2xl mx-auto">
             {/* Welcome card */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6">
+            <div className="bg-card rounded-2xl shadow-sm border border-border/60 p-6 mb-6">
               <div className="text-center mb-6">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-3xl text-white mb-4">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary text-3xl text-primary-foreground mb-4 shadow-sm">
                   {toolIcon || "🔍"}
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                <h3 className="text-xl font-semibold text-foreground mb-2">
                   {welcome.greeting}
                 </h3>
-                <p className="text-gray-600">{welcome.description}</p>
+                <p className="text-muted-foreground">{welcome.description}</p>
               </div>
 
               {/* Capabilities */}
@@ -204,10 +204,10 @@ export function Chat({
                   {welcome.capabilities.map((cap, idx) => (
                     <div
                       key={idx}
-                      className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 rounded-lg px-3 py-2"
+                      className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/40 rounded-lg px-3 py-2"
                     >
                       <svg
-                        className="w-4 h-4 text-green-500 flex-shrink-0"
+                        className="w-4 h-4 text-primary flex-shrink-0"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -226,10 +226,10 @@ export function Chat({
               {/* Subtle divider */}
               <div className="relative my-4">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-200"></div>
+                  <div className="w-full border-t border-border/60"></div>
                 </div>
                 <div className="relative flex justify-center text-xs">
-                  <span className="bg-white px-3 text-gray-400">Try an example</span>
+                  <span className="bg-card px-3 text-muted-foreground">Try an example</span>
                 </div>
               </div>
 
@@ -262,7 +262,7 @@ export function Chat({
       </div>
 
       {/* Input area */}
-      <div className="border-t border-gray-200 bg-white p-4">
+      <div className="border-t border-border/60 bg-card p-4">
         {/* Quick hints when conversation is active but not loading */}
         {messages.length > 0 && !isLoading && (
           <div className="mb-3">

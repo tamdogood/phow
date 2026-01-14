@@ -238,8 +238,8 @@ export function ChatMessage({ role, content, isStreaming }: ChatMessageProps) {
           className={cn(
             "max-w-[80%] rounded-2xl px-4 py-3",
             role === "user"
-              ? "bg-blue-600 text-white"
-              : "bg-gray-100 text-gray-900"
+              ? "bg-primary text-primary-foreground shadow-sm"
+              : "bg-muted text-foreground"
           )}
         >
           <div className="whitespace-pre-wrap text-sm leading-relaxed">

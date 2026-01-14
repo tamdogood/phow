@@ -51,14 +51,14 @@ export function QuickHints({ toolId, onSelectHint, disabled, hints }: QuickHints
             className={`
               group relative px-3 py-1.5 text-xs rounded-full border transition-all duration-150
               ${disabled
-                ? "border-gray-200 text-gray-400 cursor-not-allowed"
-                : "border-gray-200 text-gray-600 hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50"
+                ? "border-border/60 text-muted-foreground/60 cursor-not-allowed"
+                : "border-border/60 text-muted-foreground hover:border-primary/50 hover:text-primary hover:bg-primary/10"
               }
             `}
           >
             <span className="flex items-center gap-1.5">
               <svg
-                className={`w-3 h-3 ${disabled ? "text-gray-300" : "text-gray-400 group-hover:text-blue-500"}`}
+                className={`w-3 h-3 ${disabled ? "text-muted-foreground/40" : "text-muted-foreground group-hover:text-primary"}`}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -78,7 +78,7 @@ export function QuickHints({ toolId, onSelectHint, disabled, hints }: QuickHints
           disabled={disabled}
           className={`
             mt-2 text-xs transition-colors mx-auto block
-            ${disabled ? "text-gray-300" : "text-gray-400 hover:text-gray-600"}
+            ${disabled ? "text-muted-foreground/40" : "text-muted-foreground hover:text-foreground"}
           `}
         >
           {showMore ? "Show less" : `+${examples.length - 3} more examples`}
@@ -105,8 +105,8 @@ export function InlineHint({
       className={`
         inline-flex items-center gap-1 px-2 py-1 text-xs rounded-md transition-all
         ${disabled
-          ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-          : "bg-gray-100 text-gray-600 hover:bg-blue-100 hover:text-blue-700"
+          ? "bg-muted/60 text-muted-foreground/60 cursor-not-allowed"
+          : "bg-muted/60 text-muted-foreground hover:bg-primary/10 hover:text-primary"
         }
       `}
     >

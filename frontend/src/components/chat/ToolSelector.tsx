@@ -50,8 +50,8 @@ export function ToolSelector({ onSelectTool, selectedToolId }: ToolSelectorProps
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-12">
-        <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-        <p className="mt-4 text-sm text-gray-500">Loading tools...</p>
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+        <p className="mt-4 text-sm text-muted-foreground">Loading tools...</p>
       </div>
     );
   }
@@ -60,10 +60,10 @@ export function ToolSelector({ onSelectTool, selectedToolId }: ToolSelectorProps
     <div className="w-full max-w-4xl mx-auto">
       {/* Header */}
       <div className="text-center mb-8">
-        <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+        <h2 className="text-2xl font-semibold text-foreground mb-2">
           How can I help your business today?
         </h2>
-        <p className="text-gray-500">
+        <p className="text-muted-foreground">
           Choose a tool to get started with AI-powered insights
         </p>
       </div>
@@ -85,8 +85,8 @@ export function ToolSelector({ onSelectTool, selectedToolId }: ToolSelectorProps
               className={`
                 relative group text-left p-5 rounded-xl border-2 transition-all duration-200
                 ${isSelected
-                  ? "border-blue-500 bg-blue-50 shadow-md"
-                  : "border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm"
+                  ? "border-primary bg-primary/10 shadow-md"
+                  : "border-border bg-card hover:border-border/80 hover:shadow-sm"
                 }
               `}
             >
@@ -99,10 +99,10 @@ export function ToolSelector({ onSelectTool, selectedToolId }: ToolSelectorProps
               </div>
 
               {/* Title */}
-              <h3 className="font-semibold text-gray-900 mb-1">{tool.name}</h3>
+              <h3 className="font-semibold text-foreground mb-1">{tool.name}</h3>
 
               {/* Description */}
-              <p className="text-sm text-gray-500 mb-3 line-clamp-2">{tool.description}</p>
+              <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{tool.description}</p>
 
               {/* Capabilities (show on hover) */}
               {capabilities.length > 0 && (
@@ -110,11 +110,11 @@ export function ToolSelector({ onSelectTool, selectedToolId }: ToolSelectorProps
                   transition-all duration-200 overflow-hidden
                   ${isHovered || isSelected ? "max-h-24 opacity-100" : "max-h-0 opacity-0"}
                 `}>
-                  <div className="flex flex-wrap gap-1.5 pt-2 border-t border-gray-100">
+                  <div className="flex flex-wrap gap-1.5 pt-2 border-t border-border/60">
                     {capabilities.map((cap, idx) => (
                       <span
                         key={idx}
-                        className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600"
+                        className="text-xs px-2 py-0.5 rounded-full bg-muted/60 text-muted-foreground"
                       >
                         {cap}
                       </span>
@@ -126,8 +126,8 @@ export function ToolSelector({ onSelectTool, selectedToolId }: ToolSelectorProps
               {/* Selected indicator */}
               {isSelected && (
                 <div className="absolute top-3 right-3">
-                  <div className="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
-                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                    <svg className="w-3 h-3 text-primary-foreground" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
                   </div>
@@ -139,7 +139,7 @@ export function ToolSelector({ onSelectTool, selectedToolId }: ToolSelectorProps
       </div>
 
       {/* Quick tip */}
-      <p className="text-center text-xs text-gray-400 mt-6">
+      <p className="text-center text-xs text-muted-foreground mt-6">
         Tip: You can switch between tools anytime during your session
       </p>
     </div>

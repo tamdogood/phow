@@ -67,19 +67,19 @@ export default function Home() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-white">
+    <div className="flex min-h-screen flex-col bg-background">
       {/* Header */}
-      <header className="border-b px-6 py-4">
+      <header className="border-b border-border/60 bg-background/80 backdrop-blur px-6 py-4">
         <div className="mx-auto max-w-4xl flex items-center justify-between">
           <button
             type="button"
             onClick={handleReset}
-            className="text-left text-xl font-bold text-gray-900 hover:text-gray-700 transition-colors cursor-pointer"
+            className="text-left text-xl font-bold text-foreground hover:text-foreground/80 transition-colors cursor-pointer"
             aria-label="Go to home and clear chat"
           >
             PHOW
           </button>
-          <span className="text-sm text-gray-500">AI Business Analytics</span>
+          <span className="text-sm text-muted-foreground">AI Business Analytics</span>
         </div>
       </header>
 
