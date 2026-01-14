@@ -84,7 +84,9 @@ class YelpClient:
                     "rating": b.get("rating"),
                     "review_count": b.get("review_count"),
                     "price": b.get("price"),  # $, $$, $$$, $$$$
-                    "address": ", ".join(b.get("location", {}).get("display_address", [])),
+                    "address": ", ".join(
+                        b.get("location", {}).get("display_address", [])
+                    ),
                     "phone": b.get("display_phone"),
                     "categories": [c.get("title") for c in b.get("categories", [])],
                     "distance_meters": b.get("distance"),
@@ -118,18 +120,22 @@ class YelpClient:
             return None
 
         try:
-            response = await self.client.get(f"{YELP_API_BASE}/businesses/{business_id}")
+            response = await self.client.get(
+                f"{YELP_API_BASE}/businesses/{business_id}"
+            )
             response.raise_for_status()
             b = response.json()
 
             # Extract hours
             hours = []
             for day_hours in b.get("hours", [{}])[0].get("open", []):
-                hours.append({
-                    "day": day_hours.get("day"),
-                    "start": day_hours.get("start"),
-                    "end": day_hours.get("end"),
-                })
+                hours.append(
+                    {
+                        "day": day_hours.get("day"),
+                        "start": day_hours.get("start"),
+                        "end": day_hours.get("end"),
+                    }
+                )
 
             return {
                 "id": b.get("id"),
@@ -149,7 +155,9 @@ class YelpClient:
             }
 
         except httpx.HTTPError as e:
-            logger.error("Yelp business details failed", error=str(e), business_id=business_id)
+            logger.error(
+                "Yelp business details failed", error=str(e), business_id=business_id
+            )
             return None
 
     @cached(ttl=1800, key_prefix="yelp_reviews")  # Cache for 30 min

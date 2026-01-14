@@ -247,8 +247,12 @@ async def assess_foot_traffic_potential(address: str) -> dict[str, Any]:
     lat, lng = location["lat"], location["lng"]
 
     # Get various foot traffic indicators
-    transit = await maps_client.nearby_search(lat, lng, radius=500, place_type="transit_station")
-    restaurants = await maps_client.nearby_search(lat, lng, radius=400, place_type="restaurant")
+    transit = await maps_client.nearby_search(
+        lat, lng, radius=500, place_type="transit_station"
+    )
+    restaurants = await maps_client.nearby_search(
+        lat, lng, radius=400, place_type="restaurant"
+    )
     cafes = await maps_client.nearby_search(lat, lng, radius=400, place_type="cafe")
     retail = await maps_client.nearby_search(lat, lng, radius=400, place_type="store")
 
@@ -289,8 +293,7 @@ async def assess_foot_traffic_potential(address: str) -> dict[str, Any]:
             "retail_stores": len(retail),
         },
         "transit_stations": [
-            {"name": t.get("name"), "vicinity": t.get("vicinity")}
-            for t in transit[:3]
+            {"name": t.get("name"), "vicinity": t.get("vicinity")} for t in transit[:3]
         ],
     }
 
@@ -322,17 +325,21 @@ async def calculate_market_viability(
         - Opportunities
         - Recommendations
     """
-    logger.info("Calculating market viability", address=address, business_type=business_type)
+    logger.info(
+        "Calculating market viability", address=address, business_type=business_type
+    )
 
     # Get all data
     demo_data = await get_location_demographics.ainvoke({"address": address})
     if "error" in demo_data:
         return demo_data
 
-    comp_data = await analyze_competition_density.ainvoke({
-        "address": address,
-        "business_type": business_type,
-    })
+    comp_data = await analyze_competition_density.ainvoke(
+        {
+            "address": address,
+            "business_type": business_type,
+        }
+    )
     if "error" in comp_data:
         return comp_data
 
@@ -356,11 +363,7 @@ async def calculate_market_viability(
 
     # Weighted overall score
     # Demographics: 30%, Competition: 35%, Foot Traffic: 35%
-    overall_score = int(
-        demo_score * 0.30 +
-        comp_score * 0.35 +
-        traffic_score * 0.35
-    )
+    overall_score = int(demo_score * 0.30 + comp_score * 0.35 + traffic_score * 0.35)
 
     # Identify risks and opportunities
     risks = []
@@ -370,7 +373,9 @@ async def calculate_market_viability(
     if competition.get("total_competitors", 0) > 10:
         risks.append("High competition density - market may be saturated")
     elif competition.get("total_competitors", 0) == 0:
-        opportunities.append("No direct competitors found - potential first-mover advantage")
+        opportunities.append(
+            "No direct competitors found - potential first-mover advantage"
+        )
 
     # Demographics insights
     income = demographics.get("income", {}).get("median_household", 0)
@@ -383,7 +388,9 @@ async def calculate_market_viability(
     if foot_traffic.get("level") in ["very_high", "high"]:
         opportunities.append("High foot traffic area - good walk-in potential")
     elif foot_traffic.get("level") in ["very_low", "low"]:
-        risks.append("Low foot traffic - may need strong marketing to attract customers")
+        risks.append(
+            "Low foot traffic - may need strong marketing to attract customers"
+        )
 
     # Transit insights
     transit_count = traffic_data.get("nearby_counts", {}).get("transit_stations", 0)
@@ -411,7 +418,9 @@ async def calculate_market_viability(
             "population": demographics.get("population", {}).get("total"),
             "median_income": demographics.get("income", {}).get("median_household"),
             "median_age": demographics.get("age_distribution", {}).get("median_age"),
-            "college_educated_percent": demographics.get("education", {}).get("college_plus_percent"),
+            "college_educated_percent": demographics.get("education", {}).get(
+                "college_plus_percent"
+            ),
         },
         "competition_summary": {
             "competitor_count": competition.get("total_competitors"),
@@ -422,8 +431,8 @@ async def calculate_market_viability(
             "level": foot_traffic.get("level"),
             "transit_access": transit_count > 0,
             "nearby_businesses": (
-                traffic_data.get("nearby_counts", {}).get("restaurants", 0) +
-                traffic_data.get("nearby_counts", {}).get("retail_stores", 0)
+                traffic_data.get("nearby_counts", {}).get("restaurants", 0)
+                + traffic_data.get("nearby_counts", {}).get("retail_stores", 0)
             ),
         },
         "risk_factors": risks,
@@ -488,8 +497,7 @@ def _score_to_level(score: int) -> str:
 
 
 def _generate_recommendations(
-    overall: int, demo: int, comp: int, traffic: int,
-    risks: list, opportunities: list
+    overall: int, demo: int, comp: int, traffic: int, risks: list, opportunities: list
 ) -> list[str]:
     """Generate actionable recommendations based on analysis."""
     recommendations = []
@@ -497,22 +505,34 @@ def _generate_recommendations(
     if overall >= 70:
         recommendations.append("This location shows strong potential for your business")
     elif overall >= 50:
-        recommendations.append("This location has moderate potential - consider the specific risks identified")
+        recommendations.append(
+            "This location has moderate potential - consider the specific risks identified"
+        )
     else:
-        recommendations.append("This location may be challenging - carefully evaluate alternatives")
+        recommendations.append(
+            "This location may be challenging - carefully evaluate alternatives"
+        )
 
     # Specific recommendations based on scores
     if comp < 50:
-        recommendations.append("Consider differentiation strategies to stand out from existing competitors")
+        recommendations.append(
+            "Consider differentiation strategies to stand out from existing competitors"
+        )
 
     if traffic < 50:
-        recommendations.append("Plan for strong marketing and signage to attract customers to this location")
+        recommendations.append(
+            "Plan for strong marketing and signage to attract customers to this location"
+        )
 
     if demo < 50:
-        recommendations.append("The local demographics may not perfectly match your target market - consider marketing strategies to reach customers from surrounding areas")
+        recommendations.append(
+            "The local demographics may not perfectly match your target market - consider marketing strategies to reach customers from surrounding areas"
+        )
 
     if len(opportunities) > len(risks):
-        recommendations.append("The opportunities outweigh the risks - this could be a good choice with proper planning")
+        recommendations.append(
+            "The opportunities outweigh the risks - this could be a good choice with proper planning"
+        )
 
     return recommendations
 

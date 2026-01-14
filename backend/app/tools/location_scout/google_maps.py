@@ -35,7 +35,9 @@ class GoogleMapsClient:
         if data["status"] == "OK" and data["results"]:
             result = data["results"][0]
             location = result["geometry"]["location"]
-            logger.info("Geocoding successful", lat=location["lat"], lng=location["lng"])
+            logger.info(
+                "Geocoding successful", lat=location["lat"], lng=location["lng"]
+            )
             return {
                 "lat": location["lat"],
                 "lng": location["lng"],

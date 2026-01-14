@@ -135,12 +135,16 @@ class CensusClient:
                 }
 
             # Get age breakdown separately
-            age_data = await self._get_age_breakdown(state_fips, county_fips, tract_fips)
+            age_data = await self._get_age_breakdown(
+                state_fips, county_fips, tract_fips
+            )
             if age_data:
                 demographics["age_distribution"].update(age_data)
 
             # Get education data
-            education_data = await self._get_education_data(state_fips, county_fips, tract_fips)
+            education_data = await self._get_education_data(
+                state_fips, county_fips, tract_fips
+            )
             if education_data:
                 demographics["education"] = education_data
 
@@ -162,10 +166,26 @@ class CensusClient:
             # Under 18, 18-34, 35-54, 55+
             variables = [
                 "B01001_001E",  # Total
-                "B01001_003E", "B01001_004E", "B01001_005E", "B01001_006E",  # Male under 18
-                "B01001_027E", "B01001_028E", "B01001_029E", "B01001_030E",  # Female under 18
-                "B01001_007E", "B01001_008E", "B01001_009E", "B01001_010E", "B01001_011E", "B01001_012E",  # Male 18-34
-                "B01001_031E", "B01001_032E", "B01001_033E", "B01001_034E", "B01001_035E", "B01001_036E",  # Female 18-34
+                "B01001_003E",
+                "B01001_004E",
+                "B01001_005E",
+                "B01001_006E",  # Male under 18
+                "B01001_027E",
+                "B01001_028E",
+                "B01001_029E",
+                "B01001_030E",  # Female under 18
+                "B01001_007E",
+                "B01001_008E",
+                "B01001_009E",
+                "B01001_010E",
+                "B01001_011E",
+                "B01001_012E",  # Male 18-34
+                "B01001_031E",
+                "B01001_032E",
+                "B01001_033E",
+                "B01001_034E",
+                "B01001_035E",
+                "B01001_036E",  # Female 18-34
             ]
 
             if tract_fips:
@@ -186,20 +206,43 @@ class CensusClient:
                 total = self._safe_int(value_map.get("B01001_001E")) or 1
 
                 # Calculate under 18
-                under_18_vars = ["B01001_003E", "B01001_004E", "B01001_005E", "B01001_006E",
-                                 "B01001_027E", "B01001_028E", "B01001_029E", "B01001_030E"]
+                under_18_vars = [
+                    "B01001_003E",
+                    "B01001_004E",
+                    "B01001_005E",
+                    "B01001_006E",
+                    "B01001_027E",
+                    "B01001_028E",
+                    "B01001_029E",
+                    "B01001_030E",
+                ]
                 under_18 = sum(self._safe_int(value_map.get(v)) for v in under_18_vars)
 
                 # Calculate 18-34
-                age_18_34_vars = ["B01001_007E", "B01001_008E", "B01001_009E", "B01001_010E",
-                                  "B01001_011E", "B01001_012E", "B01001_031E", "B01001_032E",
-                                  "B01001_033E", "B01001_034E", "B01001_035E", "B01001_036E"]
-                age_18_34 = sum(self._safe_int(value_map.get(v)) for v in age_18_34_vars)
+                age_18_34_vars = [
+                    "B01001_007E",
+                    "B01001_008E",
+                    "B01001_009E",
+                    "B01001_010E",
+                    "B01001_011E",
+                    "B01001_012E",
+                    "B01001_031E",
+                    "B01001_032E",
+                    "B01001_033E",
+                    "B01001_034E",
+                    "B01001_035E",
+                    "B01001_036E",
+                ]
+                age_18_34 = sum(
+                    self._safe_int(value_map.get(v)) for v in age_18_34_vars
+                )
 
                 return {
                     "under_18_percent": round((under_18 / total) * 100, 1),
                     "age_18_34_percent": round((age_18_34 / total) * 100, 1),
-                    "age_35_plus_percent": round(((total - under_18 - age_18_34) / total) * 100, 1),
+                    "age_35_plus_percent": round(
+                        ((total - under_18 - age_18_34) / total) * 100, 1
+                    ),
                 }
 
             return None
@@ -243,13 +286,15 @@ class CensusClient:
                 value_map = dict(zip(headers, values))
 
                 total = self._safe_int(value_map.get("B15003_001E")) or 1
-                hs = self._safe_int(value_map.get("B15003_017E")) + self._safe_int(value_map.get("B15003_018E"))
+                hs = self._safe_int(value_map.get("B15003_017E")) + self._safe_int(
+                    value_map.get("B15003_018E")
+                )
                 associates = self._safe_int(value_map.get("B15003_021E"))
                 bachelors = self._safe_int(value_map.get("B15003_022E"))
                 graduate = (
-                    self._safe_int(value_map.get("B15003_023E")) +
-                    self._safe_int(value_map.get("B15003_024E")) +
-                    self._safe_int(value_map.get("B15003_025E"))
+                    self._safe_int(value_map.get("B15003_023E"))
+                    + self._safe_int(value_map.get("B15003_024E"))
+                    + self._safe_int(value_map.get("B15003_025E"))
                 )
 
                 college_plus = associates + bachelors + graduate
@@ -257,7 +302,9 @@ class CensusClient:
                 return {
                     "high_school_percent": round((hs / total) * 100, 1),
                     "college_plus_percent": round((college_plus / total) * 100, 1),
-                    "bachelors_plus_percent": round(((bachelors + graduate) / total) * 100, 1),
+                    "bachelors_plus_percent": round(
+                        ((bachelors + graduate) / total) * 100, 1
+                    ),
                 }
 
             return None

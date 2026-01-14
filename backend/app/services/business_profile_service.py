@@ -55,7 +55,11 @@ class BusinessProfileService:
             return result or existing
 
         # Create new profile
-        logger.info("Creating new business profile", session_id=session_id, business_type=business_type)
+        logger.info(
+            "Creating new business profile",
+            session_id=session_id,
+            business_type=business_type,
+        )
         return await self.profile_repo.create(
             session_id=session_id,
             business_type=business_type,
@@ -139,7 +143,9 @@ class BusinessProfileService:
             recommendations=recommendations,
         )
 
-    async def get_latest_market_analysis(self, profile_id: str) -> dict[str, Any] | None:
+    async def get_latest_market_analysis(
+        self, profile_id: str
+    ) -> dict[str, Any] | None:
         """Get the most recent market analysis for a business profile."""
         return await self.market_repo.get_latest(profile_id)
 
@@ -169,7 +175,9 @@ class BusinessProfileService:
             differentiation_suggestions=differentiation_suggestions,
         )
 
-    async def get_latest_competitor_analysis(self, profile_id: str) -> dict[str, Any] | None:
+    async def get_latest_competitor_analysis(
+        self, profile_id: str
+    ) -> dict[str, Any] | None:
         """Get the most recent competitor analysis for a business profile."""
         return await self.competitor_analysis_repo.get_latest(profile_id)
 

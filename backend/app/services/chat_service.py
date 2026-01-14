@@ -27,11 +27,17 @@ class ChatService:
     ) -> str:
         """Get existing conversation or create a new one."""
         if conversation_id:
-            if await self.conversation_repo.verify_ownership(conversation_id, session_id):
-                logger.debug("Using existing conversation", conversation_id=conversation_id)
+            if await self.conversation_repo.verify_ownership(
+                conversation_id, session_id
+            ):
+                logger.debug(
+                    "Using existing conversation", conversation_id=conversation_id
+                )
                 return conversation_id
 
-        conversation = await self.conversation_repo.create(session_id=session_id, tool_id=tool_id)
+        conversation = await self.conversation_repo.create(
+            session_id=session_id, tool_id=tool_id
+        )
         logger.info(
             "Created new conversation",
             conversation_id=conversation["id"],
@@ -77,7 +83,9 @@ class ChatService:
             message_length=len(message),
         )
 
-        conv_id = await self.get_or_create_conversation(session_id, conversation_id, tool_id)
+        conv_id = await self.get_or_create_conversation(
+            session_id, conversation_id, tool_id
+        )
         await self.save_message(conv_id, "user", message)
 
         tool = ToolRegistry.get(tool_id)
@@ -132,10 +140,14 @@ class ChatService:
                 error_message=str(e),
                 latency_ms=latency_ms,
             )
-            logger.error("Error processing message", error=str(e), error_type=type(e).__name__)
+            logger.error(
+                "Error processing message", error=str(e), error_type=type(e).__name__
+            )
             yield (f"Error processing message: {str(e)}", "error")
 
-    async def list_conversations(self, session_id: str, limit: int = 50) -> list[dict[str, Any]]:
+    async def list_conversations(
+        self, session_id: str, limit: int = 50
+    ) -> list[dict[str, Any]]:
         """List all conversations for a session."""
         return await self.conversation_repo.get_by_session(session_id, limit)
 

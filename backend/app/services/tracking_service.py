@@ -117,7 +117,9 @@ class TrackingService:
                 error_message=error_message,
                 latency_ms=latency_ms,
             )
-            logger.warning("Tool activity failed", activity_id=activity_id, error=error_message)
+            logger.warning(
+                "Tool activity failed", activity_id=activity_id, error=error_message
+            )
         except Exception as e:
             logger.error("Failed to log tool failure", error=str(e))
 

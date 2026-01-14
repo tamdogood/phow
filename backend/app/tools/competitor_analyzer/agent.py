@@ -73,7 +73,10 @@ class CompetitorAnalyzerAgent:
     def _get_agent(self):
         """Create or return the LangGraph ReAct agent."""
         if self._agent is None:
-            logger.info("Creating new Competitor Analyzer agent", tools=[t.name for t in self.tools])
+            logger.info(
+                "Creating new Competitor Analyzer agent",
+                tools=[t.name for t in self.tools],
+            )
             self._agent = create_react_agent(self.llm, self.tools)
         return self._agent
 
@@ -113,7 +116,9 @@ class CompetitorAnalyzerAgent:
         conversation_id: str | None = None,
     ) -> AsyncIterator[str]:
         """Process a query using the agent with streaming."""
-        logger.info("Processing competitor analysis query (streaming)", query=query[:100])
+        logger.info(
+            "Processing competitor analysis query (streaming)", query=query[:100]
+        )
         agent = self._get_agent()
         messages = self._build_messages(query, conversation_history)
 
@@ -121,7 +126,9 @@ class CompetitorAnalyzerAgent:
         tool_activities: dict[str, dict] = {}
 
         try:
-            async for chunk in agent.astream({"messages": messages}, stream_mode="updates"):
+            async for chunk in agent.astream(
+                {"messages": messages}, stream_mode="updates"
+            ):
                 for node_name, node_output in chunk.items():
                     logger.debug("Agent node update", node=node_name)
 
@@ -134,74 +141,139 @@ class CompetitorAnalyzerAgent:
                                 for tool_call in msg.tool_calls:
                                     tool_name = tool_call.get("name", "")
                                     tool_args = tool_call.get("args", {})
-                                    logger.info("Tool call started", tool=tool_name, args=tool_args)
+                                    logger.info(
+                                        "Tool call started",
+                                        tool=tool_name,
+                                        args=tool_args,
+                                    )
 
                                     # Track tool activity
                                     if tracking_service and session_id:
-                                        activity_id = await tracking_service.start_tool_activity(
-                                            session_id=session_id,
-                                            tool_id="competitor_analyzer",
-                                            tool_name=tool_name,
-                                            input_args=tool_args,
-                                            conversation_id=conversation_id,
+                                        activity_id = (
+                                            await tracking_service.start_tool_activity(
+                                                session_id=session_id,
+                                                tool_id="competitor_analyzer",
+                                                tool_name=tool_name,
+                                                input_args=tool_args,
+                                                conversation_id=conversation_id,
+                                            )
                                         )
-                                        tool_activities[tool_name] = {"id": activity_id, "start_time": time.time()}
+                                        tool_activities[tool_name] = {
+                                            "id": activity_id,
+                                            "start_time": time.time(),
+                                        }
 
                                     # Log tool activity (status messages removed from user-facing output)
-                                    logger.debug("Tool execution started", tool=tool_name, args=tool_args)
+                                    logger.debug(
+                                        "Tool execution started",
+                                        tool=tool_name,
+                                        args=tool_args,
+                                    )
 
                             elif msg.content:
-                                logger.info("Received final AI response", content_length=len(msg.content))
+                                logger.info(
+                                    "Received final AI response",
+                                    content_length=len(msg.content),
+                                )
                                 last_ai_content = msg.content
 
                         elif isinstance(msg, ToolMessage):
                             tool_name = msg.name
-                            logger.info("Tool call completed", tool=tool_name, content_length=len(str(msg.content)))
+                            logger.info(
+                                "Tool call completed",
+                                tool=tool_name,
+                                content_length=len(str(msg.content)),
+                            )
 
                             # Extract competitor data for the frontend widget
                             if tool_name == "find_competitors":
                                 try:
-                                    tool_result = msg.content if isinstance(msg.content, dict) else json.loads(msg.content)
-                                    if "competitors" in tool_result and "error" not in tool_result:
+                                    tool_result = (
+                                        msg.content
+                                        if isinstance(msg.content, dict)
+                                        else json.loads(msg.content)
+                                    )
+                                    if (
+                                        "competitors" in tool_result
+                                        and "error" not in tool_result
+                                    ):
                                         competitor_data = {
                                             "type": "competitor_data",
                                             "location": tool_result.get("location"),
-                                            "business_type": tool_result.get("business_type"),
-                                            "total_found": tool_result.get("total_found"),
-                                            "competitors": tool_result.get("competitors", [])[:10],
+                                            "business_type": tool_result.get(
+                                                "business_type"
+                                            ),
+                                            "total_found": tool_result.get(
+                                                "total_found"
+                                            ),
+                                            "competitors": tool_result.get(
+                                                "competitors", []
+                                            )[:10],
                                             "sources": tool_result.get("sources", {}),
                                         }
                                         yield f"\n<!--COMPETITOR_DATA:{json.dumps(competitor_data)}-->\n"
-                                        logger.info("Yielded competitor data for widget", count=len(competitor_data["competitors"]))
+                                        logger.info(
+                                            "Yielded competitor data for widget",
+                                            count=len(competitor_data["competitors"]),
+                                        )
                                 except (json.JSONDecodeError, TypeError, KeyError) as e:
-                                    logger.warning("Could not extract competitor data", error=str(e))
+                                    logger.warning(
+                                        "Could not extract competitor data",
+                                        error=str(e),
+                                    )
 
                             # Extract positioning data for the frontend widget
                             elif tool_name == "create_positioning_map":
                                 try:
-                                    tool_result = msg.content if isinstance(msg.content, dict) else json.loads(msg.content)
-                                    if "positioning_data" in tool_result and "error" not in tool_result:
+                                    tool_result = (
+                                        msg.content
+                                        if isinstance(msg.content, dict)
+                                        else json.loads(msg.content)
+                                    )
+                                    if (
+                                        "positioning_data" in tool_result
+                                        and "error" not in tool_result
+                                    ):
                                         positioning_data = {
                                             "type": "positioning_data",
                                             "location": tool_result.get("location"),
-                                            "business_type": tool_result.get("business_type"),
-                                            "positioning_data": tool_result.get("positioning_data", []),
-                                            "quadrant_analysis": tool_result.get("quadrant_analysis", {}),
-                                            "market_gaps": tool_result.get("market_gaps", []),
-                                            "recommendation": tool_result.get("recommendation"),
+                                            "business_type": tool_result.get(
+                                                "business_type"
+                                            ),
+                                            "positioning_data": tool_result.get(
+                                                "positioning_data", []
+                                            ),
+                                            "quadrant_analysis": tool_result.get(
+                                                "quadrant_analysis", {}
+                                            ),
+                                            "market_gaps": tool_result.get(
+                                                "market_gaps", []
+                                            ),
+                                            "recommendation": tool_result.get(
+                                                "recommendation"
+                                            ),
                                         }
                                         yield f"\n<!--POSITIONING_DATA:{json.dumps(positioning_data)}-->\n"
-                                        logger.info("Yielded positioning data for widget")
+                                        logger.info(
+                                            "Yielded positioning data for widget"
+                                        )
                                 except (json.JSONDecodeError, TypeError, KeyError) as e:
-                                    logger.warning("Could not extract positioning data", error=str(e))
+                                    logger.warning(
+                                        "Could not extract positioning data",
+                                        error=str(e),
+                                    )
 
                             # Complete tool activity tracking
                             if tracking_service and tool_name in tool_activities:
                                 activity = tool_activities.pop(tool_name)
-                                latency_ms = int((time.time() - activity["start_time"]) * 1000)
+                                latency_ms = int(
+                                    (time.time() - activity["start_time"]) * 1000
+                                )
                                 await tracking_service.complete_tool_activity(
                                     activity_id=activity["id"],
-                                    output_data={"result_length": len(str(msg.content))},
+                                    output_data={
+                                        "result_length": len(str(msg.content))
+                                    },
                                     latency_ms=latency_ms,
                                 )
 
@@ -222,7 +294,9 @@ class CompetitorAnalyzerAgent:
                         error_message=str(e),
                         latency_ms=latency_ms,
                     )
-            logger.error("Error in agent stream", error=str(e), error_type=type(e).__name__)
+            logger.error(
+                "Error in agent stream", error=str(e), error_type=type(e).__name__
+            )
             raise
 
 

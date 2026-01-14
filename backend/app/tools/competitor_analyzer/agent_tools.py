@@ -134,7 +134,9 @@ async def get_competitor_details(
     # Get Google Place details
     place_details = {}
     if best_match.get("place_id"):
-        place_details = await maps_client.get_place_details(best_match["place_id"]) or {}
+        place_details = (
+            await maps_client.get_place_details(best_match["place_id"]) or {}
+        )
 
     # Try to find on Yelp for additional info
     yelp_results = await yelp_client.search_businesses(
@@ -225,12 +227,16 @@ async def analyze_competitor_reviews(
             if details and details.get("reviews"):
                 reviews = details["reviews"][:5]
                 all_reviews.extend(reviews)
-                analyzed_competitors.append({
-                    "name": comp.get("name"),
-                    "rating": comp.get("rating"),
-                    "review_count": comp.get("user_ratings_total"),
-                    "sample_reviews": [r.get("text", "")[:200] for r in reviews[:2]],
-                })
+                analyzed_competitors.append(
+                    {
+                        "name": comp.get("name"),
+                        "rating": comp.get("rating"),
+                        "review_count": comp.get("user_ratings_total"),
+                        "sample_reviews": [
+                            r.get("text", "")[:200] for r in reviews[:2]
+                        ],
+                    }
+                )
 
     # Extract themes from reviews
     themes = _extract_review_themes(all_reviews)
@@ -300,16 +306,20 @@ async def create_positioning_map(
     positioning_data = []
     for comp in competitors:
         rating = comp.get("rating")
-        price = comp.get("price_level") or _price_string_to_level(comp.get("yelp_price"))
+        price = comp.get("price_level") or _price_string_to_level(
+            comp.get("yelp_price")
+        )
 
         if rating and price:
-            positioning_data.append({
-                "name": comp.get("name"),
-                "rating": rating,
-                "price_level": price,
-                "review_count": comp.get("review_count", 0),
-                "quadrant": _determine_quadrant(price, rating),
-            })
+            positioning_data.append(
+                {
+                    "name": comp.get("name"),
+                    "rating": rating,
+                    "price_level": price,
+                    "review_count": comp.get("review_count", 0),
+                    "quadrant": _determine_quadrant(price, rating),
+                }
+            )
 
     # Analyze quadrants
     quadrant_counts = {"premium": 0, "value": 0, "economy": 0, "avoid": 0}
@@ -332,7 +342,9 @@ async def create_positioning_map(
         "positioning_data": positioning_data,
         "quadrant_analysis": quadrant_counts,
         "market_gaps": gaps,
-        "recommendation": _get_positioning_recommendation(quadrant_counts, positioning_data),
+        "recommendation": _get_positioning_recommendation(
+            quadrant_counts, positioning_data
+        ),
     }
 
 
@@ -408,14 +420,37 @@ def _name_similarity(name1: str, name2: str) -> float:
 def _extract_review_themes(reviews: list[dict]) -> dict:
     """Extract common themes from reviews."""
     positive_keywords = [
-        "friendly", "fast", "clean", "fresh", "quality", "delicious",
-        "great service", "love", "best", "amazing", "excellent",
-        "convenient", "atmosphere", "cozy", "recommend",
+        "friendly",
+        "fast",
+        "clean",
+        "fresh",
+        "quality",
+        "delicious",
+        "great service",
+        "love",
+        "best",
+        "amazing",
+        "excellent",
+        "convenient",
+        "atmosphere",
+        "cozy",
+        "recommend",
     ]
     negative_keywords = [
-        "slow", "rude", "dirty", "expensive", "overpriced", "cold",
-        "wait", "crowded", "small", "noisy", "disappointing",
-        "mediocre", "average", "poor service",
+        "slow",
+        "rude",
+        "dirty",
+        "expensive",
+        "overpriced",
+        "cold",
+        "wait",
+        "crowded",
+        "small",
+        "noisy",
+        "disappointing",
+        "mediocre",
+        "average",
+        "poor service",
     ]
 
     positive_found = {}
@@ -434,8 +469,12 @@ def _extract_review_themes(reviews: list[dict]) -> dict:
                 negative_found[keyword] = negative_found.get(keyword, 0) + 1
 
     # Sort by frequency
-    positive_themes = sorted(positive_found.items(), key=lambda x: x[1], reverse=True)[:5]
-    negative_themes = sorted(negative_found.items(), key=lambda x: x[1], reverse=True)[:5]
+    positive_themes = sorted(positive_found.items(), key=lambda x: x[1], reverse=True)[
+        :5
+    ]
+    negative_themes = sorted(negative_found.items(), key=lambda x: x[1], reverse=True)[
+        :5
+    ]
 
     return {
         "positive_themes": [t[0] for t in positive_themes],
@@ -449,15 +488,21 @@ def _identify_opportunities(themes: dict) -> list[str]:
 
     negative = themes.get("negative_themes", [])
     if "slow" in negative or "wait" in negative:
-        opportunities.append("Fast service could be a differentiator - competitors have wait time issues")
+        opportunities.append(
+            "Fast service could be a differentiator - competitors have wait time issues"
+        )
     if "expensive" in negative or "overpriced" in negative:
         opportunities.append("Value pricing could attract price-sensitive customers")
     if "dirty" in negative:
         opportunities.append("Cleanliness and hygiene could set you apart")
     if "rude" in negative or "poor service" in negative:
-        opportunities.append("Excellent customer service would be a competitive advantage")
+        opportunities.append(
+            "Excellent customer service would be a competitive advantage"
+        )
 
-    return opportunities if opportunities else ["Focus on overall quality and consistency"]
+    return (
+        opportunities if opportunities else ["Focus on overall quality and consistency"]
+    )
 
 
 def _price_string_to_level(price_str: str | None) -> int | None:
@@ -494,7 +539,9 @@ def _get_positioning_recommendation(quadrants: dict, data: list) -> str:
         "avoid": "Focus on either improving quality or lowering prices - the high-price/low-quality segment is risky",
     }
 
-    return recommendations.get(min_quadrant, "Focus on differentiation through unique offerings")
+    return recommendations.get(
+        min_quadrant, "Focus on differentiation through unique offerings"
+    )
 
 
 # List of all tools for the agent
