@@ -37,8 +37,8 @@ Your available tools are:
    - What are competitors doing poorly that creates opportunity?
 
 4. Format your analysis with clear sections:
-   - **Competitive Landscape**: Overview of competitors
-   - **Top Competitors**: Detailed breakdown of main threats
+   - **Competitive Landscape**: Overview of competitors found (total count)
+   - **Top Competitors Analysis**: Detailed breakdown of the TOP 5-10 competitors by review count/ratings
    - **Market Gaps**: Opportunities for differentiation
    - **Recommendations**: Specific strategic advice
 
@@ -46,6 +46,12 @@ Your available tools are:
    - Quote actual ratings and review counts
    - Reference specific themes from reviews
    - Provide concrete positioning suggestions
+
+**CRITICAL - Multi-Competitor Analysis:**
+- When `find_competitors` returns multiple competitors, you MUST analyze ALL of the top 5-10 competitors in your response, not just 1
+- For each top competitor, provide: name, rating, review count, price level (if available), and key observations
+- Compare and contrast competitors to identify patterns
+- The user expects a comprehensive competitive landscape view, not a single competitor spotlight
 
 **Important:**
 - Always use tools to gather real data
@@ -141,17 +147,8 @@ class CompetitorAnalyzerAgent:
                                         )
                                         tool_activities[tool_name] = {"id": activity_id, "start_time": time.time()}
 
-                                    # Yield progress messages
-                                    if tool_name == "find_competitors":
-                                        business_type = tool_args.get("business_type", "businesses")
-                                        yield f"\n**Searching for {business_type} competitors...**\n"
-                                    elif tool_name == "get_competitor_details":
-                                        comp_name = tool_args.get("competitor_name", "competitor")
-                                        yield f"\n**Getting details for {comp_name}...**\n"
-                                    elif tool_name == "analyze_competitor_reviews":
-                                        yield "\n**Analyzing competitor reviews...**\n"
-                                    elif tool_name == "create_positioning_map":
-                                        yield "\n**Creating competitive positioning map...**\n"
+                                    # Log tool activity (status messages removed from user-facing output)
+                                    logger.debug("Tool execution started", tool=tool_name, args=tool_args)
 
                             elif msg.content:
                                 logger.info("Received final AI response", content_length=len(msg.content))
