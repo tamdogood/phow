@@ -275,8 +275,6 @@ export function ChatMessage({ role, content, isStreaming }: ChatMessageProps) {
             location={locationData.location}
             competitors={locationData.competitors}
             transitStations={locationData.transit_stations}
-            nearbyFood={locationData.nearby_food}
-            nearbyRetail={locationData.nearby_retail}
           />
         </div>
       )}
@@ -315,14 +313,14 @@ export function ChatMessage({ role, content, isStreaming }: ChatMessageProps) {
           className={cn(
             "max-w-[80%] rounded-2xl px-4 py-3",
             role === "user"
-              ? "bg-primary text-primary-foreground shadow-sm"
-              : "bg-muted text-foreground"
+              ? "bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-lg shadow-sky-500/20"
+              : "glass-card text-slate-100"
           )}
         >
           <div className="whitespace-pre-wrap text-sm leading-relaxed">
             {text}
             {isStreaming && (
-              <span className="inline-block w-2 h-4 ml-1 bg-current animate-pulse" />
+              <span className="inline-block w-2 h-4 ml-1 bg-sky-400 animate-pulse rounded-sm" />
             )}
           </div>
         </div>

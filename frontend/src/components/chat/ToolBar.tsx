@@ -58,14 +58,14 @@ export function ToolBar({ currentToolId, onSwitchTool }: ToolBarProps) {
       {/* Current tool indicator */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 transition-colors group"
+        className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-600/50 bg-slate-800/50 hover:bg-slate-700/50 transition-colors group"
       >
         <span className="text-lg">{currentTool.icon}</span>
         <div className="text-left">
-          <div className="text-sm font-medium text-gray-900">{currentTool.name}</div>
+          <div className="text-sm font-medium text-white">{currentTool.name}</div>
         </div>
         <svg
-          className={`w-4 h-4 text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`}
+          className={`w-4 h-4 text-slate-400 transition-transform ${isOpen ? "rotate-180" : ""}`}
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -76,8 +76,8 @@ export function ToolBar({ currentToolId, onSwitchTool }: ToolBarProps) {
 
       {/* Dropdown */}
       {isOpen && otherTools.length > 0 && (
-        <div className="absolute top-full left-0 mt-1 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
-          <div className="px-3 py-2 text-xs text-gray-500 border-b border-gray-100">
+        <div className="absolute top-full right-0 mt-1 w-64 glass-card py-1 z-50 shadow-xl">
+          <div className="px-3 py-2 text-xs text-slate-400 border-b border-slate-700/50">
             Switch to another tool
           </div>
           {otherTools.map((tool) => (
@@ -87,12 +87,12 @@ export function ToolBar({ currentToolId, onSwitchTool }: ToolBarProps) {
                 onSwitchTool(tool.id);
                 setIsOpen(false);
               }}
-              className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 transition-colors"
+              className="w-full flex items-center gap-3 px-3 py-2 hover:bg-white/5 transition-colors"
             >
               <span className="text-lg">{tool.icon}</span>
               <div className="text-left">
-                <div className="text-sm font-medium text-gray-900">{tool.name}</div>
-                <div className="text-xs text-gray-500 truncate">{tool.description}</div>
+                <div className="text-sm font-medium text-white">{tool.name}</div>
+                <div className="text-xs text-slate-400 truncate">{tool.description}</div>
               </div>
             </button>
           ))}
@@ -117,13 +117,13 @@ export function ToolPill({
       onClick={onClick}
       className={`
         inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-sm
-        bg-gradient-to-r from-gray-100 to-gray-50 border border-gray-200
-        ${onClick ? "hover:border-blue-300 hover:from-blue-50 hover:to-white cursor-pointer" : "cursor-default"}
+        bg-slate-800/50 border border-slate-700/50
+        ${onClick ? "hover:border-sky-400/50 hover:bg-slate-700/50 cursor-pointer" : "cursor-default"}
         transition-all
       `}
     >
       <span>{icon}</span>
-      <span className="text-gray-700 font-medium">{name}</span>
+      <span className="text-white font-medium">{name}</span>
     </button>
   );
 }

@@ -60,6 +60,16 @@ const TOOL_WELCOME: Record<string, {
       "Market gap identification",
     ],
   },
+  social_media_coach: {
+    greeting: "Let's create engaging content",
+    description: "I'll help you create social media content tailored to your business, location, and current events.",
+    capabilities: [
+      "Daily content ideas",
+      "Weather-aware suggestions",
+      "Trending hashtags",
+      "Best posting times",
+    ],
+  },
 };
 
 export function Chat({
@@ -160,19 +170,19 @@ export function Chat({
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-[calc(100vh-80px)]">
       {/* Header */}
-      <div className="border-b border-border/60 bg-card px-4 py-3">
+      <div className="glass-header px-4 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             {toolIcon && (
-              <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-xl text-primary-foreground shadow-sm">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center text-xl text-white shadow-lg">
                 {toolIcon}
               </div>
             )}
             <div>
-              <h2 className="font-semibold text-foreground">{toolName}</h2>
-              <p className="text-sm text-muted-foreground">{toolDescription}</p>
+              <h2 className="font-semibold text-white">{toolName}</h2>
+              <p className="text-sm text-white/60">{toolDescription}</p>
             </div>
           </div>
           {onSwitchTool && (
@@ -182,20 +192,20 @@ export function Chat({
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-muted/30">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
         {/* Enhanced Welcome Message */}
         {messages.length === 0 && !isLoading && (
           <div className="max-w-2xl mx-auto">
             {/* Welcome card */}
-            <div className="bg-card rounded-2xl shadow-sm border border-border/60 p-6 mb-6">
+            <div className="glass-card p-6 mb-6">
               <div className="text-center mb-6">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary text-3xl text-primary-foreground mb-4 shadow-sm">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-sky-500 to-blue-600 text-3xl text-white mb-4 shadow-lg">
                   {toolIcon || "🔍"}
                 </div>
-                <h3 className="text-xl font-semibold text-foreground mb-2">
+                <h3 className="text-xl font-semibold text-white mb-2">
                   {welcome.greeting}
                 </h3>
-                <p className="text-muted-foreground">{welcome.description}</p>
+                <p className="text-slate-400">{welcome.description}</p>
               </div>
 
               {/* Capabilities */}
@@ -204,10 +214,10 @@ export function Chat({
                   {welcome.capabilities.map((cap, idx) => (
                     <div
                       key={idx}
-                      className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/40 rounded-lg px-3 py-2"
+                      className="flex items-center gap-2 text-sm text-slate-300 bg-white/5 rounded-lg px-3 py-2"
                     >
                       <svg
-                        className="w-4 h-4 text-primary flex-shrink-0"
+                        className="w-4 h-4 text-sky-400 flex-shrink-0"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -226,10 +236,10 @@ export function Chat({
               {/* Subtle divider */}
               <div className="relative my-4">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-border/60"></div>
+                  <div className="w-full border-t border-slate-700/50"></div>
                 </div>
                 <div className="relative flex justify-center text-xs">
-                  <span className="bg-card px-3 text-muted-foreground">Try an example</span>
+                  <span className="glass px-3 py-1 rounded-full text-slate-400">Try an example</span>
                 </div>
               </div>
 
@@ -262,7 +272,7 @@ export function Chat({
       </div>
 
       {/* Input area */}
-      <div className="border-t border-border/60 bg-card p-4">
+      <div className="p-4">
         {/* Quick hints when conversation is active but not loading */}
         {messages.length > 0 && !isLoading && (
           <div className="mb-3">

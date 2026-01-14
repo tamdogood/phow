@@ -54,16 +54,16 @@ export function QuickHints({ toolId, onSelectHint, disabled, hints }: QuickHints
             onClick={() => onSelectHint(example)}
             disabled={disabled}
             className={`
-              group relative px-3 py-1.5 text-xs rounded-full border transition-all duration-150
+              group relative px-3 py-1.5 text-xs rounded-full border transition-all duration-200
               ${disabled
-                ? "border-border/60 text-muted-foreground/60 cursor-not-allowed"
-                : "border-border/60 text-muted-foreground hover:border-primary/50 hover:text-primary hover:bg-primary/10"
+                ? "border-slate-700/60 text-slate-500 cursor-not-allowed"
+                : "border-slate-600/60 text-slate-400 hover:border-sky-400/50 hover:text-sky-400 hover:bg-sky-400/10"
               }
             `}
           >
             <span className="flex items-center gap-1.5">
               <svg
-                className={`w-3 h-3 ${disabled ? "text-muted-foreground/40" : "text-muted-foreground group-hover:text-primary"}`}
+                className={`w-3 h-3 ${disabled ? "text-slate-600" : "text-slate-500 group-hover:text-sky-400"}`}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -83,7 +83,7 @@ export function QuickHints({ toolId, onSelectHint, disabled, hints }: QuickHints
           disabled={disabled}
           className={`
             mt-2 text-xs transition-colors mx-auto block
-            ${disabled ? "text-muted-foreground/40" : "text-muted-foreground hover:text-foreground"}
+            ${disabled ? "text-slate-600" : "text-slate-500 hover:text-white"}
           `}
         >
           {showMore ? "Show less" : `+${examples.length - 3} more examples`}
@@ -110,8 +110,8 @@ export function InlineHint({
       className={`
         inline-flex items-center gap-1 px-2 py-1 text-xs rounded-md transition-all
         ${disabled
-          ? "bg-muted/60 text-muted-foreground/60 cursor-not-allowed"
-          : "bg-muted/60 text-muted-foreground hover:bg-primary/10 hover:text-primary"
+          ? "bg-slate-800/60 text-slate-500 cursor-not-allowed"
+          : "bg-slate-800/60 text-slate-400 hover:bg-sky-400/10 hover:text-sky-400"
         }
       `}
     >
