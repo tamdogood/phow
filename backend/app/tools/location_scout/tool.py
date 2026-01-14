@@ -10,6 +10,17 @@ class LocationScoutTool(BaseTool):
     name = "Location Scout"
     description = "Analyze if a location is good for your business. Get insights on competition, foot traffic, and accessibility using real Google Maps data."
     icon = "📍"
+    hints = [
+        "Analyze 100 Broadway, New York for a coffee shop",
+        "What's near Pike Place Market in Seattle?",
+        "Is there good transit access at 500 Market St, San Francisco?",
+    ]
+    capabilities = [
+        "Competition density mapping",
+        "Transit accessibility check",
+        "Foot traffic indicators",
+        "Neighborhood overview",
+    ]
 
     def __init__(self):
         self.agent = get_location_scout_agent()

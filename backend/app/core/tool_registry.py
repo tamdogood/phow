@@ -29,6 +29,8 @@ class ToolRegistry:
                 "name": tool.name,
                 "description": tool.description,
                 "icon": tool.icon,
+                "hints": tool.hints,
+                "capabilities": tool.capabilities,
             }
             for tool in cls._tools.values()
         ]

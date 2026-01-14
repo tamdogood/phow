@@ -3,6 +3,9 @@ import redis.asyncio as redis
 from functools import wraps
 from typing import Any, Callable
 from .config import get_settings
+from .logging import get_logger
+
+logger = get_logger("cache")
 
 
 class CacheManager:
@@ -10,37 +13,65 @@ class CacheManager:
 
     def __init__(self):
         settings = get_settings()
-        self.redis = redis.from_url(
+        self._redis = redis.from_url(
             settings.redis_url,
             encoding="utf-8",
             decode_responses=True,
         )
         self.default_ttl = settings.cache_ttl
+        self._enabled = True
+
+    def _disable(self, reason: str) -> None:
+        if self._enabled:
+            logger.warning("Redis unavailable; caching disabled", reason=reason)
+        self._enabled = False
 
     async def get(self, key: str) -> Any | None:
         """Get value from cache."""
-        value = await self.redis.get(key)
-        if value:
-            return json.loads(value)
-        return None
+        if not self._enabled:
+            return None
+        try:
+            value = await self._redis.get(key)
+            return json.loads(value) if value else None
+        except Exception as e:
+            self._disable(str(e))
+            return None
 
     async def set(self, key: str, value: Any, ttl: int | None = None) -> None:
         """Set value in cache with TTL."""
-        ttl = ttl or self.default_ttl
-        await self.redis.setex(key, ttl, json.dumps(value))
+        if not self._enabled:
+            return
+        try:
+            ttl = ttl or self.default_ttl
+            await self._redis.setex(key, ttl, json.dumps(value))
+        except Exception as e:
+            self._disable(str(e))
 
     async def delete(self, key: str) -> None:
         """Delete key from cache."""
-        await self.redis.delete(key)
+        if not self._enabled:
+            return
+        try:
+            await self._redis.delete(key)
+        except Exception as e:
+            self._disable(str(e))
 
     async def clear_pattern(self, pattern: str) -> None:
         """Clear all keys matching pattern."""
-        async for key in self.redis.scan_iter(match=pattern):
-            await self.redis.delete(key)
+        if not self._enabled:
+            return
+        try:
+            async for key in self._redis.scan_iter(match=pattern):
+                await self._redis.delete(key)
+        except Exception as e:
+            self._disable(str(e))
 
     async def close(self) -> None:
         """Close Redis connection."""
-        await self.redis.close()
+        try:
+            await self._redis.close()
+        except Exception:
+            pass
 
 
 # Global cache instance

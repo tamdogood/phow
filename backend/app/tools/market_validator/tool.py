@@ -13,6 +13,17 @@ class MarketValidatorTool(BaseTool):
     name = "Market Validator"
     description = "Validate if your business idea is viable at a specific location. Get insights on demographics, competition, and foot traffic with a comprehensive viability score."
     icon = "📊"
+    hints = [
+        "Is a gym viable at 200 Main St, Austin TX?",
+        "Validate a bakery concept for downtown Portland",
+        "What demographics support a pet store in Brooklyn?",
+    ]
+    capabilities = [
+        "Demographics analysis",
+        "Market size estimation",
+        "Competition saturation scoring",
+        "Risk & opportunity assessment",
+    ]
 
     def __init__(self):
         self.agent = get_market_validator_agent()

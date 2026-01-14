@@ -1,19 +1,68 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 
 const Chat = dynamic(() => import("@/components/chat").then((mod) => ({ default: mod.Chat })), {
   ssr: false,
 });
 
+const ToolSelector = dynamic(
+  () => import("@/components/chat/ToolSelector").then((mod) => ({ default: mod.ToolSelector })),
+  { ssr: false }
+);
+
+interface Tool {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  hints?: string[];
+  capabilities?: string[];
+}
+
 export default function Home() {
+  const [selectedTool, setSelectedTool] = useState<Tool | null>(null);
+  const [tools, setTools] = useState<Tool[]>([]);
   const [chatKey, setChatKey] = useState(0);
 
+  // Fetch tools on mount
+  useEffect(() => {
+    async function fetchTools() {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/tools`
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setTools(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch tools:", error);
+      }
+    }
+    fetchTools();
+  }, []);
+
+  const handleSelectTool = (toolId: string) => {
+    const tool = tools.find((t) => t.id === toolId);
+    if (tool) {
+      setSelectedTool(tool);
+      setChatKey((prev) => prev + 1);
+    }
+  };
+
+  const handleSwitchTool = (toolId: string) => {
+    const tool = tools.find((t) => t.id === toolId);
+    if (tool) {
+      setSelectedTool(tool);
+      setChatKey((prev) => prev + 1);
+    }
+  };
+
   const handleReset = () => {
-    // Force Chat remount to clear local state (messages, streaming, etc.)
+    setSelectedTool(null);
     setChatKey((prev) => prev + 1);
-    // Scroll to top for a clean reset experience
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -36,12 +85,22 @@ export default function Home() {
 
       {/* Main Content */}
       <main className="flex-1 mx-auto w-full max-w-4xl">
-        <Chat
-          key={chatKey}
-          toolId="location_scout"
-          toolName="Location Scout"
-          toolDescription="Analyze if a location is good for your business"
-        />
+        {!selectedTool ? (
+          <div className="flex items-center justify-center min-h-[calc(100vh-80px)] p-6">
+            <ToolSelector onSelectTool={handleSelectTool} />
+          </div>
+        ) : (
+          <Chat
+            key={chatKey}
+            toolId={selectedTool.id}
+            toolName={selectedTool.name}
+            toolDescription={selectedTool.description}
+            toolIcon={selectedTool.icon}
+            toolHints={selectedTool.hints}
+            toolCapabilities={selectedTool.capabilities}
+            onSwitchTool={handleSwitchTool}
+          />
+        )}
       </main>
     </div>
   );

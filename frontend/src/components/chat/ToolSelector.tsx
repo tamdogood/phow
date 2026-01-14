@@ -7,6 +7,8 @@ interface Tool {
   name: string;
   description: string;
   icon: string;
+  hints?: string[];
+  capabilities?: string[];
 }
 
 interface ToolSelectorProps {
@@ -14,40 +16,11 @@ interface ToolSelectorProps {
   selectedToolId?: string;
 }
 
-// Tool metadata with examples and capabilities
-const TOOL_METADATA: Record<string, {
-  tagline: string;
-  examples: string[];
-  capabilities: string[];
-  color: string;
-}> = {
-  location_scout: {
-    tagline: "Find the perfect spot for your business",
-    examples: [
-      "Is 123 Main St, Austin TX good for a coffee shop?",
-      "Analyze the neighborhood around Pike Place Market for a bakery",
-    ],
-    capabilities: ["Competition mapping", "Transit access", "Foot traffic analysis"],
-    color: "from-blue-500 to-cyan-500",
-  },
-  market_validator: {
-    tagline: "Validate your business idea with real data",
-    examples: [
-      "Is a gym viable at 456 Oak Ave, Seattle?",
-      "Validate the market for a pet store in downtown Portland",
-    ],
-    capabilities: ["Demographics analysis", "Market sizing", "Viability scoring"],
-    color: "from-indigo-500 to-purple-500",
-  },
-  competitor_analyzer: {
-    tagline: "Understand your competition deeply",
-    examples: [
-      "Who are my competitors for a restaurant near Union Square?",
-      "Analyze coffee shop competition in Brooklyn Heights",
-    ],
-    capabilities: ["Competitor profiling", "Review analysis", "Market positioning"],
-    color: "from-orange-500 to-red-500",
-  },
+// Gradient colors per tool for visual distinction
+const TOOL_COLORS: Record<string, string> = {
+  location_scout: "from-blue-500 to-cyan-500",
+  market_validator: "from-indigo-500 to-purple-500",
+  competitor_analyzer: "from-orange-500 to-red-500",
 };
 
 export function ToolSelector({ onSelectTool, selectedToolId }: ToolSelectorProps) {
@@ -98,12 +71,8 @@ export function ToolSelector({ onSelectTool, selectedToolId }: ToolSelectorProps
       {/* Tool Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {tools.map((tool) => {
-          const metadata = TOOL_METADATA[tool.id] || {
-            tagline: tool.description,
-            examples: [],
-            capabilities: [],
-            color: "from-gray-500 to-gray-600",
-          };
+          const color = TOOL_COLORS[tool.id] || "from-gray-500 to-gray-600";
+          const capabilities = tool.capabilities || [];
           const isSelected = selectedToolId === tool.id;
           const isHovered = hoveredTool === tool.id;
 
@@ -124,7 +93,7 @@ export function ToolSelector({ onSelectTool, selectedToolId }: ToolSelectorProps
               {/* Icon */}
               <div className={`
                 w-12 h-12 rounded-lg flex items-center justify-center text-2xl mb-3
-                bg-gradient-to-br ${metadata.color} text-white
+                bg-gradient-to-br ${color} text-white
               `}>
                 {tool.icon}
               </div>
@@ -132,25 +101,27 @@ export function ToolSelector({ onSelectTool, selectedToolId }: ToolSelectorProps
               {/* Title */}
               <h3 className="font-semibold text-gray-900 mb-1">{tool.name}</h3>
 
-              {/* Tagline */}
-              <p className="text-sm text-gray-500 mb-3">{metadata.tagline}</p>
+              {/* Description */}
+              <p className="text-sm text-gray-500 mb-3 line-clamp-2">{tool.description}</p>
 
               {/* Capabilities (show on hover) */}
-              <div className={`
-                transition-all duration-200 overflow-hidden
-                ${isHovered || isSelected ? "max-h-24 opacity-100" : "max-h-0 opacity-0"}
-              `}>
-                <div className="flex flex-wrap gap-1.5 pt-2 border-t border-gray-100">
-                  {metadata.capabilities.map((cap, idx) => (
-                    <span
-                      key={idx}
-                      className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600"
-                    >
-                      {cap}
-                    </span>
-                  ))}
+              {capabilities.length > 0 && (
+                <div className={`
+                  transition-all duration-200 overflow-hidden
+                  ${isHovered || isSelected ? "max-h-24 opacity-100" : "max-h-0 opacity-0"}
+                `}>
+                  <div className="flex flex-wrap gap-1.5 pt-2 border-t border-gray-100">
+                    {capabilities.map((cap, idx) => (
+                      <span
+                        key={idx}
+                        className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600"
+                      >
+                        {cap}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Selected indicator */}
               {isSelected && (

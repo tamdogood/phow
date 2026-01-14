@@ -6,50 +6,11 @@ interface QuickHintsProps {
   toolId: string;
   onSelectHint: (hint: string) => void;
   disabled?: boolean;
+  hints?: string[];  // Hints from API, falls back to defaults if not provided
 }
 
-// Hints organized by tool and category
-const TOOL_HINTS: Record<string, {
-  quickStart: string[];
-  advanced: string[];
-}> = {
-  location_scout: {
-    quickStart: [
-      "Analyze [address] for a [business type]",
-      "What's the foot traffic like at [address]?",
-      "Show me competitors near [address]",
-    ],
-    advanced: [
-      "Compare transit access between [address1] and [address2]",
-      "What businesses are thriving in [neighborhood]?",
-    ],
-  },
-  market_validator: {
-    quickStart: [
-      "Is [business type] viable at [address]?",
-      "Validate the market for [business] in [city]",
-      "What's the demographic profile near [address]?",
-    ],
-    advanced: [
-      "What are the risks of opening [business] at [address]?",
-      "Compare viability scores for [address1] vs [address2]",
-    ],
-  },
-  competitor_analyzer: {
-    quickStart: [
-      "Find competitors for [business] near [address]",
-      "Who are the top-rated [business type] in [area]?",
-      "Analyze reviews of competitors near [address]",
-    ],
-    advanced: [
-      "Create a positioning map for [business type] in [area]",
-      "What gaps exist in the [business] market near [address]?",
-    ],
-  },
-};
-
-// Concrete example hints per tool (ready to use)
-const EXAMPLE_HINTS: Record<string, string[]> = {
+// Fallback hints if API doesn't provide them
+const DEFAULT_HINTS: Record<string, string[]> = {
   location_scout: [
     "Analyze 100 Broadway, New York for a coffee shop",
     "What's near Pike Place Market in Seattle?",
@@ -67,11 +28,13 @@ const EXAMPLE_HINTS: Record<string, string[]> = {
   ],
 };
 
-export function QuickHints({ toolId, onSelectHint, disabled }: QuickHintsProps) {
+export function QuickHints({ toolId, onSelectHint, disabled, hints }: QuickHintsProps) {
   const [showMore, setShowMore] = useState(false);
 
-  const hints = TOOL_HINTS[toolId] || TOOL_HINTS.location_scout;
-  const examples = EXAMPLE_HINTS[toolId] || EXAMPLE_HINTS.location_scout;
+  // Use provided hints or fall back to defaults
+  const examples = hints && hints.length > 0
+    ? hints
+    : (DEFAULT_HINTS[toolId] || DEFAULT_HINTS.location_scout);
 
   // Show first 3 examples by default
   const visibleExamples = showMore ? examples : examples.slice(0, 3);

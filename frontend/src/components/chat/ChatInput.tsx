@@ -8,14 +8,23 @@ interface ChatInputProps {
   onSend: (message: string) => void;
   disabled?: boolean;
   placeholder?: string;
+  value?: string;
+  onChange?: (value: string) => void;
 }
 
 export function ChatInput({
   onSend,
   disabled = false,
   placeholder = "Type your message...",
+  value: controlledValue,
+  onChange: controlledOnChange,
 }: ChatInputProps) {
-  const [message, setMessage] = useState("");
+  const [internalMessage, setInternalMessage] = useState("");
+
+  // Support both controlled and uncontrolled modes
+  const isControlled = controlledValue !== undefined && controlledOnChange !== undefined;
+  const message = isControlled ? controlledValue : internalMessage;
+  const setMessage = isControlled ? controlledOnChange : setInternalMessage;
 
   const handleSend = () => {
     if (message.trim() && !disabled) {

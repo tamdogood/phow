@@ -7,7 +7,7 @@ router = APIRouter(prefix="/tools", tags=["tools"])
 @router.get("")
 async def list_tools():
     """List all available tools."""
-    return {"tools": ToolRegistry.list_tools()}
+    return ToolRegistry.list_tools()
 
 
 @router.get("/{tool_id}")

@@ -29,6 +29,8 @@ class BaseTool(ABC):
     name: str
     description: str
     icon: str = "🔧"
+    hints: list[str] = []  # Example queries for this tool
+    capabilities: list[str] = []  # What this tool can do
 
     @abstractmethod
     async def process(self, query: str, context: ToolContext) -> ToolResponse:

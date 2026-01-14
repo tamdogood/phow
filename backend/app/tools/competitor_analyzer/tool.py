@@ -13,6 +13,17 @@ class CompetitorAnalyzerTool(BaseTool):
     name = "Competitor Analyzer"
     description = "Deep dive into your competition. Find competitors, analyze their reviews, understand their positioning, and discover opportunities to differentiate."
     icon = "🔍"
+    hints = [
+        "Find restaurant competitors near Times Square",
+        "Analyze coffee shop competition in Capitol Hill, Seattle",
+        "Show me the market positioning for gyms in Miami Beach",
+    ]
+    capabilities = [
+        "Competitor discovery",
+        "Review sentiment analysis",
+        "Price vs quality positioning",
+        "Market gap identification",
+    ]
 
     def __init__(self):
         self.agent = get_competitor_analyzer_agent()
