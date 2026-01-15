@@ -11,6 +11,7 @@ class ToolContext(BaseModel):
     session_id: str
     conversation_id: str
     business_type: str | None = None
+    business_profile: dict | None = None  # Full business profile data
     tracking_service: Any | None = None  # TrackingService, avoid circular import
 
 
@@ -38,9 +39,7 @@ class BaseTool(ABC):
         pass
 
     @abstractmethod
-    async def process_stream(
-        self, query: str, context: ToolContext
-    ) -> AsyncIterator[str]:
+    async def process_stream(self, query: str, context: ToolContext) -> AsyncIterator[str]:
         """Process a user query and stream the response."""
         pass
 

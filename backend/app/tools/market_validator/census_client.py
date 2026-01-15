@@ -22,9 +22,7 @@ class CensusClient:
         await self.client.aclose()
 
     @cached(ttl=86400, key_prefix="census_geo")  # Cache for 24 hours
-    async def get_geography_for_coordinates(
-        self, lat: float, lng: float
-    ) -> dict[str, Any] | None:
+    async def get_geography_for_coordinates(self, lat: float, lng: float) -> dict[str, Any] | None:
         """
         Get Census geography (state, county, tract) for coordinates.
         Uses FCC API to convert coordinates to FIPS codes.
@@ -135,16 +133,12 @@ class CensusClient:
                 }
 
             # Get age breakdown separately
-            age_data = await self._get_age_breakdown(
-                state_fips, county_fips, tract_fips
-            )
+            age_data = await self._get_age_breakdown(state_fips, county_fips, tract_fips)
             if age_data:
                 demographics["age_distribution"].update(age_data)
 
             # Get education data
-            education_data = await self._get_education_data(
-                state_fips, county_fips, tract_fips
-            )
+            education_data = await self._get_education_data(state_fips, county_fips, tract_fips)
             if education_data:
                 demographics["education"] = education_data
 
@@ -233,16 +227,12 @@ class CensusClient:
                     "B01001_035E",
                     "B01001_036E",
                 ]
-                age_18_34 = sum(
-                    self._safe_int(value_map.get(v)) for v in age_18_34_vars
-                )
+                age_18_34 = sum(self._safe_int(value_map.get(v)) for v in age_18_34_vars)
 
                 return {
                     "under_18_percent": round((under_18 / total) * 100, 1),
                     "age_18_34_percent": round((age_18_34 / total) * 100, 1),
-                    "age_35_plus_percent": round(
-                        ((total - under_18 - age_18_34) / total) * 100, 1
-                    ),
+                    "age_35_plus_percent": round(((total - under_18 - age_18_34) / total) * 100, 1),
                 }
 
             return None
@@ -302,9 +292,7 @@ class CensusClient:
                 return {
                     "high_school_percent": round((hs / total) * 100, 1),
                     "college_plus_percent": round((college_plus / total) * 100, 1),
-                    "bachelors_plus_percent": round(
-                        ((bachelors + graduate) / total) * 100, 1
-                    ),
+                    "bachelors_plus_percent": round(((bachelors + graduate) / total) * 100, 1),
                 }
 
             return None

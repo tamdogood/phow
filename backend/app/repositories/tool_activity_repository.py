@@ -79,9 +79,7 @@ class ToolActivityRepository(BaseRepository):
         )
         return result.data
 
-    async def get_by_session(
-        self, session_id: str, limit: int = 100
-    ) -> list[dict[str, Any]]:
+    async def get_by_session(self, session_id: str, limit: int = 100) -> list[dict[str, Any]]:
         """Get all tool activities for a session."""
         result = (
             self.db.table(self.table)
@@ -95,9 +93,7 @@ class ToolActivityRepository(BaseRepository):
 
     async def get_stats(self, tool_id: str | None = None) -> dict[str, Any]:
         """Get tool activity statistics."""
-        query = self.db.table(self.table).select(
-            "tool_id, tool_name, status, latency_ms"
-        )
+        query = self.db.table(self.table).select("tool_id, tool_name, status, latency_ms")
         if tool_id:
             query = query.eq("tool_id", tool_id)
         result = query.execute()

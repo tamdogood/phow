@@ -84,9 +84,7 @@ class YelpClient:
                     "rating": b.get("rating"),
                     "review_count": b.get("review_count"),
                     "price": b.get("price"),  # $, $$, $$$, $$$$
-                    "address": ", ".join(
-                        b.get("location", {}).get("display_address", [])
-                    ),
+                    "address": ", ".join(b.get("location", {}).get("display_address", [])),
                     "phone": b.get("display_phone"),
                     "categories": [c.get("title") for c in b.get("categories", [])],
                     "distance_meters": b.get("distance"),
@@ -120,9 +118,7 @@ class YelpClient:
             return None
 
         try:
-            response = await self.client.get(
-                f"{YELP_API_BASE}/businesses/{business_id}"
-            )
+            response = await self.client.get(f"{YELP_API_BASE}/businesses/{business_id}")
             response.raise_for_status()
             b = response.json()
 
@@ -155,15 +151,11 @@ class YelpClient:
             }
 
         except httpx.HTTPError as e:
-            logger.error(
-                "Yelp business details failed", error=str(e), business_id=business_id
-            )
+            logger.error("Yelp business details failed", error=str(e), business_id=business_id)
             return None
 
     @cached(ttl=1800, key_prefix="yelp_reviews")  # Cache for 30 min
-    async def get_business_reviews(
-        self, business_id: str, limit: int = 3
-    ) -> list[dict[str, Any]]:
+    async def get_business_reviews(self, business_id: str, limit: int = 3) -> list[dict[str, Any]]:
         """
         Get reviews for a business.
 

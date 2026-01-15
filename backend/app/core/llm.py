@@ -28,14 +28,15 @@ class LLMService:
             return ChatOpenAI(
                 model="gpt-4o",
                 api_key=settings.openai_api_key,
-                temperature=0.7,
+                temperature=0.4,  # Lower for more deterministic tool calling
+                max_tokens=4096,  # Prevent runaway responses
                 streaming=True,
             )
         else:  # ANTHROPIC
             return ChatAnthropic(
                 model="claude-sonnet-4-20250514",
                 api_key=settings.anthropic_api_key,
-                temperature=0.7,
+                temperature=0.4,  # Lower for more deterministic tool calling
                 max_tokens=4096,
             )
 

@@ -6,6 +6,7 @@ import { MapWidget } from "./MapWidget";
 import { MarketValidatorWidget } from "../tools/MarketValidatorWidget";
 import { CompetitorWidget, PositioningWidget } from "../tools/CompetitorWidget";
 import { SocialMediaCoachWidget } from "../tools/SocialMediaCoachWidget";
+import { ReviewResponderWidget } from "../tools/ReviewResponderWidget";
 
 interface LocationData {
   type: "location_data";
@@ -174,6 +175,31 @@ interface SocialContentData {
   };
 }
 
+interface ReviewResponseData {
+  type: "review_response";
+  original_review: string;
+  sentiment_analysis: {
+    sentiment: string;
+    rating?: number;
+    key_issues: string[];
+    emotional_tone: string;
+    review_type: string;
+    positive_mentions?: number;
+    negative_mentions?: number;
+  } | null;
+  responses: Array<{
+    tone: string;
+    sentiment: string;
+    key_issues: string[];
+    guidelines: {
+      opening: string;
+      style: string;
+      focus: string;
+    };
+    business_name: string;
+  }>;
+}
+
 interface ParsedContent {
   text: string;
   locationData: LocationData | null;
@@ -181,6 +207,7 @@ interface ParsedContent {
   competitorData: CompetitorData | null;
   positioningData: PositioningData | null;
   socialContentData: SocialContentData | null;
+  reviewResponseData: ReviewResponseData | null;
 }
 
 interface ChatMessageProps {
@@ -196,6 +223,7 @@ function parseContent(content: string): ParsedContent {
   let competitorData: CompetitorData | null = null;
   let positioningData: PositioningData | null = null;
   let socialContentData: SocialContentData | null = null;
+  let reviewResponseData: ReviewResponseData | null = null;
 
   // Parse location data
   const locationMatch = text.match(/<!--LOCATION_DATA:(.*?)-->/s);
@@ -252,11 +280,22 @@ function parseContent(content: string): ParsedContent {
     }
   }
 
-  return { text, locationData, marketData, competitorData, positioningData, socialContentData };
+  // Parse review response data
+  const reviewResponseMatch = text.match(/<!--REVIEW_RESPONSE_DATA:(.*?)-->/s);
+  if (reviewResponseMatch) {
+    try {
+      reviewResponseData = JSON.parse(reviewResponseMatch[1]) as ReviewResponseData;
+      text = text.replace(/<!--REVIEW_RESPONSE_DATA:.*?-->/s, "").trim();
+    } catch {
+      // Ignore parse errors
+    }
+  }
+
+  return { text, locationData, marketData, competitorData, positioningData, socialContentData, reviewResponseData };
 }
 
 export function ChatMessage({ role, content, isStreaming }: ChatMessageProps) {
-  const { text, locationData, marketData, competitorData, positioningData, socialContentData } = useMemo(
+  const { text, locationData, marketData, competitorData, positioningData, socialContentData, reviewResponseData } = useMemo(
     () => parseContent(content),
     [content]
   );
@@ -304,6 +343,13 @@ export function ChatMessage({ role, content, isStreaming }: ChatMessageProps) {
       {socialContentData && role === "assistant" && (
         <div className="w-full max-w-[90%] mb-2">
           <SocialMediaCoachWidget data={socialContentData} />
+        </div>
+      )}
+
+      {/* Review Responder widget */}
+      {reviewResponseData && role === "assistant" && (
+        <div className="w-full max-w-[90%] mb-2">
+          <ReviewResponderWidget data={reviewResponseData} />
         </div>
       )}
 

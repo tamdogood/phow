@@ -95,16 +95,18 @@ class WeatherClient:
                     date = datetime.fromtimestamp(item["dt"]).strftime("%Y-%m-%d")
                     if date not in seen_dates and len(daily_forecasts) < days:
                         seen_dates.add(date)
-                        daily_forecasts.append({
-                            "date": date,
-                            "day_name": datetime.fromtimestamp(item["dt"]).strftime("%A"),
-                            "temperature": round(item["main"]["temp"]),
-                            "temp_min": round(item["main"]["temp_min"]),
-                            "temp_max": round(item["main"]["temp_max"]),
-                            "description": item["weather"][0]["description"],
-                            "main": item["weather"][0]["main"],
-                            "icon": item["weather"][0]["icon"],
-                        })
+                        daily_forecasts.append(
+                            {
+                                "date": date,
+                                "day_name": datetime.fromtimestamp(item["dt"]).strftime("%A"),
+                                "temperature": round(item["main"]["temp"]),
+                                "temp_min": round(item["main"]["temp_min"]),
+                                "temp_max": round(item["main"]["temp_max"]),
+                                "description": item["weather"][0]["description"],
+                                "main": item["weather"][0]["main"],
+                                "icon": item["weather"][0]["icon"],
+                            }
+                        )
 
                 logger.info("Forecast retrieved", days=len(daily_forecasts))
                 return daily_forecasts
@@ -194,20 +196,23 @@ class WeatherClient:
     def _get_mock_forecast(self, days: int) -> list[dict[str, Any]]:
         """Return mock forecast data when API is not available."""
         from datetime import timedelta
+
         today = datetime.now()
         forecasts = []
         conditions = ["Clear", "Clouds", "Clear", "Rain", "Clear"]
 
         for i in range(days):
             date = today + timedelta(days=i)
-            forecasts.append({
-                "date": date.strftime("%Y-%m-%d"),
-                "day_name": date.strftime("%A"),
-                "temperature": 70 + (i * 2),
-                "temp_min": 65 + (i * 2),
-                "temp_max": 75 + (i * 2),
-                "description": conditions[i % len(conditions)].lower(),
-                "main": conditions[i % len(conditions)],
-                "icon": "01d" if conditions[i % len(conditions)] == "Clear" else "03d",
-            })
+            forecasts.append(
+                {
+                    "date": date.strftime("%Y-%m-%d"),
+                    "day_name": date.strftime("%A"),
+                    "temperature": 70 + (i * 2),
+                    "temp_min": 65 + (i * 2),
+                    "temp_max": 75 + (i * 2),
+                    "description": conditions[i % len(conditions)].lower(),
+                    "main": conditions[i % len(conditions)],
+                    "icon": "01d" if conditions[i % len(conditions)] == "Clear" else "03d",
+                }
+            )
         return forecasts

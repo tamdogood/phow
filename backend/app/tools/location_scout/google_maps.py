@@ -1,5 +1,6 @@
 import httpx
 from typing import Any
+from ...core.cache import cached
 from ...core.config import get_settings
 from ...core.logging import get_logger
 
@@ -22,6 +23,7 @@ class GoogleMapsClient:
             GoogleMapsClient._client = httpx.AsyncClient()
         return GoogleMapsClient._client
 
+    @cached(ttl=7200, key_prefix="geocode")  # Cache for 2 hours - addresses don't change
     async def geocode(self, address: str) -> dict[str, Any] | None:
         """Convert an address to coordinates."""
         logger.info("Geocoding address", address=address)
@@ -35,9 +37,7 @@ class GoogleMapsClient:
         if data["status"] == "OK" and data["results"]:
             result = data["results"][0]
             location = result["geometry"]["location"]
-            logger.info(
-                "Geocoding successful", lat=location["lat"], lng=location["lng"]
-            )
+            logger.info("Geocoding successful", lat=location["lat"], lng=location["lng"])
             return {
                 "lat": location["lat"],
                 "lng": location["lng"],
@@ -47,6 +47,7 @@ class GoogleMapsClient:
         logger.warning("Geocoding failed", status=data["status"])
         return None
 
+    @cached(ttl=1800, key_prefix="nearby")  # Cache for 30 min - businesses change occasionally
     async def nearby_search(
         self,
         lat: float,
@@ -100,6 +101,7 @@ class GoogleMapsClient:
         logger.warning("Nearby search returned no results", status=data["status"])
         return []
 
+    @cached(ttl=3600, key_prefix="place_detail")  # Cache for 1 hour - hours/reviews update
     async def get_place_details(self, place_id: str) -> dict[str, Any] | None:
         """Get detailed information about a place."""
         logger.info("Getting place details", place_id=place_id)

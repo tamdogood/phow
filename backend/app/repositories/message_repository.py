@@ -44,9 +44,7 @@ class MessageRepository(BaseRepository):
         )
         return result.data or []
 
-    async def get_latest(
-        self, conversation_id: str, limit: int = 10
-    ) -> list[dict[str, Any]]:
+    async def get_latest(self, conversation_id: str, limit: int = 10) -> list[dict[str, Any]]:
         """Get latest N messages in a conversation."""
         result = (
             self.db.table("messages")
@@ -61,10 +59,5 @@ class MessageRepository(BaseRepository):
 
     async def delete_by_conversation(self, conversation_id: str) -> bool:
         """Delete all messages in a conversation."""
-        result = (
-            self.db.table("messages")
-            .delete()
-            .eq("conversation_id", conversation_id)
-            .execute()
-        )
+        result = self.db.table("messages").delete().eq("conversation_id", conversation_id).execute()
         return True  # Cascade delete handles this

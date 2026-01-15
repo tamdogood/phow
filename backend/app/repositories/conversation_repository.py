@@ -32,17 +32,10 @@ class ConversationRepository(BaseRepository):
 
     async def get_by_id(self, conversation_id: str) -> dict[str, Any] | None:
         """Get conversation by ID."""
-        result = (
-            self.db.table("conversations")
-            .select("*")
-            .eq("id", conversation_id)
-            .execute()
-        )
+        result = self.db.table("conversations").select("*").eq("id", conversation_id).execute()
         return result.data[0] if result.data else None
 
-    async def get_by_session(
-        self, session_id: str, limit: int = 50
-    ) -> list[dict[str, Any]]:
+    async def get_by_session(self, session_id: str, limit: int = 50) -> list[dict[str, Any]]:
         """Get all conversations for a session."""
         result = (
             self.db.table("conversations")
@@ -54,9 +47,7 @@ class ConversationRepository(BaseRepository):
         )
         return result.data or []
 
-    async def update_title(
-        self, conversation_id: str, title: str
-    ) -> dict[str, Any] | None:
+    async def update_title(self, conversation_id: str, title: str) -> dict[str, Any] | None:
         """Update conversation title."""
         result = (
             self.db.table("conversations")
@@ -68,9 +59,7 @@ class ConversationRepository(BaseRepository):
 
     async def delete(self, conversation_id: str) -> bool:
         """Delete a conversation."""
-        result = (
-            self.db.table("conversations").delete().eq("id", conversation_id).execute()
-        )
+        result = self.db.table("conversations").delete().eq("id", conversation_id).execute()
         return bool(result.data)
 
     async def verify_ownership(self, conversation_id: str, session_id: str) -> bool:

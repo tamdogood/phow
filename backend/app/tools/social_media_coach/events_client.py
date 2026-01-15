@@ -97,13 +97,15 @@ class EventsClient:
             holiday_date = datetime.strptime(holiday["date"], "%Y-%m-%d").date()
             if today <= holiday_date <= end_date:
                 days_until = (holiday_date - today).days
-                upcoming.append({
-                    **holiday,
-                    "days_until": days_until,
-                    "is_today": days_until == 0,
-                    "is_tomorrow": days_until == 1,
-                    "is_this_week": days_until <= 7,
-                })
+                upcoming.append(
+                    {
+                        **holiday,
+                        "days_until": days_until,
+                        "is_today": days_until == 0,
+                        "is_tomorrow": days_until == 1,
+                        "is_this_week": days_until <= 7,
+                    }
+                )
 
         return sorted(upcoming, key=lambda x: x["days_until"])
 
@@ -117,7 +119,9 @@ class EventsClient:
             "day_name": today.strftime("%A"),
             "date": today.strftime("%B %d, %Y"),
             "themes": themes,
-            "hashtag_suggestions": [f"#{theme.replace(' ', '')}" for theme in themes if len(theme) < 25],
+            "hashtag_suggestions": [
+                f"#{theme.replace(' ', '')}" for theme in themes if len(theme) < 25
+            ],
         }
 
     @cached(ttl=3600, key_prefix="local_events")
@@ -155,14 +159,20 @@ class EventsClient:
         for i, template in enumerate(mock_event_templates):
             if i < days_ahead:
                 event_date = today + timedelta(days=i + 1)
-                events.append({
-                    "name": template["name"],
-                    "date": event_date.strftime("%Y-%m-%d"),
-                    "day_name": event_date.strftime("%A"),
-                    "category": template["category"],
-                    "distance": f"{(i + 1) * 0.5:.1f} miles away",
-                    "relevance": "May increase foot traffic" if template["category"] in ["food", "arts"] else "Networking opportunity",
-                })
+                events.append(
+                    {
+                        "name": template["name"],
+                        "date": event_date.strftime("%Y-%m-%d"),
+                        "day_name": event_date.strftime("%A"),
+                        "category": template["category"],
+                        "distance": f"{(i + 1) * 0.5:.1f} miles away",
+                        "relevance": (
+                            "May increase foot traffic"
+                            if template["category"] in ["food", "arts"]
+                            else "Networking opportunity"
+                        ),
+                    }
+                )
 
         return events
 
@@ -178,44 +188,54 @@ class EventsClient:
 
         # Today's themes
         for theme in daily_themes.get("themes", [])[:2]:
-            opportunities.append({
-                "type": "daily_theme",
-                "title": theme,
-                "urgency": "today",
-                "suggestion": f"Create a post around '{theme}' - it's a popular hashtag today",
-            })
+            opportunities.append(
+                {
+                    "type": "daily_theme",
+                    "title": theme,
+                    "urgency": "today",
+                    "suggestion": f"Create a post around '{theme}' - it's a popular hashtag today",
+                }
+            )
 
         # Upcoming holidays
         for holiday in holidays[:3]:
             if holiday.get("is_today"):
-                opportunities.append({
-                    "type": "holiday",
-                    "title": holiday["name"],
-                    "urgency": "now",
-                    "suggestion": f"Post about {holiday['name']}! Share how you're celebrating or any special offers.",
-                })
+                opportunities.append(
+                    {
+                        "type": "holiday",
+                        "title": holiday["name"],
+                        "urgency": "now",
+                        "suggestion": f"Post about {holiday['name']}! Share how you're celebrating or any special offers.",
+                    }
+                )
             elif holiday.get("is_tomorrow"):
-                opportunities.append({
-                    "type": "holiday",
-                    "title": holiday["name"],
-                    "urgency": "tomorrow",
-                    "suggestion": f"{holiday['name']} is tomorrow - perfect time for a teaser or reminder post.",
-                })
+                opportunities.append(
+                    {
+                        "type": "holiday",
+                        "title": holiday["name"],
+                        "urgency": "tomorrow",
+                        "suggestion": f"{holiday['name']} is tomorrow - perfect time for a teaser or reminder post.",
+                    }
+                )
             elif holiday.get("is_this_week"):
-                opportunities.append({
-                    "type": "holiday",
-                    "title": holiday["name"],
-                    "urgency": "this_week",
-                    "suggestion": f"{holiday['name']} is in {holiday['days_until']} days - start building anticipation!",
-                })
+                opportunities.append(
+                    {
+                        "type": "holiday",
+                        "title": holiday["name"],
+                        "urgency": "this_week",
+                        "suggestion": f"{holiday['name']} is in {holiday['days_until']} days - start building anticipation!",
+                    }
+                )
 
         # Local events
         for event in events[:2]:
-            opportunities.append({
-                "type": "local_event",
-                "title": event["name"],
-                "urgency": "upcoming",
-                "suggestion": f"{event['name']} is happening {event['day_name']}. {event.get('relevance', 'Great content opportunity!')}",
-            })
+            opportunities.append(
+                {
+                    "type": "local_event",
+                    "title": event["name"],
+                    "urgency": "upcoming",
+                    "suggestion": f"{event['name']} is happening {event['day_name']}. {event.get('relevance', 'Great content opportunity!')}",
+                }
+            )
 
         return opportunities

@@ -1,5 +1,6 @@
 """LangChain tools for Location Scout agent to interact with Google Maps APIs."""
 
+import asyncio
 from typing import Any
 from langchain_core.tools import tool
 from .google_maps import GoogleMapsClient
@@ -139,35 +140,34 @@ async def discover_neighborhood(
 
     lat, lng = location["lat"], location["lng"]
 
-    # Gather neighborhood data
+    # Build search tasks for parallel execution
+    search_tasks = [
+        client.nearby_search(lat, lng, radius=500, place_type="transit_station"),
+        client.nearby_search(lat, lng, radius=500, place_type="restaurant"),
+        client.nearby_search(lat, lng, radius=500, place_type="store"),
+    ]
+
+    # Add competitor search if business type provided
+    if business_type:
+        search_tasks.insert(0, client.nearby_search(lat, lng, radius=1000, keyword=business_type))
+
+    # Execute all searches in parallel
+    search_results = await asyncio.gather(*search_tasks)
+
+    # Unpack results based on whether we searched for competitors
+    if business_type:
+        competitors, transit_stations, nearby_food, nearby_retail = search_results
+    else:
+        competitors = []
+        transit_stations, nearby_food, nearby_retail = search_results
+
     results = {
         "location": location,
-        "competitors": [],
-        "transit_stations": [],
-        "nearby_food": [],
-        "nearby_retail": [],
+        "competitors": competitors,
+        "transit_stations": transit_stations,
+        "nearby_food": nearby_food,
+        "nearby_retail": nearby_retail,
     }
-
-    # Get competitors if business type provided
-    if business_type:
-        results["competitors"] = await client.nearby_search(
-            lat, lng, radius=1000, keyword=business_type
-        )
-
-    # Get transit stations
-    results["transit_stations"] = await client.nearby_search(
-        lat, lng, radius=500, place_type="transit_station"
-    )
-
-    # Get restaurants/cafes for foot traffic
-    results["nearby_food"] = await client.nearby_search(
-        lat, lng, radius=500, place_type="restaurant"
-    )
-
-    # Get retail stores
-    results["nearby_retail"] = await client.nearby_search(
-        lat, lng, radius=500, place_type="store"
-    )
 
     # Limit results
     results["competitors"] = results["competitors"][:10]
@@ -179,8 +179,7 @@ async def discover_neighborhood(
     results["analysis_summary"] = {
         "competitor_count": len(results["competitors"]),
         "transit_access": len(results["transit_stations"]) > 0,
-        "foot_traffic_indicators": len(results["nearby_food"])
-        + len(results["nearby_retail"]),
+        "foot_traffic_indicators": len(results["nearby_food"]) + len(results["nearby_retail"]),
     }
 
     return results

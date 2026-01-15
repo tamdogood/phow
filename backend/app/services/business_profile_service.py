@@ -33,10 +33,15 @@ class BusinessProfileService:
         location_lat: float | None = None,
         location_lng: float | None = None,
         location_place_id: str | None = None,
+        user_id: str | None = None,
     ) -> dict[str, Any]:
-        """Create a new business profile or update existing one for session."""
-        # Check if profile already exists for this session
-        existing = await self.profile_repo.get_latest_by_session(session_id)
+        """Create a new business profile or update existing one for session/user."""
+        # Check if profile already exists - try user_id first, then session_id
+        existing = None
+        if user_id:
+            existing = await self.profile_repo.get_latest_by_user(user_id)
+        if not existing:
+            existing = await self.profile_repo.get_latest_by_session(session_id)
 
         if existing:
             # Update existing profile
@@ -51,6 +56,7 @@ class BusinessProfileService:
                 location_lat=location_lat,
                 location_lng=location_lng,
                 location_place_id=location_place_id,
+                user_id=user_id,
             )
             return result or existing
 
@@ -70,11 +76,16 @@ class BusinessProfileService:
             location_lat=location_lat,
             location_lng=location_lng,
             location_place_id=location_place_id,
+            user_id=user_id,
         )
 
     async def get_profile(self, session_id: str) -> dict[str, Any] | None:
         """Get the current business profile for a session."""
         return await self.profile_repo.get_latest_by_session(session_id)
+
+    async def get_profile_by_user(self, user_id: str) -> dict[str, Any] | None:
+        """Get the current business profile for a user."""
+        return await self.profile_repo.get_latest_by_user(user_id)
 
     async def get_profile_by_id(self, profile_id: str) -> dict[str, Any] | None:
         """Get a business profile by ID."""
@@ -143,9 +154,7 @@ class BusinessProfileService:
             recommendations=recommendations,
         )
 
-    async def get_latest_market_analysis(
-        self, profile_id: str
-    ) -> dict[str, Any] | None:
+    async def get_latest_market_analysis(self, profile_id: str) -> dict[str, Any] | None:
         """Get the most recent market analysis for a business profile."""
         return await self.market_repo.get_latest(profile_id)
 
@@ -175,9 +184,7 @@ class BusinessProfileService:
             differentiation_suggestions=differentiation_suggestions,
         )
 
-    async def get_latest_competitor_analysis(
-        self, profile_id: str
-    ) -> dict[str, Any] | None:
+    async def get_latest_competitor_analysis(self, profile_id: str) -> dict[str, Any] | None:
         """Get the most recent competitor analysis for a business profile."""
         return await self.competitor_analysis_repo.get_latest(profile_id)
 

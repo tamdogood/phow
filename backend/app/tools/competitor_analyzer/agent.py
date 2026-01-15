@@ -80,9 +80,7 @@ class CompetitorAnalyzerAgent:
             self._agent = create_react_agent(self.llm, self.tools)
         return self._agent
 
-    def _build_messages(
-        self, query: str, conversation_history: list[dict] | None = None
-    ) -> list:
+    def _build_messages(self, query: str, conversation_history: list[dict] | None = None) -> list:
         """Build message list with system prompt."""
         messages = [SystemMessage(content=AGENT_SYSTEM_PROMPT)]
         if conversation_history:
@@ -94,9 +92,7 @@ class CompetitorAnalyzerAgent:
         messages.append(HumanMessage(content=query))
         return messages
 
-    async def process(
-        self, query: str, conversation_history: list[dict] | None = None
-    ) -> str:
+    async def process(self, query: str, conversation_history: list[dict] | None = None) -> str:
         """Process a query using the agent with tools."""
         logger.info("Processing competitor analysis query", query=query[:100])
         agent = self._get_agent()
@@ -116,9 +112,7 @@ class CompetitorAnalyzerAgent:
         conversation_id: str | None = None,
     ) -> AsyncIterator[str]:
         """Process a query using the agent with streaming."""
-        logger.info(
-            "Processing competitor analysis query (streaming)", query=query[:100]
-        )
+        logger.info("Processing competitor analysis query (streaming)", query=query[:100])
         agent = self._get_agent()
         messages = self._build_messages(query, conversation_history)
 
@@ -126,9 +120,7 @@ class CompetitorAnalyzerAgent:
         tool_activities: dict[str, dict] = {}
 
         try:
-            async for chunk in agent.astream(
-                {"messages": messages}, stream_mode="updates"
-            ):
+            async for chunk in agent.astream({"messages": messages}, stream_mode="updates"):
                 for node_name, node_output in chunk.items():
                     logger.debug("Agent node update", node=node_name)
 
@@ -149,14 +141,12 @@ class CompetitorAnalyzerAgent:
 
                                     # Track tool activity
                                     if tracking_service and session_id:
-                                        activity_id = (
-                                            await tracking_service.start_tool_activity(
-                                                session_id=session_id,
-                                                tool_id="competitor_analyzer",
-                                                tool_name=tool_name,
-                                                input_args=tool_args,
-                                                conversation_id=conversation_id,
-                                            )
+                                        activity_id = await tracking_service.start_tool_activity(
+                                            session_id=session_id,
+                                            tool_id="competitor_analyzer",
+                                            tool_name=tool_name,
+                                            input_args=tool_args,
+                                            conversation_id=conversation_id,
                                         )
                                         tool_activities[tool_name] = {
                                             "id": activity_id,
@@ -193,22 +183,13 @@ class CompetitorAnalyzerAgent:
                                         if isinstance(msg.content, dict)
                                         else json.loads(msg.content)
                                     )
-                                    if (
-                                        "competitors" in tool_result
-                                        and "error" not in tool_result
-                                    ):
+                                    if "competitors" in tool_result and "error" not in tool_result:
                                         competitor_data = {
                                             "type": "competitor_data",
                                             "location": tool_result.get("location"),
-                                            "business_type": tool_result.get(
-                                                "business_type"
-                                            ),
-                                            "total_found": tool_result.get(
-                                                "total_found"
-                                            ),
-                                            "competitors": tool_result.get(
-                                                "competitors", []
-                                            )[:10],
+                                            "business_type": tool_result.get("business_type"),
+                                            "total_found": tool_result.get("total_found"),
+                                            "competitors": tool_result.get("competitors", [])[:10],
                                             "sources": tool_result.get("sources", {}),
                                         }
                                         yield f"\n<!--COMPETITOR_DATA:{json.dumps(competitor_data)}-->\n"
@@ -237,26 +218,18 @@ class CompetitorAnalyzerAgent:
                                         positioning_data = {
                                             "type": "positioning_data",
                                             "location": tool_result.get("location"),
-                                            "business_type": tool_result.get(
-                                                "business_type"
-                                            ),
+                                            "business_type": tool_result.get("business_type"),
                                             "positioning_data": tool_result.get(
                                                 "positioning_data", []
                                             ),
                                             "quadrant_analysis": tool_result.get(
                                                 "quadrant_analysis", {}
                                             ),
-                                            "market_gaps": tool_result.get(
-                                                "market_gaps", []
-                                            ),
-                                            "recommendation": tool_result.get(
-                                                "recommendation"
-                                            ),
+                                            "market_gaps": tool_result.get("market_gaps", []),
+                                            "recommendation": tool_result.get("recommendation"),
                                         }
                                         yield f"\n<!--POSITIONING_DATA:{json.dumps(positioning_data)}-->\n"
-                                        logger.info(
-                                            "Yielded positioning data for widget"
-                                        )
+                                        logger.info("Yielded positioning data for widget")
                                 except (json.JSONDecodeError, TypeError, KeyError) as e:
                                     logger.warning(
                                         "Could not extract positioning data",
@@ -266,14 +239,10 @@ class CompetitorAnalyzerAgent:
                             # Complete tool activity tracking
                             if tracking_service and tool_name in tool_activities:
                                 activity = tool_activities.pop(tool_name)
-                                latency_ms = int(
-                                    (time.time() - activity["start_time"]) * 1000
-                                )
+                                latency_ms = int((time.time() - activity["start_time"]) * 1000)
                                 await tracking_service.complete_tool_activity(
                                     activity_id=activity["id"],
-                                    output_data={
-                                        "result_length": len(str(msg.content))
-                                    },
+                                    output_data={"result_length": len(str(msg.content))},
                                     latency_ms=latency_ms,
                                 )
 
@@ -294,9 +263,7 @@ class CompetitorAnalyzerAgent:
                         error_message=str(e),
                         latency_ms=latency_ms,
                     )
-            logger.error(
-                "Error in agent stream", error=str(e), error_type=type(e).__name__
-            )
+            logger.error("Error in agent stream", error=str(e), error_type=type(e).__name__)
             raise
 
 

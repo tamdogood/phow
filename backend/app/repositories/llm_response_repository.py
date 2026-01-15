@@ -61,9 +61,7 @@ class LLMResponseRepository(BaseRepository):
         )
         return result.data
 
-    async def get_usage_stats(
-        self, conversation_id: str | None = None
-    ) -> dict[str, Any]:
+    async def get_usage_stats(self, conversation_id: str | None = None) -> dict[str, Any]:
         """Get token usage statistics."""
         query = self.db.table(self.table).select(
             "provider, model, prompt_tokens, completion_tokens, total_tokens"

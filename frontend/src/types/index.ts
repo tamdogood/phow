@@ -22,3 +22,15 @@ export interface Conversation {
   created_at: string;
   updated_at: string;
 }
+
+export interface BusinessProfile {
+  id: string;
+  session_id: string;
+  business_name: string | null;
+  business_type: string;
+  business_description: string | null;
+  target_customers: string | null;
+  location_address: string | null;
+  created_at: string;
+  updated_at: string;
+}

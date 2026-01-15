@@ -75,9 +75,7 @@ class MarketValidatorAgent:
             self._agent = create_react_agent(self.llm, self.tools)
         return self._agent
 
-    def _build_messages(
-        self, query: str, conversation_history: list[dict] | None = None
-    ) -> list:
+    def _build_messages(self, query: str, conversation_history: list[dict] | None = None) -> list:
         """Build message list with system prompt."""
         messages = [SystemMessage(content=AGENT_SYSTEM_PROMPT)]
         if conversation_history:
@@ -89,9 +87,7 @@ class MarketValidatorAgent:
         messages.append(HumanMessage(content=query))
         return messages
 
-    async def process(
-        self, query: str, conversation_history: list[dict] | None = None
-    ) -> str:
+    async def process(self, query: str, conversation_history: list[dict] | None = None) -> str:
         """Process a query using the agent with tools."""
         logger.info("Processing market validation query", query=query[:100])
         agent = self._get_agent()
@@ -119,9 +115,7 @@ class MarketValidatorAgent:
         tool_activities: dict[str, dict] = {}
 
         try:
-            async for chunk in agent.astream(
-                {"messages": messages}, stream_mode="updates"
-            ):
+            async for chunk in agent.astream({"messages": messages}, stream_mode="updates"):
                 for node_name, node_output in chunk.items():
                     logger.debug("Agent node update", node=node_name)
 
@@ -142,14 +136,12 @@ class MarketValidatorAgent:
 
                                     # Track tool activity
                                     if tracking_service and session_id:
-                                        activity_id = (
-                                            await tracking_service.start_tool_activity(
-                                                session_id=session_id,
-                                                tool_id="market_validator",
-                                                tool_name=tool_name,
-                                                input_args=tool_args,
-                                                conversation_id=conversation_id,
-                                            )
+                                        activity_id = await tracking_service.start_tool_activity(
+                                            session_id=session_id,
+                                            tool_id="market_validator",
+                                            tool_name=tool_name,
+                                            input_args=tool_args,
+                                            conversation_id=conversation_id,
                                         )
                                         tool_activities[tool_name] = {
                                             "id": activity_id,
@@ -161,16 +153,12 @@ class MarketValidatorAgent:
                                         address = tool_args.get("address", "location")
                                         yield f"\n**Analyzing demographics for {address}...**\n"
                                     elif tool_name == "analyze_competition_density":
-                                        business_type = tool_args.get(
-                                            "business_type", "business"
-                                        )
+                                        business_type = tool_args.get("business_type", "business")
                                         yield f"\n**Scanning for {business_type} competitors...**\n"
                                     elif tool_name == "assess_foot_traffic_potential":
                                         yield "\n**Evaluating foot traffic potential...**\n"
                                     elif tool_name == "calculate_market_viability":
-                                        business_type = tool_args.get(
-                                            "business_type", "business"
-                                        )
+                                        business_type = tool_args.get("business_type", "business")
                                         address = tool_args.get("address", "")
                                         yield f"\n**Calculating market viability for {business_type} at {address}...**\n"
 
@@ -204,18 +192,10 @@ class MarketValidatorAgent:
                                         market_data = {
                                             "type": "market_data",
                                             "location": tool_result.get("location"),
-                                            "business_type": tool_result.get(
-                                                "business_type"
-                                            ),
-                                            "viability_score": tool_result.get(
-                                                "viability_score"
-                                            ),
-                                            "viability_level": tool_result.get(
-                                                "viability_level"
-                                            ),
-                                            "score_breakdown": tool_result.get(
-                                                "score_breakdown"
-                                            ),
+                                            "business_type": tool_result.get("business_type"),
+                                            "viability_score": tool_result.get("viability_score"),
+                                            "viability_level": tool_result.get("viability_level"),
+                                            "score_breakdown": tool_result.get("score_breakdown"),
                                             "demographics_summary": tool_result.get(
                                                 "demographics_summary"
                                             ),
@@ -225,12 +205,8 @@ class MarketValidatorAgent:
                                             "foot_traffic_summary": tool_result.get(
                                                 "foot_traffic_summary"
                                             ),
-                                            "risk_factors": tool_result.get(
-                                                "risk_factors", []
-                                            ),
-                                            "opportunities": tool_result.get(
-                                                "opportunities", []
-                                            ),
+                                            "risk_factors": tool_result.get("risk_factors", []),
+                                            "opportunities": tool_result.get("opportunities", []),
                                             "recommendations": tool_result.get(
                                                 "recommendations", []
                                             ),
@@ -244,21 +220,15 @@ class MarketValidatorAgent:
                                             score=tool_result["viability_score"],
                                         )
                                 except (json.JSONDecodeError, TypeError, KeyError) as e:
-                                    logger.warning(
-                                        "Could not extract market data", error=str(e)
-                                    )
+                                    logger.warning("Could not extract market data", error=str(e))
 
                             # Complete tool activity tracking
                             if tracking_service and tool_name in tool_activities:
                                 activity = tool_activities.pop(tool_name)
-                                latency_ms = int(
-                                    (time.time() - activity["start_time"]) * 1000
-                                )
+                                latency_ms = int((time.time() - activity["start_time"]) * 1000)
                                 await tracking_service.complete_tool_activity(
                                     activity_id=activity["id"],
-                                    output_data={
-                                        "result_length": len(str(msg.content))
-                                    },
+                                    output_data={"result_length": len(str(msg.content))},
                                     latency_ms=latency_ms,
                                 )
 
@@ -279,9 +249,7 @@ class MarketValidatorAgent:
                         error_message=str(e),
                         latency_ms=latency_ms,
                     )
-            logger.error(
-                "Error in agent stream", error=str(e), error_type=type(e).__name__
-            )
+            logger.error("Error in agent stream", error=str(e), error_type=type(e).__name__)
             raise
 
 

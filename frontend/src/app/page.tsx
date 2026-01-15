@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
+import Link from "next/link";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Chat = dynamic(() => import("@/components/chat").then((mod) => ({ default: mod.Chat })), {
   ssr: false,
@@ -22,6 +24,7 @@ interface Tool {
 }
 
 export default function Home() {
+  const { user, loading: authLoading, isConfigured, signInWithGoogle } = useAuth();
   const [selectedTool, setSelectedTool] = useState<Tool | null>(null);
   const [tools, setTools] = useState<Tool[]>([]);
   const [chatKey, setChatKey] = useState(0);
@@ -92,12 +95,47 @@ export default function Home() {
           >
             <span className="text-2xl">PHOW</span>
           </button>
-          <button
-            onClick={() => !selectedTool && handleSelectTool(tools[0]?.id)}
-            className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm font-medium transition-all border border-white/20"
-          >
-            Get Started
-          </button>
+          <div className="flex items-center gap-3">
+            {!authLoading && (
+              <>
+                {user ? (
+                  <>
+                    <Link
+                      href="/business-setup"
+                      className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm font-medium transition-all border border-white/20"
+                    >
+                      My Business
+                    </Link>
+                    <Link
+                      href="/profile"
+                      className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm font-medium transition-all border border-white/20 flex items-center gap-2"
+                    >
+                      <span className="truncate max-w-[120px]">
+                        {user.user_metadata?.full_name || user.email?.split("@")[0]}
+                      </span>
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href="/business-setup"
+                      className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm font-medium transition-all border border-white/20"
+                    >
+                      Business Setup
+                    </Link>
+                    <button
+                      onClick={signInWithGoogle}
+                      disabled={!isConfigured}
+                      className="px-4 py-2 rounded-lg bg-white text-slate-900 text-sm font-medium hover:bg-white/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                      title={!isConfigured ? "Supabase not configured" : undefined}
+                    >
+                      Sign In
+                    </button>
+                  </>
+                )}
+              </>
+            )}
+          </div>
         </div>
       </header>
 

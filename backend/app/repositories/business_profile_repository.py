@@ -41,17 +41,10 @@ class BusinessProfileRepository(BaseRepository):
 
     async def get_by_id(self, profile_id: str) -> dict[str, Any] | None:
         """Get business profile by ID."""
-        result = (
-            self.db.table("business_profiles")
-            .select("*")
-            .eq("id", profile_id)
-            .execute()
-        )
+        result = self.db.table("business_profiles").select("*").eq("id", profile_id).execute()
         return result.data[0] if result.data else None
 
-    async def get_by_session(
-        self, session_id: str, limit: int = 10
-    ) -> list[dict[str, Any]]:
+    async def get_by_session(self, session_id: str, limit: int = 10) -> list[dict[str, Any]]:
         """Get all business profiles for a session."""
         result = (
             self.db.table("business_profiles")
@@ -75,25 +68,30 @@ class BusinessProfileRepository(BaseRepository):
         )
         return result.data[0] if result.data else None
 
+    async def get_latest_by_user(self, user_id: str) -> dict[str, Any] | None:
+        """Get the most recent business profile for a user."""
+        result = (
+            self.db.table("business_profiles")
+            .select("*")
+            .eq("user_id", user_id)
+            .order("created_at", desc=True)
+            .limit(1)
+            .execute()
+        )
+        return result.data[0] if result.data else None
+
     async def update(self, profile_id: str, **kwargs) -> dict[str, Any] | None:
         """Update a business profile."""
         # Filter out None values
         updates = {k: v for k, v in kwargs.items() if v is not None}
         if not updates:
             return await self.get_by_id(profile_id)
-        result = (
-            self.db.table("business_profiles")
-            .update(updates)
-            .eq("id", profile_id)
-            .execute()
-        )
+        result = self.db.table("business_profiles").update(updates).eq("id", profile_id).execute()
         return result.data[0] if result.data else None
 
     async def delete(self, profile_id: str) -> bool:
         """Delete a business profile."""
-        result = (
-            self.db.table("business_profiles").delete().eq("id", profile_id).execute()
-        )
+        result = self.db.table("business_profiles").delete().eq("id", profile_id).execute()
         return bool(result.data)
 
 
@@ -165,21 +163,13 @@ class TrackedCompetitorRepository(BaseRepository):
         if not updates:
             return None
         result = (
-            self.db.table("tracked_competitors")
-            .update(updates)
-            .eq("id", competitor_id)
-            .execute()
+            self.db.table("tracked_competitors").update(updates).eq("id", competitor_id).execute()
         )
         return result.data[0] if result.data else None
 
     async def delete_competitor(self, competitor_id: str) -> bool:
         """Delete a tracked competitor."""
-        result = (
-            self.db.table("tracked_competitors")
-            .delete()
-            .eq("id", competitor_id)
-            .execute()
-        )
+        result = self.db.table("tracked_competitors").delete().eq("id", competitor_id).execute()
         return bool(result.data)
 
 
@@ -228,9 +218,7 @@ class MarketAnalysisRepository(BaseRepository):
         )
         return result.data[0] if result.data else None
 
-    async def get_history(
-        self, business_profile_id: str, limit: int = 10
-    ) -> list[dict[str, Any]]:
+    async def get_history(self, business_profile_id: str, limit: int = 10) -> list[dict[str, Any]]:
         """Get market analysis history for a business profile."""
         result = (
             self.db.table("market_analyses")

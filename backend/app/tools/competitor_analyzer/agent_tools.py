@@ -1,5 +1,6 @@
 """LangChain tools for Competitor Analyzer agent."""
 
+import asyncio
 import re
 from typing import Any
 from langchain_core.tools import tool
@@ -52,21 +53,16 @@ async def find_competitors(
     lat, lng = location["lat"], location["lng"]
     logger.info("Finding competitors", lat=lat, lng=lng, business_type=business_type)
 
-    # Get competitors from Google Maps
-    google_competitors = await maps_client.nearby_search(
-        lat=lat,
-        lng=lng,
-        radius=radius_meters,
-        keyword=business_type,
-    )
-
-    # Get competitors from Yelp
-    yelp_competitors = await yelp_client.search_businesses(
-        term=business_type,
-        latitude=lat,
-        longitude=lng,
-        radius=radius_meters,
-        sort_by="distance",
+    # Get competitors from Google Maps and Yelp in parallel
+    google_competitors, yelp_competitors = await asyncio.gather(
+        maps_client.nearby_search(lat=lat, lng=lng, radius=radius_meters, keyword=business_type),
+        yelp_client.search_businesses(
+            term=business_type,
+            latitude=lat,
+            longitude=lng,
+            radius=radius_meters,
+            sort_by="distance",
+        ),
     )
 
     # Merge and deduplicate based on name similarity
@@ -134,9 +130,7 @@ async def get_competitor_details(
     # Get Google Place details
     place_details = {}
     if best_match.get("place_id"):
-        place_details = (
-            await maps_client.get_place_details(best_match["place_id"]) or {}
-        )
+        place_details = await maps_client.get_place_details(best_match["place_id"]) or {}
 
     # Try to find on Yelp for additional info
     yelp_results = await yelp_client.search_businesses(
@@ -217,13 +211,21 @@ async def analyze_competitor_reviews(
         keyword=business_type,
     )
 
-    # Analyze reviews from top competitors
+    # Analyze reviews from top competitors (fetch details in parallel)
     all_reviews = []
     analyzed_competitors = []
 
-    for comp in competitors[:5]:  # Top 5 competitors
-        if comp.get("place_id"):
-            details = await maps_client.get_place_details(comp["place_id"])
+    # Get competitors with place_ids
+    competitors_with_ids = [c for c in competitors[:5] if c.get("place_id")]
+
+    # Fetch all place details in parallel
+    if competitors_with_ids:
+        details_list = await asyncio.gather(
+            *[maps_client.get_place_details(c["place_id"]) for c in competitors_with_ids]
+        )
+
+        # Process results
+        for comp, details in zip(competitors_with_ids, details_list):
             if details and details.get("reviews"):
                 reviews = details["reviews"][:5]
                 all_reviews.extend(reviews)
@@ -232,9 +234,7 @@ async def analyze_competitor_reviews(
                         "name": comp.get("name"),
                         "rating": comp.get("rating"),
                         "review_count": comp.get("user_ratings_total"),
-                        "sample_reviews": [
-                            r.get("text", "")[:200] for r in reviews[:2]
-                        ],
+                        "sample_reviews": [r.get("text", "")[:200] for r in reviews[:2]],
                     }
                 )
 
@@ -284,19 +284,10 @@ async def create_positioning_map(
 
     lat, lng = location["lat"], location["lng"]
 
-    # Get competitors from both sources
-    google_competitors = await maps_client.nearby_search(
-        lat=lat,
-        lng=lng,
-        radius=1500,
-        keyword=business_type,
-    )
-
-    yelp_competitors = await yelp_client.search_businesses(
-        term=business_type,
-        latitude=lat,
-        longitude=lng,
-        radius=1500,
+    # Get competitors from both sources in parallel
+    google_competitors, yelp_competitors = await asyncio.gather(
+        maps_client.nearby_search(lat=lat, lng=lng, radius=1500, keyword=business_type),
+        yelp_client.search_businesses(term=business_type, latitude=lat, longitude=lng, radius=1500),
     )
 
     # Merge competitors
@@ -306,9 +297,7 @@ async def create_positioning_map(
     positioning_data = []
     for comp in competitors:
         rating = comp.get("rating")
-        price = comp.get("price_level") or _price_string_to_level(
-            comp.get("yelp_price")
-        )
+        price = comp.get("price_level") or _price_string_to_level(comp.get("yelp_price"))
 
         if rating and price:
             positioning_data.append(
@@ -342,9 +331,7 @@ async def create_positioning_map(
         "positioning_data": positioning_data,
         "quadrant_analysis": quadrant_counts,
         "market_gaps": gaps,
-        "recommendation": _get_positioning_recommendation(
-            quadrant_counts, positioning_data
-        ),
+        "recommendation": _get_positioning_recommendation(quadrant_counts, positioning_data),
     }
 
 
@@ -469,12 +456,8 @@ def _extract_review_themes(reviews: list[dict]) -> dict:
                 negative_found[keyword] = negative_found.get(keyword, 0) + 1
 
     # Sort by frequency
-    positive_themes = sorted(positive_found.items(), key=lambda x: x[1], reverse=True)[
-        :5
-    ]
-    negative_themes = sorted(negative_found.items(), key=lambda x: x[1], reverse=True)[
-        :5
-    ]
+    positive_themes = sorted(positive_found.items(), key=lambda x: x[1], reverse=True)[:5]
+    negative_themes = sorted(negative_found.items(), key=lambda x: x[1], reverse=True)[:5]
 
     return {
         "positive_themes": [t[0] for t in positive_themes],
@@ -496,13 +479,9 @@ def _identify_opportunities(themes: dict) -> list[str]:
     if "dirty" in negative:
         opportunities.append("Cleanliness and hygiene could set you apart")
     if "rude" in negative or "poor service" in negative:
-        opportunities.append(
-            "Excellent customer service would be a competitive advantage"
-        )
+        opportunities.append("Excellent customer service would be a competitive advantage")
 
-    return (
-        opportunities if opportunities else ["Focus on overall quality and consistency"]
-    )
+    return opportunities if opportunities else ["Focus on overall quality and consistency"]
 
 
 def _price_string_to_level(price_str: str | None) -> int | None:
@@ -539,9 +518,7 @@ def _get_positioning_recommendation(quadrants: dict, data: list) -> str:
         "avoid": "Focus on either improving quality or lowering prices - the high-price/low-quality segment is risky",
     }
 
-    return recommendations.get(
-        min_quadrant, "Focus on differentiation through unique offerings"
-    )
+    return recommendations.get(min_quadrant, "Focus on differentiation through unique offerings")
 
 
 # List of all tools for the agent

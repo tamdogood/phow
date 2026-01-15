@@ -43,9 +43,7 @@ class MarketValidatorTool(BaseTool):
             ],
         )
 
-    async def process_stream(
-        self, query: str, context: ToolContext
-    ) -> AsyncIterator[str]:
+    async def process_stream(self, query: str, context: ToolContext) -> AsyncIterator[str]:
         """Process a market validation request with streaming using the agent."""
         async for chunk in self.agent.process_stream(
             query=query,

@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .api.routes import chat_router, tools_router
+from .api.routes import chat_router, tools_router, business_profile_router
 from .core.tool_registry import ToolRegistry
 from .core.cache import get_cache
 from .core.logging import setup_logging, get_logger
@@ -9,6 +9,7 @@ from .tools.location_scout import LocationScoutTool
 from .tools.market_validator import MarketValidatorTool
 from .tools.competitor_analyzer import CompetitorAnalyzerTool
 from .tools.social_media_coach import SocialMediaCoachTool
+from .tools.review_responder import ReviewResponderTool
 
 logger = get_logger("main")
 
@@ -24,6 +25,7 @@ async def lifespan(app: FastAPI):
     ToolRegistry.register(MarketValidatorTool())
     ToolRegistry.register(CompetitorAnalyzerTool())
     ToolRegistry.register(SocialMediaCoachTool())
+    ToolRegistry.register(ReviewResponderTool())
     logger.info("Registered tools", tools=ToolRegistry.list_tools())
 
     yield
@@ -59,6 +61,7 @@ app.add_middleware(
 # Include routers
 app.include_router(chat_router, prefix="/api")
 app.include_router(tools_router, prefix="/api")
+app.include_router(business_profile_router, prefix="/api")
 
 
 @app.get("/")
