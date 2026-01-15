@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .api.routes import chat_router, tools_router, business_profile_router
+from .api.routes import chat_router, tools_router, business_profile_router, dashboard_router
 from .core.tool_registry import ToolRegistry
 from .core.cache import get_cache
 from .core.logging import setup_logging, get_logger
@@ -62,6 +62,7 @@ app.add_middleware(
 app.include_router(chat_router, prefix="/api")
 app.include_router(tools_router, prefix="/api")
 app.include_router(business_profile_router, prefix="/api")
+app.include_router(dashboard_router, prefix="/api")
 
 
 @app.get("/")
