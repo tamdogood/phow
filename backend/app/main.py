@@ -1,13 +1,17 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .api.routes import chat_router, tools_router, business_profile_router, dashboard_router
+from .api.routes import (
+    chat_router,
+    tools_router,
+    business_profile_router,
+    dashboard_router,
+    community_router,
+)
 from .core.tool_registry import ToolRegistry
 from .core.cache import get_cache
 from .core.logging import setup_logging, get_logger
-from .tools.location_scout import LocationScoutTool
-from .tools.market_validator import MarketValidatorTool
-from .tools.competitor_analyzer import CompetitorAnalyzerTool
+from .tools.market_research import MarketResearchTool
 from .tools.social_media_coach import SocialMediaCoachTool
 from .tools.review_responder import ReviewResponderTool
 
@@ -21,9 +25,7 @@ async def lifespan(app: FastAPI):
     logger.info("Starting PHOW API")
 
     # Startup: Register tools
-    ToolRegistry.register(LocationScoutTool())
-    ToolRegistry.register(MarketValidatorTool())
-    ToolRegistry.register(CompetitorAnalyzerTool())
+    ToolRegistry.register(MarketResearchTool())
     ToolRegistry.register(SocialMediaCoachTool())
     ToolRegistry.register(ReviewResponderTool())
     logger.info("Registered tools", tools=ToolRegistry.list_tools())
@@ -63,6 +65,7 @@ app.include_router(chat_router, prefix="/api")
 app.include_router(tools_router, prefix="/api")
 app.include_router(business_profile_router, prefix="/api")
 app.include_router(dashboard_router, prefix="/api")
+app.include_router(community_router, prefix="/api")
 
 
 @app.get("/")

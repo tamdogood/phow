@@ -57,6 +57,9 @@ export interface MarketAnalysis {
   demand_indicators: Record<string, unknown> | null;
   competition_saturation: Record<string, unknown> | null;
   recommendations: string[] | null;
+  risk_factors: string[] | null;
+  opportunities: string[] | null;
+  market_size_estimates: Record<string, unknown> | null;
   created_at: string;
 }
 
@@ -67,6 +70,15 @@ export interface CompetitorAnalysis {
   positioning_data: Record<string, unknown> | null;
   market_gaps: Record<string, unknown> | null;
   differentiation_suggestions: string[] | null;
+  pricing_insights: {
+    price_range?: { min: number; max: number };
+    average_price_level?: number;
+    notes?: string;
+  } | null;
+  sentiment_summary: {
+    positive_themes?: string[];
+    negative_themes?: string[];
+  } | null;
   created_at: string;
 }
 
@@ -77,4 +89,39 @@ export interface DashboardData {
   competitor_analysis: CompetitorAnalysis | null;
   tracked_competitors: TrackedCompetitor[];
   recent_conversations: Conversation[];
+}
+
+export interface PostAuthor {
+  business_name: string | null;
+  business_type: string | null;
+}
+
+export interface CommunityPost {
+  id: string;
+  session_id: string;
+  user_id: string | null;
+  business_profile_id: string | null;
+  title: string;
+  content: string;
+  category: string | null;
+  metadata: Record<string, unknown> | null;
+  created_at: string;
+  updated_at: string;
+  business_profiles: PostAuthor | null;
+  comment_count: number;
+}
+
+export interface PostComment {
+  id: string;
+  post_id: string;
+  session_id: string;
+  user_id: string | null;
+  business_profile_id: string | null;
+  content: string;
+  created_at: string;
+  business_profiles: PostAuthor | null;
+}
+
+export interface PostWithComments extends CommunityPost {
+  comments: PostComment[];
 }

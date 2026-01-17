@@ -4,6 +4,41 @@
 
 PHOW is a production-ready web application that helps small business owners make data-driven decisions about their business locations. The MVP features a **Location Scout** tool that analyzes potential business locations using Google Maps data and AI-powered insights.
 
+---
+
+## Quick Start (5 minutes)
+
+Get PHOW running locally with your own API keys:
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/tamdogood/phow.git
+cd phow
+
+# 2. Run the setup script (interactive)
+./setup.sh
+
+# 3. Start backend services
+docker-compose up
+
+# 4. Start frontend (in a new terminal)
+cd frontend && npm install && npm run dev
+
+# 5. Open http://localhost:3000
+```
+
+### What You'll Need
+
+| API Key | Required | Free Tier | Get It At |
+|---------|----------|-----------|-----------|
+| Google Maps | Yes | $200/month | [Google Cloud Console](https://console.cloud.google.com/apis/credentials) |
+| OpenAI OR Anthropic | Yes (one) | Pay-as-you-go | [OpenAI](https://platform.openai.com/api-keys) / [Anthropic](https://console.anthropic.com/) |
+| Yelp | Optional | 500 calls/day | [Yelp Developers](https://www.yelp.com/developers/v3/manage_app) |
+
+**No Supabase account needed!** Docker Compose includes a local PostgreSQL database.
+
+---
+
 ## Features
 
 - **Location Scout**: Analyze potential business locations with insights on:

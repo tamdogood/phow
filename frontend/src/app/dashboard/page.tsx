@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { getDashboard } from "@/lib/api";
 import { getSessionId } from "@/lib/session";
-import { DashboardData } from "@/types";
+import { DashboardData, TrackedCompetitor } from "@/types";
 
 function ScoreCard({
   label,
@@ -36,25 +36,81 @@ function ScoreCard({
   );
 }
 
-function CompetitorCard({
-  name,
-  rating,
-  address,
-}: {
-  name: string;
-  rating: number | null;
-  address: string | null;
-}) {
+function CompetitorCard({ competitor }: { competitor: TrackedCompetitor }) {
+  const [expanded, setExpanded] = useState(false);
+  const hasDetails =
+    (competitor.strengths && competitor.strengths.length > 0) ||
+    (competitor.weaknesses && competitor.weaknesses.length > 0);
+
+  const priceLevel = competitor.price_level
+    ? "$".repeat(competitor.price_level)
+    : null;
+
   return (
-    <div className="flex items-center justify-between py-3 border-b border-white/10 last:border-0">
-      <div>
-        <p className="text-white font-medium">{name}</p>
-        {address && <p className="text-white/50 text-sm truncate max-w-xs">{address}</p>}
+    <div className="py-3 border-b border-white/10 last:border-0">
+      <div
+        className={`flex items-center justify-between ${hasDetails ? "cursor-pointer" : ""}`}
+        onClick={() => hasDetails && setExpanded(!expanded)}
+      >
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <p className="text-white font-medium">{competitor.name}</p>
+            {priceLevel && (
+              <span className="text-emerald-400 text-sm">{priceLevel}</span>
+            )}
+          </div>
+          {competitor.address && (
+            <p className="text-white/50 text-sm truncate max-w-xs">{competitor.address}</p>
+          )}
+        </div>
+        <div className="flex items-center gap-3">
+          {competitor.rating && (
+            <div className="flex items-center gap-1 text-amber-400">
+              <span>★</span>
+              <span className="font-medium">{competitor.rating.toFixed(1)}</span>
+              {competitor.review_count && (
+                <span className="text-white/40 text-xs">({competitor.review_count})</span>
+              )}
+            </div>
+          )}
+          {hasDetails && (
+            <span className="text-white/40 text-sm">{expanded ? "▲" : "▼"}</span>
+          )}
+        </div>
       </div>
-      {rating && (
-        <div className="flex items-center gap-1 text-amber-400">
-          <span>★</span>
-          <span className="font-medium">{rating.toFixed(1)}</span>
+
+      {expanded && hasDetails && (
+        <div className="mt-3 pt-3 border-t border-white/10">
+          {competitor.strengths && competitor.strengths.length > 0 && (
+            <div className="mb-2">
+              <p className="text-white/50 text-xs mb-1">Strengths</p>
+              <div className="flex flex-wrap gap-2">
+                {competitor.strengths.map((s, idx) => (
+                  <span
+                    key={idx}
+                    className="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded"
+                  >
+                    {s}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+          {competitor.weaknesses && competitor.weaknesses.length > 0 && (
+            <div>
+              <p className="text-white/50 text-xs mb-1">Weaknesses</p>
+              <div className="flex flex-wrap gap-2">
+                {competitor.weaknesses.map((w, idx) => (
+                  <span
+                    key={idx}
+                    className="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded"
+                  >
+                    {w}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -94,6 +150,30 @@ function ConversationCard({
       </div>
       <p className="text-white/40 text-sm">{formattedDate}</p>
     </div>
+  );
+}
+
+function RecommendationItem({ text }: { text: string }) {
+  const [done, setDone] = useState(false);
+
+  return (
+    <li className={`flex items-start gap-3 ${done ? "opacity-50" : ""}`}>
+      <button
+        onClick={() => setDone(!done)}
+        className={`w-5 h-5 rounded border flex-shrink-0 flex items-center justify-center mt-0.5 transition-colors ${
+          done
+            ? "bg-emerald-500 border-emerald-500"
+            : "border-white/30 hover:border-white/50"
+        }`}
+      >
+        {done && (
+          <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+          </svg>
+        )}
+      </button>
+      <span className={`text-white/80 ${done ? "line-through" : ""}`}>{text}</span>
+    </li>
   );
 }
 
@@ -149,6 +229,12 @@ export default function DashboardPage() {
             <span className="text-2xl">PHOW</span>
           </Link>
           <div className="flex items-center gap-3">
+            <Link
+              href="/community"
+              className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm font-medium transition-all border border-white/20"
+            >
+              Community
+            </Link>
             <Link
               href="/business-setup"
               className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm font-medium transition-all border border-white/20"
@@ -226,6 +312,62 @@ export default function DashboardPage() {
                 />
               </div>
 
+              {/* Quick Insights */}
+              {(data.market_analysis?.risk_factors?.length || data.market_analysis?.opportunities?.length) && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                  {/* Risks Card */}
+                  {data.market_analysis?.risk_factors && data.market_analysis.risk_factors.length > 0 && (
+                    <div className="glass-card p-6 border-l-4 border-red-500">
+                      <h3 className="text-red-400 font-semibold mb-3 flex items-center gap-2">
+                        <span>⚠️</span> Top Risks
+                      </h3>
+                      <ul className="space-y-2">
+                        {data.market_analysis.risk_factors.slice(0, 3).map((risk, idx) => (
+                          <li key={idx} className="flex items-start gap-2 text-white/80 text-sm">
+                            <span className="text-red-400 mt-1">•</span>
+                            <span>{risk}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* Opportunities Card */}
+                  {data.market_analysis?.opportunities && data.market_analysis.opportunities.length > 0 && (
+                    <div className="glass-card p-6 border-l-4 border-emerald-500">
+                      <h3 className="text-emerald-400 font-semibold mb-3 flex items-center gap-2">
+                        <span>✨</span> Top Opportunities
+                      </h3>
+                      <ul className="space-y-2">
+                        {data.market_analysis.opportunities.slice(0, 3).map((opp, idx) => (
+                          <li key={idx} className="flex items-start gap-2 text-white/80 text-sm">
+                            <span className="text-emerald-400 mt-1">•</span>
+                            <span>{opp}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Demographics Section */}
+              {data.market_analysis?.demographics && Object.keys(data.market_analysis.demographics).length > 0 && (
+                <div className="glass-card p-6 mb-6">
+                  <h2 className="text-xl font-semibold text-white mb-4">Market Demographics</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {Object.entries(data.market_analysis.demographics).map(([key, value]) => (
+                      <div key={key} className="bg-white/5 rounded-lg p-4">
+                        <p className="text-white/50 text-sm mb-2 capitalize">
+                          {key.replace(/_/g, " ")}
+                        </p>
+                        <p className="text-white font-medium">{String(value)}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Two Column Layout */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Competitors */}
@@ -242,12 +384,7 @@ export default function DashboardPage() {
                   {data.tracked_competitors.length > 0 ? (
                     <div>
                       {data.tracked_competitors.slice(0, 5).map((competitor) => (
-                        <CompetitorCard
-                          key={competitor.id}
-                          name={competitor.name}
-                          rating={competitor.rating}
-                          address={competitor.address}
-                        />
+                        <CompetitorCard key={competitor.id} competitor={competitor} />
                       ))}
                       {data.tracked_competitors.length > 5 && (
                         <p className="text-white/40 text-sm mt-3 text-center">
@@ -292,17 +429,52 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {/* Recommendations */}
+              {/* Market Gaps / Competitive Advantages */}
+              {data.competitor_analysis?.market_gaps && Object.keys(data.competitor_analysis.market_gaps).length > 0 && (
+                <div className="glass-card p-6 mt-6">
+                  <h2 className="text-xl font-semibold text-white mb-2">Your Competitive Advantages</h2>
+                  <p className="text-white/50 text-sm mb-4">
+                    Gaps in the market where you can differentiate
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {Object.entries(data.competitor_analysis.market_gaps).map(([key, value]) => (
+                      <div key={key} className="bg-white/5 rounded-lg p-4 border-l-2 border-sky-500">
+                        <p className="text-sky-400 text-sm font-medium capitalize mb-1">
+                          {key.replace(/_/g, " ")}
+                        </p>
+                        <p className="text-white/80 text-sm">{String(value)}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Differentiation Suggestions */}
+              {data.competitor_analysis?.differentiation_suggestions &&
+                data.competitor_analysis.differentiation_suggestions.length > 0 && (
+                  <div className="glass-card p-6 mt-6">
+                    <h2 className="text-xl font-semibold text-white mb-4">
+                      Differentiation Strategies
+                    </h2>
+                    <ul className="space-y-2">
+                      {data.competitor_analysis.differentiation_suggestions.map((sug, idx) => (
+                        <li key={idx} className="flex items-start gap-3">
+                          <span className="text-sky-400 mt-1">→</span>
+                          <span className="text-white/80">{sug}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+              {/* Recommendations (Checkable) */}
               {data.market_analysis?.recommendations &&
                 data.market_analysis.recommendations.length > 0 && (
                   <div className="glass-card p-6 mt-6">
-                    <h2 className="text-xl font-semibold text-white mb-4">Recommendations</h2>
-                    <ul className="space-y-2">
+                    <h2 className="text-xl font-semibold text-white mb-4">Action Items</h2>
+                    <ul className="space-y-3">
                       {data.market_analysis.recommendations.map((rec, idx) => (
-                        <li key={idx} className="flex items-start gap-3">
-                          <span className="text-emerald-400 mt-1">•</span>
-                          <span className="text-white/80">{rec}</span>
-                        </li>
+                        <RecommendationItem key={idx} text={rec} />
                       ))}
                     </ul>
                   </div>

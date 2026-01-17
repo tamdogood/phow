@@ -1,6 +1,22 @@
 version: '3.8'
 
+# ============================================================================
+# PHOW Development Environment
+# ============================================================================
+# Start all services:
+#   docker-compose up
+#
+# Start specific services:
+#   docker-compose up backend redis db
+#
+# For frontend, run separately (better dev experience with hot reload):
+#   cd frontend && npm install && npm run dev
+# ============================================================================
+
 services:
+  # --------------------------------------------------------------------------
+  # Backend API (FastAPI)
+  # --------------------------------------------------------------------------
   backend:
     build:
       context: ./backend
@@ -15,7 +31,13 @@ services:
     depends_on:
       - db
       - redis
+    restart: unless-stopped
 
+  # --------------------------------------------------------------------------
+  # PostgreSQL Database
+  # --------------------------------------------------------------------------
+  # Local PostgreSQL - no Supabase account needed!
+  # Migrations run automatically on startup.
   db:
     image: supabase/postgres:15.1.0.117
     ports:
@@ -26,7 +48,11 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
       - ./supabase/migrations:/docker-entrypoint-initdb.d
+    restart: unless-stopped
 
+  # --------------------------------------------------------------------------
+  # Redis Cache
+  # --------------------------------------------------------------------------
   redis:
     image: redis:7-alpine
     ports:
@@ -34,7 +60,11 @@ services:
     volumes:
       - redis_data:/data
     command: redis-server --appendonly yes
+    restart: unless-stopped
 
+  # --------------------------------------------------------------------------
+  # Celery Worker (Background Tasks)
+  # --------------------------------------------------------------------------
   celery_worker:
     build:
       context: ./backend
@@ -47,7 +77,17 @@ services:
     depends_on:
       - redis
       - db
+    restart: unless-stopped
 
 volumes:
   db_data:
   redis_data:
+
+# ============================================================================
+# Quick Start:
+# ============================================================================
+# 1. Run setup script: ./setup.sh
+# 2. Start services: docker-compose up
+# 3. Start frontend (separate terminal): cd frontend && npm run dev
+# 4. Open: http://localhost:3000
+# ============================================================================
