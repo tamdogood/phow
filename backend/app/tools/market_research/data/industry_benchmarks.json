@@ -1,0 +1,207 @@
+{
+  "metadata": {
+    "description": "Industry financial benchmarks compiled from SBA, RMA, and public sources",
+    "last_updated": "2026-01-20",
+    "sources": ["SBA Size Standards", "RMA Annual Statement Studies", "IBISWorld", "Census Bureau"]
+  },
+  "benchmarks": {
+    "722515": {
+      "name": "Snack and Nonalcoholic Beverage Bars (Coffee Shops)",
+      "avg_revenue_per_location": 500000,
+      "revenue_range": {"min": 200000, "max": 1000000},
+      "cost_structure": {
+        "cogs_percent": 30,
+        "labor_percent": 35,
+        "rent_percent": 10,
+        "marketing_percent": 3,
+        "utilities_percent": 3,
+        "other_percent": 9
+      },
+      "profit_margin": {"low": 5, "median": 10, "high": 15},
+      "avg_ticket": 8.50,
+      "transactions_per_day": {"low": 100, "median": 200, "high": 400},
+      "startup_costs": {"low": 80000, "median": 200000, "high": 400000},
+      "break_even_months": {"optimistic": 12, "realistic": 18, "conservative": 24}
+    },
+    "722511": {
+      "name": "Full-Service Restaurants",
+      "avg_revenue_per_location": 1200000,
+      "revenue_range": {"min": 500000, "max": 3000000},
+      "cost_structure": {
+        "cogs_percent": 32,
+        "labor_percent": 33,
+        "rent_percent": 8,
+        "marketing_percent": 2,
+        "utilities_percent": 3,
+        "other_percent": 12
+      },
+      "profit_margin": {"low": 3, "median": 6, "high": 10},
+      "avg_ticket": 35.00,
+      "transactions_per_day": {"low": 80, "median": 150, "high": 300},
+      "startup_costs": {"low": 175000, "median": 500000, "high": 1500000},
+      "break_even_months": {"optimistic": 18, "realistic": 24, "conservative": 36}
+    },
+    "722513": {
+      "name": "Limited-Service Restaurants (Fast Food/Fast Casual)",
+      "avg_revenue_per_location": 800000,
+      "revenue_range": {"min": 400000, "max": 2000000},
+      "cost_structure": {
+        "cogs_percent": 28,
+        "labor_percent": 28,
+        "rent_percent": 8,
+        "marketing_percent": 3,
+        "utilities_percent": 4,
+        "other_percent": 14
+      },
+      "profit_margin": {"low": 5, "median": 10, "high": 15},
+      "avg_ticket": 12.00,
+      "transactions_per_day": {"low": 150, "median": 300, "high": 600},
+      "startup_costs": {"low": 100000, "median": 350000, "high": 750000},
+      "break_even_months": {"optimistic": 12, "realistic": 18, "conservative": 24}
+    },
+    "713940": {
+      "name": "Fitness and Recreational Sports Centers (Gyms)",
+      "avg_revenue_per_location": 600000,
+      "revenue_range": {"min": 200000, "max": 2000000},
+      "cost_structure": {
+        "cogs_percent": 5,
+        "labor_percent": 40,
+        "rent_percent": 15,
+        "marketing_percent": 5,
+        "utilities_percent": 8,
+        "other_percent": 12
+      },
+      "profit_margin": {"low": 8, "median": 15, "high": 25},
+      "avg_ticket": 50.00,
+      "transactions_per_day": {"low": 30, "median": 80, "high": 200},
+      "startup_costs": {"low": 50000, "median": 250000, "high": 1000000},
+      "break_even_months": {"optimistic": 12, "realistic": 18, "conservative": 30}
+    },
+    "812112": {
+      "name": "Beauty Salons",
+      "avg_revenue_per_location": 280000,
+      "revenue_range": {"min": 100000, "max": 600000},
+      "cost_structure": {
+        "cogs_percent": 8,
+        "labor_percent": 45,
+        "rent_percent": 12,
+        "marketing_percent": 3,
+        "utilities_percent": 3,
+        "other_percent": 14
+      },
+      "profit_margin": {"low": 8, "median": 15, "high": 22},
+      "avg_ticket": 65.00,
+      "transactions_per_day": {"low": 8, "median": 15, "high": 30},
+      "startup_costs": {"low": 30000, "median": 75000, "high": 200000},
+      "break_even_months": {"optimistic": 8, "realistic": 12, "conservative": 18}
+    },
+    "812111": {
+      "name": "Barber Shops",
+      "avg_revenue_per_location": 180000,
+      "revenue_range": {"min": 80000, "max": 400000},
+      "cost_structure": {
+        "cogs_percent": 5,
+        "labor_percent": 50,
+        "rent_percent": 12,
+        "marketing_percent": 2,
+        "utilities_percent": 3,
+        "other_percent": 13
+      },
+      "profit_margin": {"low": 10, "median": 15, "high": 25},
+      "avg_ticket": 25.00,
+      "transactions_per_day": {"low": 12, "median": 25, "high": 50},
+      "startup_costs": {"low": 20000, "median": 50000, "high": 120000},
+      "break_even_months": {"optimistic": 6, "realistic": 10, "conservative": 15}
+    },
+    "311811": {
+      "name": "Retail Bakeries",
+      "avg_revenue_per_location": 350000,
+      "revenue_range": {"min": 150000, "max": 800000},
+      "cost_structure": {
+        "cogs_percent": 35,
+        "labor_percent": 30,
+        "rent_percent": 10,
+        "marketing_percent": 3,
+        "utilities_percent": 5,
+        "other_percent": 7
+      },
+      "profit_margin": {"low": 5, "median": 10, "high": 18},
+      "avg_ticket": 15.00,
+      "transactions_per_day": {"low": 50, "median": 100, "high": 200},
+      "startup_costs": {"low": 50000, "median": 150000, "high": 400000},
+      "break_even_months": {"optimistic": 10, "realistic": 15, "conservative": 24}
+    },
+    "445110": {
+      "name": "Supermarkets and Other Grocery Stores",
+      "avg_revenue_per_location": 15000000,
+      "revenue_range": {"min": 2000000, "max": 50000000},
+      "cost_structure": {
+        "cogs_percent": 75,
+        "labor_percent": 12,
+        "rent_percent": 3,
+        "marketing_percent": 1,
+        "utilities_percent": 2,
+        "other_percent": 4
+      },
+      "profit_margin": {"low": 1, "median": 2.5, "high": 4},
+      "avg_ticket": 45.00,
+      "transactions_per_day": {"low": 500, "median": 1500, "high": 5000},
+      "startup_costs": {"low": 500000, "median": 2000000, "high": 10000000},
+      "break_even_months": {"optimistic": 24, "realistic": 36, "conservative": 48}
+    },
+    "453998": {
+      "name": "Miscellaneous Retail (Boutique/Specialty)",
+      "avg_revenue_per_location": 400000,
+      "revenue_range": {"min": 150000, "max": 1000000},
+      "cost_structure": {
+        "cogs_percent": 50,
+        "labor_percent": 20,
+        "rent_percent": 10,
+        "marketing_percent": 4,
+        "utilities_percent": 3,
+        "other_percent": 5
+      },
+      "profit_margin": {"low": 3, "median": 8, "high": 15},
+      "avg_ticket": 55.00,
+      "transactions_per_day": {"low": 15, "median": 40, "high": 100},
+      "startup_costs": {"low": 50000, "median": 150000, "high": 400000},
+      "break_even_months": {"optimistic": 12, "realistic": 18, "conservative": 24}
+    },
+    "611620": {
+      "name": "Sports and Recreation Instruction (Yoga Studios)",
+      "avg_revenue_per_location": 200000,
+      "revenue_range": {"min": 75000, "max": 500000},
+      "cost_structure": {
+        "cogs_percent": 3,
+        "labor_percent": 45,
+        "rent_percent": 18,
+        "marketing_percent": 5,
+        "utilities_percent": 4,
+        "other_percent": 10
+      },
+      "profit_margin": {"low": 8, "median": 15, "high": 25},
+      "avg_ticket": 20.00,
+      "transactions_per_day": {"low": 20, "median": 50, "high": 100},
+      "startup_costs": {"low": 25000, "median": 75000, "high": 200000},
+      "break_even_months": {"optimistic": 8, "realistic": 12, "conservative": 18}
+    }
+  },
+  "default": {
+    "name": "General Small Business",
+    "avg_revenue_per_location": 500000,
+    "revenue_range": {"min": 100000, "max": 2000000},
+    "cost_structure": {
+      "cogs_percent": 30,
+      "labor_percent": 30,
+      "rent_percent": 10,
+      "marketing_percent": 3,
+      "utilities_percent": 3,
+      "other_percent": 14
+    },
+    "profit_margin": {"low": 5, "median": 10, "high": 15},
+    "avg_ticket": 30.00,
+    "transactions_per_day": {"low": 30, "median": 80, "high": 200},
+    "startup_costs": {"low": 50000, "median": 200000, "high": 500000},
+    "break_even_months": {"optimistic": 12, "realistic": 18, "conservative": 24}
+  }
+}

@@ -66,6 +66,16 @@ class CacheManager:
         except Exception as e:
             self._disable(str(e))
 
+    async def health_check(self) -> bool:
+        """Check if Redis is available."""
+        if not self._enabled:
+            return False
+        try:
+            await self._redis.ping()
+            return True
+        except Exception:
+            return False
+
     async def close(self) -> None:
         """Close Redis connection."""
         try:

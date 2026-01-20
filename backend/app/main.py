@@ -80,10 +80,13 @@ async def root():
 @app.get("/health")
 async def health():
     """Health check endpoint."""
+    cache = get_cache()
+    redis_status = "ok" if await cache.health_check() else "unavailable"
+
     return {
         "status": "healthy",
         "services": {
             "api": "ok",
-            "redis": "ok",  # TODO: Add actual Redis health check
+            "redis": redis_status,
         },
     }

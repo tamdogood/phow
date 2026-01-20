@@ -137,8 +137,8 @@ class EventsClient:
             logger.warning("Eventbrite API key not configured, using mock events")
             return self._get_mock_events(days_ahead)
 
-        # TODO: Implement actual Eventbrite API call when key is available
-        # The Eventbrite API requires OAuth2, so we'd need to implement that flow
+        # Eventbrite API requires OAuth2, which is not yet implemented
+        # Using mock events for now
         return self._get_mock_events(days_ahead)
 
     def _get_mock_events(self, days_ahead: int = 7) -> list[dict[str, Any]]:

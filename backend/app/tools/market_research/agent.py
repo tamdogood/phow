@@ -1,4 +1,4 @@
-"""Market Research Agent - Unified LangGraph agent with all 12 tools."""
+"""Market Research Agent - Unified LangGraph agent with all market research tools."""
 
 import json
 import time
@@ -7,6 +7,33 @@ from langchain_core.messages import HumanMessage, SystemMessage, AIMessage, Tool
 from langgraph.prebuilt import create_react_agent
 
 from .prompts import AGENT_SYSTEM_PROMPT
+from .market_sizing_tools import MARKET_SIZING_TOOLS
+from .economic_tools import ECONOMIC_TOOLS
+from .competitive_intelligence_tools import COMPETITIVE_INTELLIGENCE_TOOLS
+from .consumer_insights_tools import CONSUMER_INSIGHTS_TOOLS
+from .financial_tools import FINANCIAL_TOOLS
+from .widget_extractor import (
+    create_market_size_widget,
+    create_industry_widget,
+    create_labor_market_widget,
+    create_growth_projection_widget,
+    create_economic_snapshot_widget,
+    create_industry_trend_widget,
+    create_seasonality_widget,
+    create_entry_timing_widget,
+    create_swot_widget,
+    create_five_forces_widget,
+    create_pricing_widget,
+    create_market_share_widget,
+    create_sentiment_widget,
+    create_pain_points_widget,
+    create_journey_widget,
+    create_profile_widget,
+    create_financial_projection_widget,
+    create_break_even_widget,
+    create_scenario_widget,
+    create_viability_widget,
+)
 from ..location_scout.agent_tools import LOCATION_SCOUT_TOOLS
 from ..market_validator.agent_tools import MARKET_VALIDATOR_TOOLS
 from ..competitor_analyzer.agent_tools import COMPETITOR_ANALYZER_TOOLS
@@ -15,12 +42,21 @@ from ...core.logging import get_logger
 
 logger = get_logger("agent.market_research")
 
-# Combine all tools from the three existing modules
-MARKET_RESEARCH_TOOLS = LOCATION_SCOUT_TOOLS + MARKET_VALIDATOR_TOOLS + COMPETITOR_ANALYZER_TOOLS
+# Combine all tools from all domains (41 tools across 8 domains)
+MARKET_RESEARCH_TOOLS = (
+    LOCATION_SCOUT_TOOLS
+    + MARKET_VALIDATOR_TOOLS
+    + COMPETITOR_ANALYZER_TOOLS
+    + MARKET_SIZING_TOOLS
+    + ECONOMIC_TOOLS
+    + COMPETITIVE_INTELLIGENCE_TOOLS
+    + CONSUMER_INSIGHTS_TOOLS
+    + FINANCIAL_TOOLS
+)
 
 
 class MarketResearchAgent:
-    """Unified agent with all 12 market research tools."""
+    """Unified agent with all market research tools (41 tools across 8 domains)."""
 
     def __init__(self):
         self.llm_service = get_llm_service()
@@ -180,6 +216,40 @@ class MarketResearchAgent:
             "get_competitor_details": "\n**Getting competitor details...**\n",
             "analyze_competitor_reviews": "\n**Analyzing competitor reviews...**\n",
             "create_positioning_map": "\n**Creating competitive positioning map...**\n",
+            # Market Sizing tools
+            "calculate_market_size": f"\n**Calculating TAM/SAM/SOM for {business_type}...**\n",
+            "get_industry_profile": f"\n**Building industry profile...**\n",
+            "analyze_labor_market": f"\n**Analyzing labor market conditions...**\n",
+            "project_market_growth": "\n**Projecting market growth...**\n",
+            "get_market_sizing_summary": f"\n**Generating comprehensive market analysis...**\n",
+            # Economic Intelligence tools
+            "get_economic_indicators": "\n**Fetching economic indicators...**\n",
+            "analyze_industry_trends": f"\n**Analyzing industry trends for {business_type}...**\n",
+            "get_seasonality_pattern": f"\n**Analyzing seasonal patterns...**\n",
+            "analyze_entry_timing": f"\n**Analyzing optimal entry timing...**\n",
+            "get_consumer_spending_trends": "\n**Analyzing consumer spending trends...**\n",
+            "get_economic_summary": f"\n**Generating economic intelligence summary...**\n",
+            # Competitive Intelligence tools
+            "generate_swot_analysis": f"\n**Generating SWOT analysis for {business_type}...**\n",
+            "analyze_competitive_forces": f"\n**Analyzing Porter's Five Forces...**\n",
+            "estimate_market_shares": f"\n**Estimating market share distribution...**\n",
+            "analyze_pricing_landscape": f"\n**Analyzing pricing landscape...**\n",
+            "benchmark_competitors": f"\n**Benchmarking against competitors...**\n",
+            "get_competitive_intelligence_summary": f"\n**Generating competitive intelligence summary...**\n",
+            # Consumer Insights tools
+            "analyze_customer_sentiment": f"\n**Analyzing customer sentiment...**\n",
+            "extract_customer_themes": f"\n**Extracting themes from reviews...**\n",
+            "identify_customer_pain_points": f"\n**Identifying customer pain points...**\n",
+            "map_customer_journey": f"\n**Mapping customer journey for {business_type}...**\n",
+            "build_customer_profile": f"\n**Building customer profile...**\n",
+            "get_consumer_insights_summary": f"\n**Generating consumer insights summary...**\n",
+            # Financial tools
+            "project_revenue": f"\n**Projecting revenue for {business_type}...**\n",
+            "calculate_break_even": f"\n**Calculating break-even analysis...**\n",
+            "run_financial_scenario": f"\n**Running financial scenario analysis...**\n",
+            "assess_financial_viability": f"\n**Assessing financial viability...**\n",
+            "get_financial_summary": f"\n**Generating financial summary...**\n",
+            "get_industry_benchmarks": f"\n**Fetching industry benchmarks...**\n",
         }
         return messages.get(tool_name, f"\n**Running {tool_name}...**\n")
 
@@ -251,6 +321,142 @@ class MarketResearchAgent:
                 }
                 logger.info("Yielded positioning data", count=tool_result.get("total_competitors"))
                 return f"\n<!--POSITIONING_DATA:{json.dumps(positioning_data)}-->\n"
+
+            # Market size data (TAM/SAM/SOM)
+            if tool_name in ["calculate_market_size", "get_market_sizing_summary"] and "tam" in tool_result:
+                widget = create_market_size_widget(
+                    tool_result.get("market_size", tool_result)
+                )
+                logger.info("Yielded market size data")
+                return f"\n{widget}\n"
+
+            # Industry profile data
+            if tool_name == "get_industry_profile" and "industry_name" in tool_result:
+                widget = create_industry_widget(tool_result)
+                logger.info("Yielded industry profile data")
+                return f"\n{widget}\n"
+
+            # Labor market data
+            if tool_name == "analyze_labor_market" and "workforce" in tool_result:
+                widget = create_labor_market_widget(tool_result)
+                logger.info("Yielded labor market data")
+                return f"\n{widget}\n"
+
+            # Growth projection data
+            if tool_name == "project_market_growth" and "projections" in tool_result:
+                widget = create_growth_projection_widget(tool_result)
+                logger.info("Yielded growth projection data")
+                return f"\n{widget}\n"
+
+            # Economic snapshot data
+            if tool_name in ["get_economic_indicators", "get_economic_summary"] and "indicators" in tool_result:
+                widget = create_economic_snapshot_widget(
+                    tool_result.get("economic_conditions", tool_result)
+                )
+                logger.info("Yielded economic data")
+                return f"\n{widget}\n"
+
+            # Industry trend data
+            if tool_name == "analyze_industry_trends" and "trend_direction" in tool_result:
+                widget = create_industry_trend_widget(tool_result)
+                logger.info("Yielded industry trend data")
+                return f"\n{widget}\n"
+
+            # Seasonality data
+            if tool_name == "get_seasonality_pattern" and "monthly_indices" in tool_result:
+                widget = create_seasonality_widget(tool_result)
+                logger.info("Yielded seasonality data")
+                return f"\n{widget}\n"
+
+            # Entry timing data
+            if tool_name == "analyze_entry_timing" and "timing_score" in tool_result:
+                widget = create_entry_timing_widget(tool_result)
+                logger.info("Yielded entry timing data")
+                return f"\n{widget}\n"
+
+            # SWOT analysis data
+            if tool_name == "generate_swot_analysis" and "strengths" in tool_result:
+                widget = create_swot_widget(tool_result)
+                logger.info("Yielded SWOT data")
+                return f"\n{widget}\n"
+
+            # Porter's Five Forces data
+            if tool_name == "analyze_competitive_forces" and "forces" in tool_result:
+                widget = create_five_forces_widget(tool_result)
+                logger.info("Yielded Five Forces data")
+                return f"\n{widget}\n"
+
+            # Pricing landscape data
+            if tool_name == "analyze_pricing_landscape" and "distribution" in tool_result:
+                widget = create_pricing_widget(tool_result)
+                logger.info("Yielded pricing data")
+                return f"\n{widget}\n"
+
+            # Market share data
+            if tool_name == "estimate_market_shares" and "shares" in tool_result:
+                widget = create_market_share_widget(tool_result)
+                logger.info("Yielded market share data")
+                return f"\n{widget}\n"
+
+            # Competitive intelligence summary - extract SWOT
+            if tool_name == "get_competitive_intelligence_summary" and "full_swot" in tool_result:
+                widget = create_swot_widget(tool_result["full_swot"])
+                logger.info("Yielded competitive intelligence SWOT data")
+                return f"\n{widget}\n"
+
+            # Sentiment analysis data
+            if tool_name == "analyze_customer_sentiment" and "sentiment_label" in tool_result:
+                widget = create_sentiment_widget(tool_result)
+                logger.info("Yielded sentiment data")
+                return f"\n{widget}\n"
+
+            # Pain points data
+            if tool_name == "identify_customer_pain_points" and "pain_points" in tool_result:
+                widget = create_pain_points_widget(tool_result)
+                logger.info("Yielded pain points data")
+                return f"\n{widget}\n"
+
+            # Customer journey data
+            if tool_name == "map_customer_journey" and "journey_stages" in tool_result:
+                widget = create_journey_widget(tool_result)
+                logger.info("Yielded journey data")
+                return f"\n{widget}\n"
+
+            # Customer profile data
+            if tool_name == "build_customer_profile" and "primary_persona" in tool_result:
+                widget = create_profile_widget(tool_result)
+                logger.info("Yielded profile data")
+                return f"\n{widget}\n"
+
+            # Consumer insights summary - extract sentiment
+            if tool_name == "get_consumer_insights_summary" and "full_sentiment" in tool_result:
+                widget = create_sentiment_widget(tool_result["full_sentiment"])
+                logger.info("Yielded consumer insights sentiment data")
+                return f"\n{widget}\n"
+
+            # Revenue projection data
+            if tool_name in ["project_revenue", "get_financial_summary"] and "projections" in tool_result or "revenue_scenarios" in tool_result:
+                widget = create_financial_projection_widget(tool_result)
+                logger.info("Yielded financial projection data")
+                return f"\n{widget}\n"
+
+            # Break-even data
+            if tool_name == "calculate_break_even" and "break_even_revenue" in tool_result:
+                widget = create_break_even_widget(tool_result)
+                logger.info("Yielded break-even data")
+                return f"\n{widget}\n"
+
+            # Scenario comparison data
+            if tool_name == "run_financial_scenario" and "impact" in tool_result:
+                widget = create_scenario_widget(tool_result)
+                logger.info("Yielded scenario data")
+                return f"\n{widget}\n"
+
+            # Financial viability data
+            if tool_name == "assess_financial_viability" and "viability_score" in tool_result:
+                widget = create_viability_widget(tool_result)
+                logger.info("Yielded viability data")
+                return f"\n{widget}\n"
 
         except (json.JSONDecodeError, TypeError, KeyError) as e:
             logger.warning("Could not extract widget data", tool=tool_name, error=str(e))

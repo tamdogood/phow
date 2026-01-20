@@ -1,0 +1,241 @@
+{
+  "metadata": {
+    "version": "2022",
+    "source": "US Census Bureau NAICS",
+    "last_updated": "2024-01-01"
+  },
+  "codes": {
+    "44": {"code": "44", "title": "Retail Trade", "description": "Retail trade sector", "parent_code": null, "keywords": ["retail", "store", "shop"]},
+    "45": {"code": "45", "title": "Retail Trade", "description": "Retail trade sector (continued)", "parent_code": null, "keywords": ["retail", "store", "shop"]},
+    "72": {"code": "72", "title": "Accommodation and Food Services", "description": "Accommodation and food services sector", "parent_code": null, "keywords": ["restaurant", "hotel", "food", "hospitality"]},
+    "81": {"code": "81", "title": "Other Services", "description": "Other services (except public administration)", "parent_code": null, "keywords": ["services", "repair", "personal care"]},
+
+    "311": {"code": "311", "title": "Food Manufacturing", "description": "Food manufacturing subsector", "parent_code": "31", "keywords": ["food production", "manufacturing"]},
+    "311811": {"code": "311811", "title": "Retail Bakeries", "description": "Establishments primarily engaged in retailing bread and other bakery products not for immediate consumption", "parent_code": "3118", "keywords": ["bakery", "bread", "pastry", "cake", "baked goods"]},
+    "311812": {"code": "311812", "title": "Commercial Bakeries", "description": "Establishments primarily engaged in manufacturing bread, rolls, and related products", "parent_code": "3118", "keywords": ["commercial bakery", "wholesale bakery", "bread manufacturing"]},
+
+    "445": {"code": "445", "title": "Food and Beverage Retailers", "description": "Food and beverage retailers", "parent_code": "44", "keywords": ["grocery", "food store", "beverage"]},
+    "445110": {"code": "445110", "title": "Supermarkets and Other Grocery Retailers", "description": "Supermarkets and other grocery (except convenience) retailers", "parent_code": "4451", "keywords": ["supermarket", "grocery store", "food market"]},
+    "445120": {"code": "445120", "title": "Convenience Retailers", "description": "Convenience retailers and specialty food stores", "parent_code": "4451", "keywords": ["convenience store", "corner store", "bodega"]},
+    "445230": {"code": "445230", "title": "Fruit and Vegetable Retailers", "description": "Fruit and vegetable retailers", "parent_code": "4452", "keywords": ["produce", "fruit stand", "vegetable market", "farmers market"]},
+    "445291": {"code": "445291", "title": "Baked Goods Retailers", "description": "Baked goods retailers", "parent_code": "4452", "keywords": ["bakery retail", "bread shop", "pastry shop"]},
+    "445292": {"code": "445292", "title": "Confectionery and Nut Retailers", "description": "Confectionery and nut retailers", "parent_code": "4452", "keywords": ["candy store", "chocolate shop", "nut shop", "confectionery"]},
+    "445298": {"code": "445298", "title": "All Other Specialty Food Retailers", "description": "All other specialty food retailers", "parent_code": "4452", "keywords": ["specialty food", "gourmet food", "cheese shop", "deli"]},
+
+    "446": {"code": "446", "title": "Health and Personal Care Retailers", "description": "Health and personal care retailers", "parent_code": "44", "keywords": ["pharmacy", "health store", "beauty supply"]},
+    "446110": {"code": "446110", "title": "Pharmacies and Drug Retailers", "description": "Pharmacies and drug retailers", "parent_code": "4461", "keywords": ["pharmacy", "drugstore", "apothecary"]},
+    "446120": {"code": "446120", "title": "Cosmetics, Beauty Supplies, and Perfume Retailers", "description": "Cosmetics, beauty supplies, and perfume retailers", "parent_code": "4461", "keywords": ["beauty supply", "cosmetics store", "perfume shop"]},
+
+    "448": {"code": "448", "title": "Clothing and Clothing Accessories Retailers", "description": "Clothing and clothing accessories retailers", "parent_code": "44", "keywords": ["clothing", "apparel", "fashion", "boutique"]},
+    "448110": {"code": "448110", "title": "Men's Clothing Retailers", "description": "Men's clothing retailers", "parent_code": "4481", "keywords": ["men's clothing", "menswear"]},
+    "448120": {"code": "448120", "title": "Women's Clothing Retailers", "description": "Women's clothing retailers", "parent_code": "4481", "keywords": ["women's clothing", "womenswear", "boutique"]},
+    "448140": {"code": "448140", "title": "Family Clothing Retailers", "description": "Family clothing retailers", "parent_code": "4481", "keywords": ["family clothing", "clothing store"]},
+    "448150": {"code": "448150", "title": "Clothing Accessories Retailers", "description": "Clothing accessories retailers", "parent_code": "4481", "keywords": ["accessories", "handbags", "jewelry"]},
+
+    "451": {"code": "451", "title": "Sporting Goods, Hobby, Musical Instrument, Book, and Miscellaneous Retailers", "description": "Sporting goods, hobby, and other retailers", "parent_code": "45", "keywords": ["sports", "hobby", "books"]},
+    "451110": {"code": "451110", "title": "Sporting Goods Retailers", "description": "Sporting goods retailers", "parent_code": "4511", "keywords": ["sporting goods", "sports equipment", "athletic gear"]},
+    "451211": {"code": "451211", "title": "Book Retailers", "description": "Book retailers and news dealers", "parent_code": "4512", "keywords": ["bookstore", "book shop", "books"]},
+    "451220": {"code": "451220", "title": "Prerecorded Tape, Compact Disc, and Record Retailers", "description": "Prerecorded media retailers", "parent_code": "4512", "keywords": ["record store", "music store", "vinyl"]},
+
+    "453": {"code": "453", "title": "Miscellaneous Store Retailers", "description": "Miscellaneous store retailers", "parent_code": "45", "keywords": ["gift shop", "florist", "pet store"]},
+    "453110": {"code": "453110", "title": "Florists", "description": "Florists", "parent_code": "4531", "keywords": ["florist", "flower shop", "floral"]},
+    "453210": {"code": "453210", "title": "Office Supplies and Stationery Retailers", "description": "Office supplies and stationery retailers", "parent_code": "4532", "keywords": ["office supplies", "stationery"]},
+    "453220": {"code": "453220", "title": "Gift, Novelty, and Souvenir Retailers", "description": "Gift, novelty, and souvenir retailers", "parent_code": "4532", "keywords": ["gift shop", "souvenir shop", "novelty store"]},
+    "453310": {"code": "453310", "title": "Used Merchandise Retailers", "description": "Used merchandise retailers", "parent_code": "4533", "keywords": ["thrift store", "consignment", "vintage", "secondhand"]},
+    "453910": {"code": "453910", "title": "Pet and Pet Supplies Retailers", "description": "Pet and pet supplies retailers", "parent_code": "4539", "keywords": ["pet store", "pet supplies", "pet shop"]},
+    "453920": {"code": "453920", "title": "Art Dealers", "description": "Art dealers", "parent_code": "4539", "keywords": ["art gallery", "art dealer", "gallery"]},
+
+    "713": {"code": "713", "title": "Amusement, Gambling, and Recreation Industries", "description": "Amusement, gambling, and recreation industries", "parent_code": "71", "keywords": ["entertainment", "recreation", "amusement"]},
+    "713940": {"code": "713940", "title": "Fitness and Recreational Sports Centers", "description": "Fitness and recreational sports centers", "parent_code": "7139", "keywords": ["gym", "fitness center", "health club", "workout", "exercise", "CrossFit", "yoga studio", "pilates"]},
+    "713950": {"code": "713950", "title": "Bowling Centers", "description": "Bowling centers", "parent_code": "7139", "keywords": ["bowling alley", "bowling"]},
+
+    "721": {"code": "721", "title": "Accommodation", "description": "Accommodation subsector", "parent_code": "72", "keywords": ["hotel", "motel", "lodging", "inn"]},
+    "721110": {"code": "721110", "title": "Hotels and Motels", "description": "Hotels (except casino hotels) and motels", "parent_code": "7211", "keywords": ["hotel", "motel", "inn", "lodging"]},
+    "721191": {"code": "721191", "title": "Bed-and-Breakfast Inns", "description": "Bed-and-breakfast inns", "parent_code": "7211", "keywords": ["bed and breakfast", "B&B", "inn"]},
+
+    "722": {"code": "722", "title": "Food Services and Drinking Places", "description": "Food services and drinking places", "parent_code": "72", "keywords": ["restaurant", "bar", "food service", "dining"]},
+    "7223": {"code": "7223", "title": "Special Food Services", "description": "Special food services including catering and food trucks", "parent_code": "722", "keywords": ["catering", "food truck", "mobile food"]},
+    "7224": {"code": "7224", "title": "Drinking Places (Alcoholic Beverages)", "description": "Drinking places serving alcoholic beverages", "parent_code": "722", "keywords": ["bar", "pub", "tavern"]},
+    "7225": {"code": "7225", "title": "Restaurants and Other Eating Places", "description": "Restaurants and other eating places", "parent_code": "722", "keywords": ["restaurant", "cafe", "eating place"]},
+    "722310": {"code": "722310", "title": "Food Service Contractors", "description": "Food service contractors", "parent_code": "7223", "keywords": ["catering", "food service", "contract food"]},
+    "722320": {"code": "722320", "title": "Caterers", "description": "Caterers", "parent_code": "7223", "keywords": ["catering", "caterer", "event catering"]},
+    "722330": {"code": "722330", "title": "Mobile Food Services", "description": "Mobile food services", "parent_code": "7223", "keywords": ["food truck", "mobile food", "street food"]},
+    "722410": {"code": "722410", "title": "Drinking Places (Alcoholic Beverages)", "description": "Drinking places (alcoholic beverages)", "parent_code": "7224", "keywords": ["bar", "pub", "tavern", "nightclub", "lounge", "wine bar"]},
+    "722511": {"code": "722511", "title": "Full-Service Restaurants", "description": "Full-service restaurants", "parent_code": "7225", "keywords": ["restaurant", "full service restaurant", "sit-down restaurant", "fine dining", "casual dining"]},
+    "722513": {"code": "722513", "title": "Limited-Service Restaurants", "description": "Limited-service restaurants", "parent_code": "7225", "keywords": ["fast food", "quick service", "fast casual", "counter service", "takeout"]},
+    "722514": {"code": "722514", "title": "Cafeterias, Grill Buffets, and Buffets", "description": "Cafeterias, grill buffets, and buffets", "parent_code": "7225", "keywords": ["cafeteria", "buffet", "grill"]},
+    "722515": {"code": "722515", "title": "Snack and Nonalcoholic Beverage Bars", "description": "Snack and nonalcoholic beverage bars", "parent_code": "7225", "keywords": ["coffee shop", "cafe", "coffee house", "tea house", "juice bar", "smoothie bar", "boba", "bubble tea", "ice cream shop", "frozen yogurt", "dessert shop"]},
+
+    "811": {"code": "811", "title": "Repair and Maintenance", "description": "Repair and maintenance subsector", "parent_code": "81", "keywords": ["repair", "maintenance", "service"]},
+    "811111": {"code": "811111", "title": "General Automotive Repair", "description": "General automotive repair", "parent_code": "8111", "keywords": ["auto repair", "car repair", "mechanic", "automotive service"]},
+    "811121": {"code": "811121", "title": "Automotive Body, Paint, and Interior Repair and Maintenance", "description": "Automotive body, paint, and interior repair", "parent_code": "8111", "keywords": ["body shop", "auto body", "paint shop"]},
+    "811192": {"code": "811192", "title": "Car Washes", "description": "Car washes", "parent_code": "8111", "keywords": ["car wash", "auto wash", "detailing"]},
+
+    "812": {"code": "812", "title": "Personal and Laundry Services", "description": "Personal and laundry services", "parent_code": "81", "keywords": ["personal services", "laundry", "cleaning"]},
+    "812111": {"code": "812111", "title": "Barber Shops", "description": "Barber shops", "parent_code": "8121", "keywords": ["barber", "barber shop", "haircut", "men's grooming"]},
+    "812112": {"code": "812112", "title": "Beauty Salons", "description": "Beauty salons", "parent_code": "8121", "keywords": ["salon", "beauty salon", "hair salon", "hairdresser", "stylist"]},
+    "812113": {"code": "812113", "title": "Nail Salons", "description": "Nail salons", "parent_code": "8121", "keywords": ["nail salon", "manicure", "pedicure", "nails"]},
+    "812191": {"code": "812191", "title": "Diet and Weight Reducing Centers", "description": "Diet and weight reducing centers", "parent_code": "8121", "keywords": ["weight loss", "diet center"]},
+    "812199": {"code": "812199", "title": "Other Personal Care Services", "description": "Other personal care services", "parent_code": "8121", "keywords": ["spa", "massage", "skin care", "esthetician", "waxing", "tanning"]},
+    "812310": {"code": "812310", "title": "Coin-Operated Laundries and Drycleaners", "description": "Coin-operated laundries and drycleaners", "parent_code": "8123", "keywords": ["laundromat", "coin laundry", "self-service laundry"]},
+    "812320": {"code": "812320", "title": "Drycleaning and Laundry Services", "description": "Drycleaning and laundry services (except coin-operated)", "parent_code": "8123", "keywords": ["dry cleaner", "laundry service", "dry cleaning"]},
+    "812910": {"code": "812910", "title": "Pet Care (except Veterinary) Services", "description": "Pet care (except veterinary) services", "parent_code": "8129", "keywords": ["pet grooming", "dog grooming", "pet sitting", "dog walking", "pet boarding", "doggy daycare"]},
+    "812921": {"code": "812921", "title": "Photofinishing Laboratories", "description": "Photofinishing laboratories (except one-hour)", "parent_code": "8129", "keywords": ["photo lab", "photo printing"]},
+    "812922": {"code": "812922", "title": "One-Hour Photofinishing", "description": "One-hour photofinishing", "parent_code": "8129", "keywords": ["photo printing", "one hour photo"]},
+
+    "541": {"code": "541", "title": "Professional, Scientific, and Technical Services", "description": "Professional, scientific, and technical services", "parent_code": "54", "keywords": ["professional services", "consulting", "technical"]},
+    "541110": {"code": "541110", "title": "Offices of Lawyers", "description": "Offices of lawyers", "parent_code": "5411", "keywords": ["law firm", "attorney", "lawyer", "legal services"]},
+    "541211": {"code": "541211", "title": "Offices of Certified Public Accountants", "description": "Offices of certified public accountants", "parent_code": "5412", "keywords": ["CPA", "accountant", "accounting firm", "tax preparation"]},
+    "541219": {"code": "541219", "title": "Other Accounting Services", "description": "Other accounting services", "parent_code": "5412", "keywords": ["bookkeeping", "payroll services"]},
+    "541310": {"code": "541310", "title": "Architectural Services", "description": "Architectural services", "parent_code": "5413", "keywords": ["architect", "architecture firm"]},
+    "541410": {"code": "541410", "title": "Interior Design Services", "description": "Interior design services", "parent_code": "5414", "keywords": ["interior design", "interior decorator"]},
+    "541430": {"code": "541430", "title": "Graphic Design Services", "description": "Graphic design services", "parent_code": "5414", "keywords": ["graphic design", "design studio"]},
+    "541511": {"code": "541511", "title": "Custom Computer Programming Services", "description": "Custom computer programming services", "parent_code": "5415", "keywords": ["software development", "programming", "web development"]},
+    "541611": {"code": "541611", "title": "Administrative Management Consulting Services", "description": "Administrative management and general management consulting services", "parent_code": "5416", "keywords": ["management consulting", "business consulting"]},
+    "541810": {"code": "541810", "title": "Advertising Agencies", "description": "Advertising agencies", "parent_code": "5418", "keywords": ["advertising agency", "ad agency", "marketing agency"]},
+    "541921": {"code": "541921", "title": "Photography Studios, Portrait", "description": "Photography studios, portrait", "parent_code": "5419", "keywords": ["photography studio", "portrait photography", "photographer"]},
+    "541922": {"code": "541922", "title": "Commercial Photography", "description": "Commercial photography", "parent_code": "5419", "keywords": ["commercial photography", "product photography"]},
+
+    "611": {"code": "611", "title": "Educational Services", "description": "Educational services", "parent_code": "61", "keywords": ["education", "school", "training"]},
+    "611110": {"code": "611110", "title": "Elementary and Secondary Schools", "description": "Elementary and secondary schools", "parent_code": "6111", "keywords": ["school", "private school"]},
+    "611610": {"code": "611610", "title": "Fine Arts Schools", "description": "Fine arts schools", "parent_code": "6116", "keywords": ["art school", "music school", "dance school", "performing arts"]},
+    "611620": {"code": "611620", "title": "Sports and Recreation Instruction", "description": "Sports and recreation instruction", "parent_code": "6116", "keywords": ["sports training", "martial arts", "swimming lessons", "tennis lessons"]},
+    "611691": {"code": "611691", "title": "Exam Preparation and Tutoring", "description": "Exam preparation and tutoring", "parent_code": "6116", "keywords": ["tutoring", "test prep", "SAT prep", "tutoring center"]},
+    "611699": {"code": "611699", "title": "All Other Miscellaneous Schools and Instruction", "description": "All other miscellaneous schools and instruction", "parent_code": "6116", "keywords": ["driving school", "cooking class", "language school"]},
+
+    "624": {"code": "624", "title": "Social Assistance", "description": "Social assistance", "parent_code": "62", "keywords": ["social services", "childcare", "elderly care"]},
+    "624410": {"code": "624410", "title": "Child Day Care Services", "description": "Child day care services", "parent_code": "6244", "keywords": ["daycare", "childcare", "preschool", "nursery", "child care center"]}
+  },
+  "business_type_mappings": {
+    "coffee shop": ["722515"],
+    "cafe": ["722515"],
+    "coffee house": ["722515"],
+    "tea house": ["722515"],
+    "juice bar": ["722515"],
+    "smoothie bar": ["722515"],
+    "boba shop": ["722515"],
+    "bubble tea": ["722515"],
+    "ice cream shop": ["722515"],
+    "frozen yogurt": ["722515"],
+
+    "restaurant": ["722511", "722513"],
+    "full service restaurant": ["722511"],
+    "fine dining": ["722511"],
+    "casual dining": ["722511"],
+    "fast food": ["722513"],
+    "fast casual": ["722513"],
+    "quick service": ["722513"],
+    "food truck": ["722330"],
+    "catering": ["722320"],
+    "caterer": ["722320"],
+
+    "bar": ["722410"],
+    "pub": ["722410"],
+    "nightclub": ["722410"],
+    "wine bar": ["722410"],
+    "lounge": ["722410"],
+
+    "bakery": ["311811", "722515", "445291"],
+    "bread shop": ["311811", "445291"],
+    "pastry shop": ["311811", "445291"],
+
+    "gym": ["713940"],
+    "fitness center": ["713940"],
+    "health club": ["713940"],
+    "crossfit": ["713940"],
+    "yoga studio": ["713940"],
+    "pilates studio": ["713940"],
+
+    "salon": ["812112"],
+    "beauty salon": ["812112"],
+    "hair salon": ["812112"],
+    "barber": ["812111"],
+    "barber shop": ["812111"],
+    "nail salon": ["812113"],
+    "spa": ["812199"],
+    "massage": ["812199"],
+
+    "pet store": ["453910"],
+    "pet shop": ["453910"],
+    "pet grooming": ["812910"],
+    "dog grooming": ["812910"],
+    "pet boarding": ["812910"],
+    "doggy daycare": ["812910"],
+
+    "daycare": ["624410"],
+    "childcare": ["624410"],
+    "preschool": ["624410"],
+    "child care center": ["624410"],
+
+    "laundromat": ["812310"],
+    "dry cleaner": ["812320"],
+    "dry cleaning": ["812320"],
+
+    "auto repair": ["811111"],
+    "mechanic": ["811111"],
+    "car wash": ["811192"],
+    "body shop": ["811121"],
+
+    "florist": ["453110"],
+    "flower shop": ["453110"],
+
+    "gift shop": ["453220"],
+    "souvenir shop": ["453220"],
+
+    "bookstore": ["451211"],
+    "book shop": ["451211"],
+
+    "clothing store": ["448140"],
+    "boutique": ["448120"],
+    "apparel": ["448140"],
+
+    "thrift store": ["453310"],
+    "consignment shop": ["453310"],
+    "vintage shop": ["453310"],
+
+    "art gallery": ["453920"],
+
+    "grocery store": ["445110"],
+    "supermarket": ["445110"],
+    "convenience store": ["445120"],
+
+    "pharmacy": ["446110"],
+    "drugstore": ["446110"],
+
+    "hotel": ["721110"],
+    "motel": ["721110"],
+    "bed and breakfast": ["721191"],
+    "inn": ["721191"],
+
+    "photography studio": ["541921"],
+    "photographer": ["541921"],
+
+    "tutoring": ["611691"],
+    "tutoring center": ["611691"],
+    "test prep": ["611691"],
+
+    "dance studio": ["611610"],
+    "music school": ["611610"],
+    "art school": ["611610"],
+    "martial arts": ["611620"],
+
+    "law firm": ["541110"],
+    "attorney": ["541110"],
+
+    "accounting firm": ["541211"],
+    "CPA": ["541211"],
+    "bookkeeper": ["541219"],
+
+    "web development": ["541511"],
+    "software development": ["541511"],
+
+    "marketing agency": ["541810"],
+    "advertising agency": ["541810"],
+
+    "interior design": ["541410"],
+    "graphic design": ["541430"],
+
+    "consulting": ["541611"],
+    "business consulting": ["541611"]
+  }
+}

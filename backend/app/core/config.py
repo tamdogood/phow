@@ -23,6 +23,10 @@ class Settings(BaseSettings):
     eventbrite_api_key: str = ""
     newsapi_key: str = ""
 
+    # Market Research APIs
+    bls_api_key: str = ""  # Bureau of Labor Statistics
+    fred_api_key: str = ""  # Federal Reserve Economic Data
+
     # Redis
     redis_url: str = "redis://localhost:6379/0"
     cache_ttl: int = 3600  # 1 hour default cache TTL
