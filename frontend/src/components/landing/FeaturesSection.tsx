@@ -42,7 +42,14 @@ export function FeaturesSection() {
 
   return (
     <section ref={ref} className="relative z-10 py-24 px-6">
-      <div className="mx-auto max-w-6xl">
+      {/* Top gradient for seamless transition from hero */}
+      <div
+        className="absolute top-0 left-0 right-0 h-32 z-0"
+        style={{
+          background: "linear-gradient(to bottom, rgba(15, 23, 42, 0.95) 0%, transparent 100%)"
+        }}
+      />
+      <div className="relative z-10 mx-auto max-w-6xl">
         {/* Section Header */}
         <div className={`text-center mb-16 animate-on-scroll ${isVisible ? "visible" : ""}`}>
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
