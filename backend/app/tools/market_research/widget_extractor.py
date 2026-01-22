@@ -717,3 +717,69 @@ def create_viability_widget(viability_data: dict) -> str:
     """Helper to create viability widget from service output."""
     widget_data = format_viability_widget(viability_data)
     return WidgetExtractor.inject_widget("VIABILITY_DATA", widget_data)
+
+
+# Report & Recommendations Widgets
+
+
+@register_widget("EXECUTIVE_SUMMARY_DATA")
+def format_executive_summary_widget(summary_data: dict) -> dict:
+    """
+    Format executive summary data for visualization widget.
+
+    Expected input: Output from get_executive_summary()
+    """
+    recommendation = summary_data.get("recommendation", {})
+    return {
+        "widget_type": "executive_summary",
+        "location": summary_data.get("location") or summary_data.get("metadata", {}).get("location", ""),
+        "business_type": summary_data.get("business_type") or summary_data.get("metadata", {}).get("business_type", ""),
+        "summary_paragraphs": summary_data.get("summary_paragraphs", []),
+        "key_findings": summary_data.get("key_findings", []),
+        "recommendation": {
+            "verdict": recommendation.get("verdict", "neutral"),
+            "rationale": recommendation.get("rationale", ""),
+        },
+    }
+
+
+@register_widget("RECOMMENDATIONS_DATA")
+def format_recommendations_widget(recommendations_data: dict) -> dict:
+    """
+    Format recommendations data for visualization widget.
+
+    Expected input: Output from get_key_recommendations()
+    """
+    recommendations = recommendations_data.get("recommendations", [])
+    return {
+        "widget_type": "recommendations",
+        "location": recommendations_data.get("location", ""),
+        "business_type": recommendations_data.get("business_type", ""),
+        "total_count": len(recommendations),
+        "recommendations": [
+            {
+                "title": r.get("title"),
+                "description": r.get("description"),
+                "priority": r.get("priority", "medium"),
+                "category": r.get("category", "strategic_considerations"),
+            }
+            for r in recommendations[:8]
+        ],
+        "by_priority": {
+            "high": len([r for r in recommendations if r.get("priority") == "high"]),
+            "medium": len([r for r in recommendations if r.get("priority") == "medium"]),
+            "low": len([r for r in recommendations if r.get("priority") == "low"]),
+        },
+    }
+
+
+def create_executive_summary_widget(summary_data: dict) -> str:
+    """Helper to create executive summary widget from service output."""
+    widget_data = format_executive_summary_widget(summary_data)
+    return WidgetExtractor.inject_widget("EXECUTIVE_SUMMARY_DATA", widget_data)
+
+
+def create_recommendations_widget(recommendations_data: dict) -> str:
+    """Helper to create recommendations widget from service output."""
+    widget_data = format_recommendations_widget(recommendations_data)
+    return WidgetExtractor.inject_widget("RECOMMENDATIONS_DATA", widget_data)

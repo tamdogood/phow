@@ -12,6 +12,7 @@ from .economic_tools import ECONOMIC_TOOLS
 from .competitive_intelligence_tools import COMPETITIVE_INTELLIGENCE_TOOLS
 from .consumer_insights_tools import CONSUMER_INSIGHTS_TOOLS
 from .financial_tools import FINANCIAL_TOOLS
+from .report_tools import REPORT_TOOLS
 from .widget_extractor import (
     create_market_size_widget,
     create_industry_widget,
@@ -33,6 +34,8 @@ from .widget_extractor import (
     create_break_even_widget,
     create_scenario_widget,
     create_viability_widget,
+    create_executive_summary_widget,
+    create_recommendations_widget,
 )
 from ..location_scout.agent_tools import LOCATION_SCOUT_TOOLS
 from ..market_validator.agent_tools import MARKET_VALIDATOR_TOOLS
@@ -42,7 +45,7 @@ from ...core.logging import get_logger
 
 logger = get_logger("agent.market_research")
 
-# Combine all tools from all domains (41 tools across 8 domains)
+# Combine all tools from all domains (44 tools across 9 domains)
 MARKET_RESEARCH_TOOLS = (
     LOCATION_SCOUT_TOOLS
     + MARKET_VALIDATOR_TOOLS
@@ -52,11 +55,12 @@ MARKET_RESEARCH_TOOLS = (
     + COMPETITIVE_INTELLIGENCE_TOOLS
     + CONSUMER_INSIGHTS_TOOLS
     + FINANCIAL_TOOLS
+    + REPORT_TOOLS
 )
 
 
 class MarketResearchAgent:
-    """Unified agent with all market research tools (41 tools across 8 domains)."""
+    """Unified agent with all market research tools (44 tools across 9 domains)."""
 
     def __init__(self):
         self.llm_service = get_llm_service()
@@ -250,6 +254,10 @@ class MarketResearchAgent:
             "assess_financial_viability": f"\n**Assessing financial viability...**\n",
             "get_financial_summary": f"\n**Generating financial summary...**\n",
             "get_industry_benchmarks": f"\n**Fetching industry benchmarks...**\n",
+            # Report tools
+            "generate_market_report": f"\n**Generating market report for {business_type}...**\n",
+            "get_executive_summary": f"\n**Creating executive summary...**\n",
+            "get_key_recommendations": f"\n**Generating key recommendations...**\n",
         }
         return messages.get(tool_name, f"\n**Running {tool_name}...**\n")
 
@@ -456,6 +464,18 @@ class MarketResearchAgent:
             if tool_name == "assess_financial_viability" and "viability_score" in tool_result:
                 widget = create_viability_widget(tool_result)
                 logger.info("Yielded viability data")
+                return f"\n{widget}\n"
+
+            # Executive summary data
+            if tool_name == "get_executive_summary" and "summary_paragraphs" in tool_result:
+                widget = create_executive_summary_widget(tool_result)
+                logger.info("Yielded executive summary data")
+                return f"\n{widget}\n"
+
+            # Recommendations data
+            if tool_name == "get_key_recommendations" and "recommendations" in tool_result:
+                widget = create_recommendations_widget(tool_result)
+                logger.info("Yielded recommendations data")
                 return f"\n{widget}\n"
 
         except (json.JSONDecodeError, TypeError, KeyError) as e:
