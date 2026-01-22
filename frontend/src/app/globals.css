@@ -248,6 +248,53 @@
   background: rgba(148, 163, 184, 0.5);
 }
 
+/* Text wrapping utilities for chat messages */
+.overflow-wrap-anywhere {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* Prose styles for markdown in chat */
+.prose {
+  color: inherit;
+}
+
+.prose-invert {
+  color: inherit;
+}
+
+.prose-invert p {
+  color: inherit;
+}
+
+.prose-invert h1,
+.prose-invert h2,
+.prose-invert h3,
+.prose-invert h4,
+.prose-invert h5,
+.prose-invert h6 {
+  color: inherit;
+}
+
+.prose-invert code {
+  color: inherit;
+  background-color: rgba(15, 23, 42, 0.5);
+}
+
+.prose-invert pre {
+  background-color: rgba(15, 23, 42, 0.5);
+  color: inherit;
+}
+
+.prose-invert a {
+  color: rgb(56, 189, 248);
+  text-decoration: underline;
+}
+
+.prose-invert a:hover {
+  color: rgb(125, 211, 252);
+}
+
 /* Landing Page Animations */
 .animate-on-scroll {
   opacity: 0;

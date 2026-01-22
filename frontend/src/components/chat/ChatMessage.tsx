@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import ReactMarkdown from "react-markdown";
 import { cn } from "@/lib/utils";
 import { MapWidget } from "./MapWidget";
 import { MarketValidatorWidget } from "../tools/MarketValidatorWidget";
@@ -291,6 +292,9 @@ function parseContent(content: string): ParsedContent {
     }
   }
 
+  // Remove all remaining HTML comments (like <!--INDUSTRY_DATA:...-->, <!--TREND_DATA:...-->, etc.)
+  text = text.replace(/<!--.*?-->/gs, "").trim();
+
   return { text, locationData, marketData, competitorData, positioningData, socialContentData, reviewResponseData };
 }
 
@@ -363,8 +367,38 @@ export function ChatMessage({ role, content, isStreaming }: ChatMessageProps) {
               : "glass-card text-slate-100"
           )}
         >
-          <div className="whitespace-pre-wrap text-sm leading-relaxed">
-            {text}
+          <div className="text-sm leading-relaxed break-words overflow-wrap-anywhere">
+            <ReactMarkdown
+              className="prose prose-invert prose-sm max-w-none"
+              components={{
+                p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                h1: ({ children }) => <h1 className="text-lg font-bold mb-2 mt-3 first:mt-0">{children}</h1>,
+                h2: ({ children }) => <h2 className="text-base font-semibold mb-2 mt-3 first:mt-0">{children}</h2>,
+                h3: ({ children }) => <h3 className="text-sm font-semibold mb-2 mt-2 first:mt-0">{children}</h3>,
+                ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
+                ol: ({ children }) => <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>,
+                li: ({ children }) => <li className="ml-2">{children}</li>,
+                strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+                em: ({ children }) => <em className="italic">{children}</em>,
+                code: ({ children }) => (
+                  <code className="bg-slate-800/50 px-1.5 py-0.5 rounded text-xs font-mono">
+                    {children}
+                  </code>
+                ),
+                pre: ({ children }) => (
+                  <pre className="bg-slate-800/50 p-2 rounded overflow-x-auto text-xs mb-2">
+                    {children}
+                  </pre>
+                ),
+                blockquote: ({ children }) => (
+                  <blockquote className="border-l-2 border-slate-600 pl-3 italic my-2">
+                    {children}
+                  </blockquote>
+                ),
+              }}
+            >
+              {text}
+            </ReactMarkdown>
             {isStreaming && (
               <span className="inline-block w-2 h-4 ml-1 bg-sky-400 animate-pulse rounded-sm" />
             )}
