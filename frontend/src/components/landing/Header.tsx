@@ -11,19 +11,20 @@ export function Header() {
   return (
     <header className="glass-header fixed top-0 left-0 right-0 z-50 px-6 py-4">
       <div className="mx-auto max-w-6xl flex items-center justify-between">
-        <Link href="/" className="text-2xl font-bold text-white hover:text-white/80 transition-colors">
-          PHOW
-        </Link>
-
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-6">
-          <Link href="/features" className="text-white/70 hover:text-white transition-colors text-sm font-medium">
-            Features
+        {/* Logo + Navigation */}
+        <div className="flex items-center gap-8">
+          <Link href="/" className="text-2xl font-bold text-white hover:text-white/80 transition-colors">
+            PHOW
           </Link>
-          <Link href="/about" className="text-white/70 hover:text-white transition-colors text-sm font-medium">
-            About
-          </Link>
-        </nav>
+          <nav className="hidden md:flex items-center gap-6">
+            <Link href="/features" className="text-white/70 hover:text-white transition-colors text-sm font-medium">
+              Features
+            </Link>
+            <Link href="/about" className="text-white/70 hover:text-white transition-colors text-sm font-medium">
+              About
+            </Link>
+          </nav>
+        </div>
 
         {/* Desktop CTAs */}
         <div className="hidden md:flex items-center gap-3">
