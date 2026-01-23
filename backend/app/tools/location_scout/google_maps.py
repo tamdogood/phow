@@ -114,6 +114,7 @@ class GoogleMapsClient:
             "website",
             "price_level",
             "user_ratings_total",
+            "current_opening_hours",
         ]
 
         response = await self._get_client().get(
@@ -132,3 +133,77 @@ class GoogleMapsClient:
             return data["result"]
         logger.warning("Place details not found", status=data["status"])
         return None
+
+    @cached(ttl=1800, key_prefix="popular_times")  # Cache for 30 min
+    async def get_popular_times(self, place_id: str) -> dict[str, Any] | None:
+        """
+        Get popular times (foot traffic) data for a place.
+        Note: Popular times data is not directly available via Places API.
+        This method returns opening hours as a proxy for business activity patterns.
+
+        For actual popular times, consider using third-party services like:
+        - Placer.ai
+        - SafeGraph
+        - BestTime API
+        """
+        logger.info("Getting popular times proxy data", place_id=place_id)
+
+        # Get place details with opening hours
+        details = await self.get_place_details(place_id)
+        if not details:
+            return None
+
+        opening_hours = details.get("opening_hours", {})
+        current_hours = details.get("current_opening_hours", {})
+
+        result = {
+            "place_id": place_id,
+            "name": details.get("name"),
+            "weekday_text": opening_hours.get("weekday_text", []),
+            "open_now": opening_hours.get("open_now"),
+            "periods": opening_hours.get("periods", []),
+            "note": "Actual popular times data requires third-party API integration",
+        }
+
+        # Extract hours by day for analysis
+        if opening_hours.get("periods"):
+            hours_by_day = self._parse_opening_periods(opening_hours["periods"])
+            result["hours_by_day"] = hours_by_day
+            result["total_weekly_hours"] = sum(
+                h.get("duration_hours", 0) for h in hours_by_day.values()
+            )
+
+        return result
+
+    def _parse_opening_periods(self, periods: list[dict]) -> dict[str, Any]:
+        """Parse opening periods into hours by day."""
+        days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+        hours_by_day = {}
+
+        for period in periods:
+            open_info = period.get("open", {})
+            close_info = period.get("close", {})
+
+            day_idx = open_info.get("day", 0)
+            day_name = days[day_idx] if day_idx < len(days) else f"Day {day_idx}"
+
+            open_time = open_info.get("time", "0000")
+            close_time = close_info.get("time", "2359")
+
+            # Calculate duration
+            try:
+                open_hour = int(open_time[:2]) + int(open_time[2:]) / 60
+                close_hour = int(close_time[:2]) + int(close_time[2:]) / 60
+                if close_hour < open_hour:
+                    close_hour += 24  # Handle overnight hours
+                duration = close_hour - open_hour
+            except (ValueError, IndexError):
+                duration = 0
+
+            hours_by_day[day_name] = {
+                "open": f"{open_time[:2]}:{open_time[2:]}",
+                "close": f"{close_time[:2]}:{close_time[2:]}",
+                "duration_hours": round(duration, 1),
+            }
+
+        return hours_by_day

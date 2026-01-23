@@ -27,6 +27,15 @@ class Settings(BaseSettings):
     bls_api_key: str = ""  # Bureau of Labor Statistics
     fred_api_key: str = ""  # Federal Reserve Economic Data
 
+    # Location Intelligence APIs (Phase 1 - Free)
+    walkscore_api_key: str = ""  # Walk Score API
+    crimemapping_api_key: str = ""  # CrimeMapping API
+    eia_api_key: str = ""  # Energy Information Administration
+
+    # Scraping Infrastructure
+    scraping_proxy_url: str = ""  # ScrapingBee/Bright Data/Apify
+    scraping_api_key: str = ""
+
     # Redis
     redis_url: str = "redis://localhost:6379/0"
     cache_ttl: int = 3600  # 1 hour default cache TTL
