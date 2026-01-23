@@ -34,14 +34,12 @@ export default function ProfilePage() {
     business_description: "",
   });
 
-  // Redirect if not authenticated
   useEffect(() => {
     if (!authLoading && !user) {
       router.push("/auth/signin");
     }
   }, [user, authLoading, router]);
 
-  // Load business profile
   useEffect(() => {
     async function loadProfile() {
       if (!user) return;
@@ -112,8 +110,8 @@ export default function ProfilePage() {
 
   if (authLoading || isFetching) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-900">
-        <div className="text-white">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a]">
+        <div className="text-white/50">Loading...</div>
       </div>
     );
   }
@@ -123,26 +121,15 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Background */}
-      <div
-        className="absolute inset-0 z-0"
-        style={{
-          backgroundImage: `url('https://plus.unsplash.com/premium_photo-1664443577580-dd2674e9d359?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      />
-      <div className="absolute inset-0 z-0 bg-gradient-to-b from-slate-900/40 via-transparent to-slate-900/60" />
+    <div className="min-h-screen bg-[#0a0a0a] relative overflow-hidden">
+      {/* Grid pattern overlay */}
+      <div className="fixed inset-0 grid-pattern pointer-events-none" />
 
       {/* Header */}
-      <header className="glass-header fixed top-0 left-0 right-0 z-50 px-6 py-4">
+      <header className="dark-header fixed top-0 left-0 right-0 z-50 px-6 py-4">
         <div className="mx-auto max-w-6xl flex items-center justify-between">
-          <Link
-            href="/"
-            className="text-xl font-bold text-white hover:text-white/80 transition-colors"
-          >
-            <span className="text-2xl">PHOW</span>
+          <Link href="/" className="text-xl font-bold text-white hover:text-white/80 transition-colors tracking-tight">
+            PHOW
           </Link>
         </div>
       </header>
@@ -151,7 +138,7 @@ export default function ProfilePage() {
       <main className="relative z-10 pt-24 pb-12 px-6">
         <div className="max-w-xl mx-auto space-y-6">
           {/* User Info Card */}
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-6">
+          <div className="dark-card p-6 animate-fade-in-up">
             <h2 className="text-lg font-semibold text-white mb-4">Account</h2>
             <div className="flex items-center gap-4">
               {user.user_metadata?.avatar_url && (
@@ -165,11 +152,11 @@ export default function ProfilePage() {
                 <p className="text-white font-medium">
                   {user.user_metadata?.full_name || "User"}
                 </p>
-                <p className="text-white/60 text-sm">{user.email}</p>
+                <p className="text-white/50 text-sm">{user.email}</p>
               </div>
               <button
                 onClick={handleSignOut}
-                className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm font-medium transition-all border border-white/20"
+                className="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white text-sm font-medium transition-all border border-white/10"
               >
                 Sign Out
               </button>
@@ -177,27 +164,27 @@ export default function ProfilePage() {
           </div>
 
           {/* Business Profile Card */}
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-8">
+          <div className="dark-card p-8 animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
             <h1 className="text-2xl font-bold text-white mb-2">Business Profile</h1>
-            <p className="text-white/70 mb-6">
+            <p className="text-white/50 mb-6">
               Update your business information to get better insights.
             </p>
 
             {error && (
-              <div className="mb-4 p-3 bg-red-500/20 border border-red-500/40 rounded-lg text-red-200 text-sm">
+              <div className="mb-4 p-3 bg-red-500/20 border border-red-500/30 rounded-lg text-red-400 text-sm">
                 {error}
               </div>
             )}
 
             {success && (
-              <div className="mb-4 p-3 bg-green-500/20 border border-green-500/40 rounded-lg text-green-200 text-sm">
+              <div className="mb-4 p-3 bg-green-500/20 border border-green-500/30 rounded-lg text-green-400 text-sm">
                 {success}
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label htmlFor="business_name" className="block text-sm font-medium text-white/80 mb-1">
+                <label htmlFor="business_name" className="block text-sm font-medium text-white/70 mb-1">
                   Business Name *
                 </label>
                 <input
@@ -207,13 +194,13 @@ export default function ProfilePage() {
                   value={formData.business_name}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/30"
+                  className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50"
                   placeholder="e.g., Joe's Coffee"
                 />
               </div>
 
               <div>
-                <label htmlFor="business_type" className="block text-sm font-medium text-white/80 mb-1">
+                <label htmlFor="business_type" className="block text-sm font-medium text-white/70 mb-1">
                   Business Type *
                 </label>
                 <select
@@ -222,11 +209,11 @@ export default function ProfilePage() {
                   value={formData.business_type}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
+                  className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50"
                 >
-                  <option value="" className="bg-slate-800">Select a type...</option>
+                  <option value="" className="bg-[#111]">Select a type...</option>
                   {BUSINESS_TYPES.map((type) => (
-                    <option key={type.value} value={type.value} className="bg-slate-800">
+                    <option key={type.value} value={type.value} className="bg-[#111]">
                       {type.label}
                     </option>
                   ))}
@@ -234,7 +221,7 @@ export default function ProfilePage() {
               </div>
 
               <div>
-                <label htmlFor="location_address" className="block text-sm font-medium text-white/80 mb-1">
+                <label htmlFor="location_address" className="block text-sm font-medium text-white/70 mb-1">
                   Business Address *
                 </label>
                 <input
@@ -244,13 +231,13 @@ export default function ProfilePage() {
                   value={formData.location_address}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/30"
+                  className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50"
                   placeholder="e.g., 123 Main St, Austin, TX"
                 />
               </div>
 
               <div>
-                <label htmlFor="target_customers" className="block text-sm font-medium text-white/80 mb-1">
+                <label htmlFor="target_customers" className="block text-sm font-medium text-white/70 mb-1">
                   Target Customers
                 </label>
                 <input
@@ -259,13 +246,13 @@ export default function ProfilePage() {
                   name="target_customers"
                   value={formData.target_customers}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/30"
+                  className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50"
                   placeholder="e.g., Young professionals, students"
                 />
               </div>
 
               <div>
-                <label htmlFor="business_description" className="block text-sm font-medium text-white/80 mb-1">
+                <label htmlFor="business_description" className="block text-sm font-medium text-white/70 mb-1">
                   Description
                 </label>
                 <textarea
@@ -274,7 +261,7 @@ export default function ProfilePage() {
                   value={formData.business_description}
                   onChange={handleChange}
                   rows={3}
-                  className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/30 resize-none"
+                  className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 resize-none"
                   placeholder="Brief description of your business..."
                 />
               </div>
@@ -282,14 +269,14 @@ export default function ProfilePage() {
               <div className="flex gap-3 pt-2">
                 <Link
                   href="/"
-                  className="flex-1 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm font-medium transition-all border border-white/20 text-center"
+                  className="flex-1 px-4 py-2.5 rounded-lg bg-white/5 hover:bg-white/10 text-white text-sm font-medium transition-all border border-white/10 text-center"
                 >
                   Back to Home
                 </Link>
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="flex-1 px-4 py-2 rounded-lg bg-white text-slate-900 text-sm font-medium hover:bg-white/90 transition-all disabled:opacity-50"
+                  className="flex-1 px-4 py-2.5 rounded-lg bg-white text-black text-sm font-medium hover:bg-white/90 transition-all disabled:opacity-50"
                 >
                   {isLoading ? "Saving..." : "Save Changes"}
                 </button>

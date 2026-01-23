@@ -9,7 +9,6 @@ export default function SignInPage() {
   const router = useRouter();
   const { user, loading, signInWithGoogle } = useAuth();
 
-  // Redirect if already signed in
   useEffect(() => {
     if (!loading && user) {
       router.push("/");
@@ -18,49 +17,38 @@ export default function SignInPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-900">
-        <div className="text-white">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a]">
+        <div className="text-white/50">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Background */}
-      <div
-        className="absolute inset-0 z-0"
-        style={{
-          backgroundImage: `url('https://plus.unsplash.com/premium_photo-1664443577580-dd2674e9d359?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      />
-      <div className="absolute inset-0 z-0 bg-gradient-to-b from-slate-900/40 via-transparent to-slate-900/60" />
+    <div className="min-h-screen bg-[#0a0a0a] relative overflow-hidden">
+      {/* Grid pattern overlay */}
+      <div className="fixed inset-0 grid-pattern pointer-events-none" />
 
       {/* Header */}
-      <header className="glass-header fixed top-0 left-0 right-0 z-50 px-6 py-4">
+      <header className="dark-header fixed top-0 left-0 right-0 z-50 px-6 py-4">
         <div className="mx-auto max-w-6xl flex items-center justify-between">
-          <Link
-            href="/"
-            className="text-xl font-bold text-white hover:text-white/80 transition-colors"
-          >
-            <span className="text-2xl">PHOW</span>
+          <Link href="/" className="text-xl font-bold text-white hover:text-white/80 transition-colors tracking-tight">
+            PHOW
           </Link>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="relative z-10 pt-24 pb-12 px-6">
-        <div className="max-w-md mx-auto">
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-8 text-center">
-            <h1 className="text-2xl font-bold text-white mb-2">Welcome to PHOW</h1>
-            <p className="text-white/70 mb-8">
+      <main className="relative z-10 min-h-screen flex items-center justify-center px-6">
+        <div className="max-w-md w-full animate-fade-in-up">
+          <div className="dark-card p-8 text-center">
+            <h1 className="text-2xl font-bold text-white mb-2">Welcome to <span className="text-accent-blue">PHOW</span></h1>
+            <p className="text-white/50 mb-8">
               Sign in to save your business profile and get personalized insights.
             </p>
 
             <button
               onClick={signInWithGoogle}
-              className="w-full px-6 py-3 rounded-lg bg-white text-slate-900 font-medium hover:bg-white/90 transition-all flex items-center justify-center gap-3"
+              className="w-full px-6 py-3 rounded-lg bg-white text-black font-medium hover:bg-white/90 transition-all flex items-center justify-center gap-3"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
@@ -83,7 +71,7 @@ export default function SignInPage() {
               Continue with Google
             </button>
 
-            <p className="text-white/50 text-sm mt-6">
+            <p className="text-white/30 text-sm mt-6">
               By signing in, you agree to our Terms of Service.
             </p>
           </div>

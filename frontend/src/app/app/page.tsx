@@ -24,11 +24,11 @@ interface LocalMessage {
 }
 
 const TOOL_COLORS: Record<string, string> = {
-  location_scout: "from-sky-500 to-blue-600",
-  market_validator: "from-violet-500 to-purple-600",
-  competitor_analyzer: "from-orange-500 to-rose-600",
-  social_media_coach: "from-pink-500 to-rose-500",
-  review_responder: "from-emerald-500 to-teal-600",
+  location_scout: "bg-blue-500/20 text-blue-400",
+  market_validator: "bg-purple-500/20 text-purple-400",
+  competitor_analyzer: "bg-orange-500/20 text-orange-400",
+  social_media_coach: "bg-pink-500/20 text-pink-400",
+  review_responder: "bg-emerald-500/20 text-emerald-400",
 };
 
 const EXAMPLE_PROMPTS = [
@@ -179,41 +179,26 @@ export default function AppPage() {
   };
 
   const handleExportPDF = () => {
-    // Basic print-to-PDF functionality
     window.print();
   };
 
   const hasMessages = messages.length > 0 || streamingContent;
 
   return (
-    <div className="min-h-screen relative overflow-hidden flex flex-col">
-      {/* Background */}
-      <div
-        className="fixed inset-0 z-0"
-        style={{
-          backgroundImage: `url('https://plus.unsplash.com/premium_photo-1664443577580-dd2674e9d359?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-        }}
-      />
-      <div className="fixed inset-0 z-0 bg-gradient-to-b from-slate-900/60 via-slate-900/40 to-slate-900/80" />
+    <div className="min-h-screen bg-[#0a0a0a] relative overflow-hidden flex flex-col">
+      {/* Grid pattern overlay */}
+      <div className="fixed inset-0 grid-pattern pointer-events-none" />
 
-      {/* Header - Matching landing page */}
-      <header className="glass-header fixed top-0 left-0 right-0 z-50 px-6 py-4">
+      {/* Header */}
+      <header className="dark-header fixed top-0 left-0 right-0 z-50 px-6 py-4">
         <div className="mx-auto max-w-6xl flex items-center justify-between">
-          <div className="flex items-center gap-8">
-            <Link href="/" className="text-2xl font-bold text-white hover:text-white/80 transition-colors">
+          <div className="flex items-center gap-3">
+            <Link href="/" className="text-xl font-bold text-white hover:text-white/80 transition-colors tracking-tight">
               PHOW
             </Link>
-            <nav className="hidden md:flex items-center gap-6">
-              <Link href="/features" className="text-white/70 hover:text-white transition-colors text-sm font-medium">
-                Features
-              </Link>
-              <Link href="/about" className="text-white/70 hover:text-white transition-colors text-sm font-medium">
-                About
-              </Link>
-            </nav>
+            <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded bg-white/10 text-[10px] font-mono text-white/60 uppercase tracking-wider">
+              AI Analytics
+            </span>
           </div>
 
           <div className="hidden md:flex items-center gap-3">
@@ -223,13 +208,13 @@ export default function AppPage() {
                   <>
                     <Link
                       href="/dashboard"
-                      className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm font-medium transition-all border border-white/20"
+                      className="px-4 py-2 text-white/70 hover:text-white text-sm font-medium transition-colors"
                     >
                       Dashboard
                     </Link>
                     <Link
                       href="/profile"
-                      className="px-4 py-2 rounded-lg bg-gradient-to-r from-sky-500 to-blue-600 text-white text-sm font-medium hover:from-sky-400 hover:to-blue-500 transition-all shadow-lg shadow-sky-500/25"
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white text-black text-sm font-medium hover:bg-white/90 transition-all"
                     >
                       {user.user_metadata?.full_name || user.email?.split("@")[0]}
                     </Link>
@@ -239,15 +224,15 @@ export default function AppPage() {
                     <button
                       onClick={signInWithGoogle}
                       disabled={!isConfigured}
-                      className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm font-medium transition-all border border-white/20 disabled:opacity-50"
+                      className="px-4 py-2 text-white/70 hover:text-white text-sm font-medium transition-colors disabled:opacity-50"
                     >
                       Sign In
                     </button>
                     <Link
-                      href="/app"
-                      className="px-4 py-2 rounded-lg bg-gradient-to-r from-sky-500 to-blue-600 text-white text-sm font-medium hover:from-sky-400 hover:to-blue-500 transition-all shadow-lg shadow-sky-500/25"
+                      href="/"
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white text-black text-sm font-medium hover:bg-white/90 transition-all"
                     >
-                      Get Started
+                      Home
                     </Link>
                   </>
                 )}
@@ -265,12 +250,12 @@ export default function AppPage() {
             leftSidebarOpen ? "w-64" : "w-0"
           } transition-all duration-300 overflow-hidden flex-shrink-0`}
         >
-          <div className="h-full w-64 glass p-4 flex flex-col border-r border-white/10">
+          <div className="h-full w-64 bg-[#111] border-r border-white/5 p-4 flex flex-col">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-sm font-semibold text-white/80">Chat History</h2>
+              <h2 className="text-sm font-semibold text-white/70">Chat History</h2>
               <button
                 onClick={handleNewChat}
-                className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all"
+                className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-all"
                 title="New Chat"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -287,26 +272,26 @@ export default function AppPage() {
                       key={convo.id}
                       className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all ${
                         conversationId === convo.id
-                          ? "bg-white/20 text-white"
-                          : "text-white/60 hover:bg-white/10 hover:text-white"
+                          ? "bg-white/10 text-white"
+                          : "text-white/50 hover:bg-white/5 hover:text-white/70"
                       }`}
                     >
                       <p className="truncate">{convo.title || "New conversation"}</p>
-                      <p className="text-xs text-white/40 mt-0.5">
+                      <p className="text-xs text-white/30 mt-0.5">
                         {new Date(convo.created_at).toLocaleDateString()}
                       </p>
                     </button>
                   ))
                 ) : (
-                  <p className="text-sm text-white/40 text-center py-4">No conversations yet</p>
+                  <p className="text-sm text-white/30 text-center py-4">No conversations yet</p>
                 )
               ) : (
                 <div className="text-center py-8">
-                  <p className="text-sm text-white/40 mb-3">Sign in to save your chat history</p>
+                  <p className="text-sm text-white/30 mb-3">Sign in to save history</p>
                   <button
                     onClick={signInWithGoogle}
                     disabled={!isConfigured}
-                    className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-medium transition-all border border-white/20 disabled:opacity-50"
+                    className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 text-xs font-medium transition-all border border-white/10 disabled:opacity-50"
                   >
                     Sign In
                   </button>
@@ -319,7 +304,7 @@ export default function AppPage() {
         {/* Toggle Left Sidebar */}
         <button
           onClick={() => setLeftSidebarOpen(!leftSidebarOpen)}
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-20 p-1 bg-slate-800/80 hover:bg-slate-700 rounded-r-lg text-white/60 hover:text-white transition-all"
+          className="absolute left-0 top-1/2 -translate-y-1/2 z-20 p-1 bg-[#1a1a1a] hover:bg-[#222] rounded-r-lg text-white/40 hover:text-white/70 transition-all border-y border-r border-white/5"
           style={{ left: leftSidebarOpen ? "256px" : "0" }}
         >
           <svg
@@ -338,27 +323,28 @@ export default function AppPage() {
             {!hasMessages ? (
               /* Welcome State */
               <div className="flex-1 flex flex-col items-center justify-center py-8">
-                <div className="text-center mb-10">
-                  <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-                    What would you like to explore?
+                <div className="text-center mb-10 animate-fade-in-up">
+                  <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">
+                    What would you like to <span className="text-accent-blue">explore</span>?
                   </h1>
-                  <p className="text-lg text-white/60">
+                  <p className="text-lg text-white/50">
                     Ask anything about your business - locations, markets, competitors, and more.
                   </p>
                 </div>
 
                 {/* Tool Suggestion Cards */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 w-full max-w-2xl mb-10">
-                  {tools.map((tool) => {
-                    const color = TOOL_COLORS[tool.id] || "from-gray-500 to-gray-600";
+                  {tools.map((tool, index) => {
+                    const colorClass = TOOL_COLORS[tool.id] || "bg-gray-500/20 text-gray-400";
                     return (
                       <button
                         key={tool.id}
                         onClick={() => handleToolCardClick(tool)}
-                        className="glass-card p-4 text-left hover:scale-[1.02] transition-all duration-200 group"
+                        className="dark-card p-4 text-left hover-lift group animate-fade-in-up"
+                        style={{ animationDelay: `${index * 0.1}s` }}
                       >
                         <div
-                          className={`w-10 h-10 rounded-lg flex items-center justify-center text-xl mb-2 bg-gradient-to-br ${color} text-white shadow-md group-hover:scale-110 transition-transform`}
+                          className={`w-10 h-10 rounded-lg flex items-center justify-center text-xl mb-2 ${colorClass} group-hover:scale-110 transition-transform`}
                         >
                           {tool.icon}
                         </div>
@@ -370,12 +356,13 @@ export default function AppPage() {
 
                 {/* Example Prompts */}
                 <div className="w-full max-w-2xl space-y-2">
-                  <p className="text-xs text-white/40 text-center mb-3">Try an example</p>
+                  <p className="text-xs text-white/30 text-center mb-3 font-mono uppercase tracking-wider">Try an example</p>
                   {EXAMPLE_PROMPTS.map((prompt, idx) => (
                     <button
                       key={idx}
                       onClick={() => handleExampleClick(prompt)}
-                      className="w-full text-left px-4 py-3 glass-card text-sm text-white/80 hover:text-white hover:bg-white/10 transition-all rounded-xl"
+                      className="w-full text-left px-4 py-3 dark-card text-sm text-white/60 hover:text-white hover:bg-white/5 transition-all rounded-xl animate-fade-in-up"
+                      style={{ animationDelay: `${(idx + 4) * 0.1}s` }}
                     >
                       &ldquo;{prompt}&rdquo;
                     </button>
@@ -413,7 +400,7 @@ export default function AppPage() {
         {/* Toggle Right Sidebar */}
         <button
           onClick={() => setRightSidebarOpen(!rightSidebarOpen)}
-          className="absolute right-0 top-1/2 -translate-y-1/2 z-20 p-1 bg-slate-800/80 hover:bg-slate-700 rounded-l-lg text-white/60 hover:text-white transition-all"
+          className="absolute right-0 top-1/2 -translate-y-1/2 z-20 p-1 bg-[#1a1a1a] hover:bg-[#222] rounded-l-lg text-white/40 hover:text-white/70 transition-all border-y border-l border-white/5"
           style={{ right: rightSidebarOpen ? "256px" : "0" }}
         >
           <svg
@@ -432,14 +419,14 @@ export default function AppPage() {
             rightSidebarOpen ? "w-64" : "w-0"
           } transition-all duration-300 overflow-hidden flex-shrink-0`}
         >
-          <div className="h-full w-64 glass p-4 flex flex-col border-l border-white/10">
-            <h2 className="text-sm font-semibold text-white/80 mb-4">Tools</h2>
+          <div className="h-full w-64 bg-[#111] border-l border-white/5 p-4 flex flex-col">
+            <h2 className="text-sm font-semibold text-white/70 mb-4">Tools</h2>
 
             <div className="space-y-2">
               <button
                 onClick={handleCopyChat}
                 disabled={!hasMessages}
-                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-white/70 hover:text-white hover:bg-white/10 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-white/50 hover:text-white hover:bg-white/5 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path
@@ -455,7 +442,7 @@ export default function AppPage() {
               <button
                 onClick={handleExportPDF}
                 disabled={!hasMessages}
-                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-white/70 hover:text-white hover:bg-white/10 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-white/50 hover:text-white hover:bg-white/5 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path
@@ -470,7 +457,7 @@ export default function AppPage() {
 
               <button
                 onClick={handleNewChat}
-                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-white/70 hover:text-white hover:bg-white/10 transition-all"
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-white/50 hover:text-white hover:bg-white/5 transition-all"
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path
@@ -486,8 +473,8 @@ export default function AppPage() {
 
             {hasMessages && (
               <>
-                <hr className="border-white/10 my-4" />
-                <div className="text-xs text-white/40">
+                <hr className="border-white/5 my-4" />
+                <div className="text-xs text-white/30 font-mono">
                   <p className="mb-1">Messages: {messages.length}</p>
                   {conversationId && (
                     <p className="truncate">ID: {conversationId.slice(0, 8)}...</p>

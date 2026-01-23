@@ -22,16 +22,16 @@ function ScoreCard({
     green: "text-emerald-400",
     yellow: "text-amber-400",
     red: "text-red-400",
-    blue: "text-sky-400",
+    blue: "text-blue-400",
   };
 
   return (
-    <div className="glass-card p-6 text-center">
-      <p className="text-white/60 text-sm mb-2">{label}</p>
+    <div className="dark-card p-6 text-center hover-lift">
+      <p className="text-white/50 text-sm mb-2">{label}</p>
       <p className={`text-3xl font-bold ${color ? colorClasses[color] : "text-white"}`}>
         {value}
       </p>
-      {subtext && <p className="text-white/40 text-xs mt-1">{subtext}</p>}
+      {subtext && <p className="text-white/30 text-xs mt-1">{subtext}</p>}
     </div>
   );
 }
@@ -47,7 +47,7 @@ function CompetitorCard({ competitor }: { competitor: TrackedCompetitor }) {
     : null;
 
   return (
-    <div className="py-3 border-b border-white/10 last:border-0">
+    <div className="py-3 border-b border-white/5 last:border-0">
       <div
         className={`flex items-center justify-between ${hasDetails ? "cursor-pointer" : ""}`}
         onClick={() => hasDetails && setExpanded(!expanded)}
@@ -60,7 +60,7 @@ function CompetitorCard({ competitor }: { competitor: TrackedCompetitor }) {
             )}
           </div>
           {competitor.address && (
-            <p className="text-white/50 text-sm truncate max-w-xs">{competitor.address}</p>
+            <p className="text-white/40 text-sm truncate max-w-xs">{competitor.address}</p>
           )}
         </div>
         <div className="flex items-center gap-3">
@@ -69,21 +69,21 @@ function CompetitorCard({ competitor }: { competitor: TrackedCompetitor }) {
               <span>★</span>
               <span className="font-medium">{competitor.rating.toFixed(1)}</span>
               {competitor.review_count && (
-                <span className="text-white/40 text-xs">({competitor.review_count})</span>
+                <span className="text-white/30 text-xs">({competitor.review_count})</span>
               )}
             </div>
           )}
           {hasDetails && (
-            <span className="text-white/40 text-sm">{expanded ? "▲" : "▼"}</span>
+            <span className="text-white/30 text-sm">{expanded ? "▲" : "▼"}</span>
           )}
         </div>
       </div>
 
       {expanded && hasDetails && (
-        <div className="mt-3 pt-3 border-t border-white/10">
+        <div className="mt-3 pt-3 border-t border-white/5">
           {competitor.strengths && competitor.strengths.length > 0 && (
             <div className="mb-2">
-              <p className="text-white/50 text-xs mb-1">Strengths</p>
+              <p className="text-white/40 text-xs mb-1">Strengths</p>
               <div className="flex flex-wrap gap-2">
                 {competitor.strengths.map((s, idx) => (
                   <span
@@ -98,7 +98,7 @@ function CompetitorCard({ competitor }: { competitor: TrackedCompetitor }) {
           )}
           {competitor.weaknesses && competitor.weaknesses.length > 0 && (
             <div>
-              <p className="text-white/50 text-xs mb-1">Weaknesses</p>
+              <p className="text-white/40 text-xs mb-1">Weaknesses</p>
               <div className="flex flex-wrap gap-2">
                 {competitor.weaknesses.map((w, idx) => (
                   <span
@@ -141,14 +141,14 @@ function ConversationCard({
   });
 
   return (
-    <div className="flex items-center justify-between py-3 border-b border-white/10 last:border-0">
+    <div className="flex items-center justify-between py-3 border-b border-white/5 last:border-0">
       <div>
-        <p className="text-white/60 text-sm">{toolNames[toolId] || toolId}</p>
+        <p className="text-white/50 text-sm">{toolNames[toolId] || toolId}</p>
         <p className="text-white font-medium truncate max-w-sm">
           {title || "New conversation"}
         </p>
       </div>
-      <p className="text-white/40 text-sm">{formattedDate}</p>
+      <p className="text-white/30 text-sm">{formattedDate}</p>
     </div>
   );
 }
@@ -163,7 +163,7 @@ function RecommendationItem({ text }: { text: string }) {
         className={`w-5 h-5 rounded border flex-shrink-0 flex items-center justify-center mt-0.5 transition-colors ${
           done
             ? "bg-emerald-500 border-emerald-500"
-            : "border-white/30 hover:border-white/50"
+            : "border-white/20 hover:border-white/40"
         }`}
       >
         {done && (
@@ -172,7 +172,7 @@ function RecommendationItem({ text }: { text: string }) {
           </svg>
         )}
       </button>
-      <span className={`text-white/80 ${done ? "line-through" : ""}`}>{text}</span>
+      <span className={`text-white/70 ${done ? "line-through" : ""}`}>{text}</span>
     </li>
   );
 }
@@ -206,44 +206,37 @@ export default function DashboardPage() {
   }, [user]);
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Background */}
-      <div
-        className="absolute inset-0 z-0"
-        style={{
-          backgroundImage: `url('https://plus.unsplash.com/premium_photo-1664443577580-dd2674e9d359?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-        }}
-      />
-      <div className="absolute inset-0 z-0 bg-gradient-to-b from-slate-900/40 via-transparent to-slate-900/60" />
+    <div className="min-h-screen bg-[#0a0a0a] relative overflow-hidden">
+      {/* Grid pattern overlay */}
+      <div className="fixed inset-0 grid-pattern pointer-events-none" />
 
       {/* Header */}
-      <header className="glass-header fixed top-0 left-0 right-0 z-50 px-6 py-4">
+      <header className="dark-header fixed top-0 left-0 right-0 z-50 px-6 py-4">
         <div className="mx-auto max-w-6xl flex items-center justify-between">
-          <Link
-            href="/"
-            className="text-left text-xl font-bold text-white hover:text-white/80 transition-colors"
-          >
-            <span className="text-2xl">PHOW</span>
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link href="/" className="text-xl font-bold text-white hover:text-white/80 transition-colors tracking-tight">
+              PHOW
+            </Link>
+            <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded bg-white/10 text-[10px] font-mono text-white/60 uppercase tracking-wider">
+              Dashboard
+            </span>
+          </div>
           <div className="flex items-center gap-3">
             <Link
               href="/community"
-              className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm font-medium transition-all border border-white/20"
+              className="px-4 py-2 text-white/70 hover:text-white text-sm font-medium transition-colors"
             >
               Community
             </Link>
             <Link
               href="/business-setup"
-              className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm font-medium transition-all border border-white/20"
+              className="px-4 py-2 text-white/70 hover:text-white text-sm font-medium transition-colors"
             >
               My Business
             </Link>
             <Link
-              href="/"
-              className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm font-medium transition-all border border-white/20"
+              href="/app"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white text-black text-sm font-medium hover:bg-white/90 transition-all"
             >
               New Analysis
             </Link>
@@ -256,31 +249,37 @@ export default function DashboardPage() {
         <div className="max-w-6xl mx-auto">
           {loading ? (
             <div className="flex items-center justify-center min-h-[60vh]">
-              <div className="text-white/60">Loading dashboard...</div>
+              <div className="text-white/50">Loading dashboard...</div>
             </div>
           ) : error ? (
             <div className="flex items-center justify-center min-h-[60vh]">
               <div className="text-red-400">{error}</div>
             </div>
           ) : !data?.has_profile ? (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
-              <h1 className="text-3xl font-bold text-white mb-4">Welcome to PHOW</h1>
-              <p className="text-white/60 mb-8 max-w-md">
+            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center animate-fade-in-up">
+              <h1 className="text-3xl font-bold text-white mb-4">Welcome to <span className="text-accent-blue">PHOW</span></h1>
+              <p className="text-white/50 mb-8 max-w-md">
                 Set up your business profile to start getting insights about your market,
                 competitors, and location.
               </p>
-              <Link href="/business-setup" className="btn-primary">
+              <Link
+                href="/business-setup"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-white text-black font-semibold hover:bg-white/90 transition-all"
+              >
                 Set Up Business Profile
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
               </Link>
             </div>
           ) : (
             <>
               {/* Business Header */}
-              <div className="mb-8">
+              <div className="mb-8 animate-fade-in-up">
                 <h1 className="text-3xl font-bold text-white">
                   {data.business_profile?.business_name || "Your Business"}
                 </h1>
-                <p className="text-white/60 mt-1">
+                <p className="text-white/50 mt-1">
                   {data.business_profile?.business_type}
                   {data.business_profile?.location_address &&
                     ` • ${data.business_profile.location_address}`}
@@ -315,15 +314,14 @@ export default function DashboardPage() {
               {/* Quick Insights */}
               {(data.market_analysis?.risk_factors?.length || data.market_analysis?.opportunities?.length) && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                  {/* Risks Card */}
                   {data.market_analysis?.risk_factors && data.market_analysis.risk_factors.length > 0 && (
-                    <div className="glass-card p-6 border-l-4 border-red-500">
+                    <div className="dark-card p-6 border-l-4 border-red-500">
                       <h3 className="text-red-400 font-semibold mb-3 flex items-center gap-2">
                         <span>⚠️</span> Top Risks
                       </h3>
                       <ul className="space-y-2">
                         {data.market_analysis.risk_factors.slice(0, 3).map((risk, idx) => (
-                          <li key={idx} className="flex items-start gap-2 text-white/80 text-sm">
+                          <li key={idx} className="flex items-start gap-2 text-white/70 text-sm">
                             <span className="text-red-400 mt-1">•</span>
                             <span>{risk}</span>
                           </li>
@@ -332,15 +330,14 @@ export default function DashboardPage() {
                     </div>
                   )}
 
-                  {/* Opportunities Card */}
                   {data.market_analysis?.opportunities && data.market_analysis.opportunities.length > 0 && (
-                    <div className="glass-card p-6 border-l-4 border-emerald-500">
+                    <div className="dark-card p-6 border-l-4 border-emerald-500">
                       <h3 className="text-emerald-400 font-semibold mb-3 flex items-center gap-2">
                         <span>✨</span> Top Opportunities
                       </h3>
                       <ul className="space-y-2">
                         {data.market_analysis.opportunities.slice(0, 3).map((opp, idx) => (
-                          <li key={idx} className="flex items-start gap-2 text-white/80 text-sm">
+                          <li key={idx} className="flex items-start gap-2 text-white/70 text-sm">
                             <span className="text-emerald-400 mt-1">•</span>
                             <span>{opp}</span>
                           </li>
@@ -353,12 +350,12 @@ export default function DashboardPage() {
 
               {/* Demographics Section */}
               {data.market_analysis?.demographics && Object.keys(data.market_analysis.demographics).length > 0 && (
-                <div className="glass-card p-6 mb-6">
+                <div className="dark-card p-6 mb-6">
                   <h2 className="text-xl font-semibold text-white mb-4">Market Demographics</h2>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {Object.entries(data.market_analysis.demographics).map(([key, value]) => (
                       <div key={key} className="bg-white/5 rounded-lg p-4">
-                        <p className="text-white/50 text-sm mb-2 capitalize">
+                        <p className="text-white/40 text-sm mb-2 capitalize">
                           {key.replace(/_/g, " ")}
                         </p>
                         <p className="text-white font-medium">{String(value)}</p>
@@ -371,12 +368,12 @@ export default function DashboardPage() {
               {/* Two Column Layout */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Competitors */}
-                <div className="glass-card p-6">
+                <div className="dark-card p-6">
                   <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-semibold text-white">Top Competitors</h2>
                     <Link
-                      href="/?tool=competitor_analyzer"
-                      className="text-sky-400 text-sm hover:underline"
+                      href="/app?tool=competitor_analyzer"
+                      className="text-blue-400 text-sm hover:underline"
                     >
                       Analyze More
                     </Link>
@@ -387,15 +384,18 @@ export default function DashboardPage() {
                         <CompetitorCard key={competitor.id} competitor={competitor} />
                       ))}
                       {data.tracked_competitors.length > 5 && (
-                        <p className="text-white/40 text-sm mt-3 text-center">
+                        <p className="text-white/30 text-sm mt-3 text-center">
                           +{data.tracked_competitors.length - 5} more competitors
                         </p>
                       )}
                     </div>
                   ) : (
                     <div className="text-center py-8">
-                      <p className="text-white/50 mb-4">No competitors tracked yet</p>
-                      <Link href="/?tool=competitor_analyzer" className="btn-primary text-sm">
+                      <p className="text-white/40 mb-4">No competitors tracked yet</p>
+                      <Link
+                        href="/app?tool=competitor_analyzer"
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 text-white text-sm hover:bg-white/10 transition-all"
+                      >
                         Find Competitors
                       </Link>
                     </div>
@@ -403,7 +403,7 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Recent Activity */}
-                <div className="glass-card p-6">
+                <div className="dark-card p-6">
                   <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-semibold text-white">Recent Activity</h2>
                   </div>
@@ -420,8 +420,11 @@ export default function DashboardPage() {
                     </div>
                   ) : (
                     <div className="text-center py-8">
-                      <p className="text-white/50 mb-4">No analyses yet</p>
-                      <Link href="/" className="btn-primary text-sm">
+                      <p className="text-white/40 mb-4">No analyses yet</p>
+                      <Link
+                        href="/app"
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 text-white text-sm hover:bg-white/10 transition-all"
+                      >
                         Start Your First Analysis
                       </Link>
                     </div>
@@ -429,20 +432,20 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {/* Market Gaps / Competitive Advantages */}
+              {/* Market Gaps */}
               {data.competitor_analysis?.market_gaps && Object.keys(data.competitor_analysis.market_gaps).length > 0 && (
-                <div className="glass-card p-6 mt-6">
+                <div className="dark-card p-6 mt-6">
                   <h2 className="text-xl font-semibold text-white mb-2">Your Competitive Advantages</h2>
-                  <p className="text-white/50 text-sm mb-4">
+                  <p className="text-white/40 text-sm mb-4">
                     Gaps in the market where you can differentiate
                   </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {Object.entries(data.competitor_analysis.market_gaps).map(([key, value]) => (
-                      <div key={key} className="bg-white/5 rounded-lg p-4 border-l-2 border-sky-500">
-                        <p className="text-sky-400 text-sm font-medium capitalize mb-1">
+                      <div key={key} className="bg-white/5 rounded-lg p-4 border-l-2 border-blue-500">
+                        <p className="text-blue-400 text-sm font-medium capitalize mb-1">
                           {key.replace(/_/g, " ")}
                         </p>
-                        <p className="text-white/80 text-sm">{String(value)}</p>
+                        <p className="text-white/70 text-sm">{String(value)}</p>
                       </div>
                     ))}
                   </div>
@@ -452,25 +455,25 @@ export default function DashboardPage() {
               {/* Differentiation Suggestions */}
               {data.competitor_analysis?.differentiation_suggestions &&
                 data.competitor_analysis.differentiation_suggestions.length > 0 && (
-                  <div className="glass-card p-6 mt-6">
+                  <div className="dark-card p-6 mt-6">
                     <h2 className="text-xl font-semibold text-white mb-4">
                       Differentiation Strategies
                     </h2>
                     <ul className="space-y-2">
                       {data.competitor_analysis.differentiation_suggestions.map((sug, idx) => (
                         <li key={idx} className="flex items-start gap-3">
-                          <span className="text-sky-400 mt-1">→</span>
-                          <span className="text-white/80">{sug}</span>
+                          <span className="text-blue-400 mt-1">→</span>
+                          <span className="text-white/70">{sug}</span>
                         </li>
                       ))}
                     </ul>
                   </div>
                 )}
 
-              {/* Recommendations (Checkable) */}
+              {/* Recommendations */}
               {data.market_analysis?.recommendations &&
                 data.market_analysis.recommendations.length > 0 && (
-                  <div className="glass-card p-6 mt-6">
+                  <div className="dark-card p-6 mt-6">
                     <h2 className="text-xl font-semibold text-white mb-4">Action Items</h2>
                     <ul className="space-y-3">
                       {data.market_analysis.recommendations.map((rec, idx) => (
@@ -483,20 +486,20 @@ export default function DashboardPage() {
               {/* Quick Actions */}
               <div className="flex flex-wrap gap-4 mt-8 justify-center">
                 <Link
-                  href="/?tool=market_validator"
-                  className="px-6 py-3 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 font-medium transition-all border border-emerald-500/30"
+                  href="/app?tool=market_validator"
+                  className="px-6 py-3 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 font-medium transition-all border border-emerald-500/20"
                 >
                   Validate Market
                 </Link>
                 <Link
-                  href="/?tool=competitor_analyzer"
-                  className="px-6 py-3 rounded-lg bg-sky-500/20 hover:bg-sky-500/30 text-sky-400 font-medium transition-all border border-sky-500/30"
+                  href="/app?tool=competitor_analyzer"
+                  className="px-6 py-3 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 font-medium transition-all border border-blue-500/20"
                 >
                   Analyze Competitors
                 </Link>
                 <Link
-                  href="/?tool=location_scout"
-                  className="px-6 py-3 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 font-medium transition-all border border-purple-500/30"
+                  href="/app?tool=location_scout"
+                  className="px-6 py-3 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 font-medium transition-all border border-purple-500/20"
                 >
                   Scout Location
                 </Link>

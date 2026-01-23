@@ -38,11 +38,11 @@ function ValuesSection() {
   const { ref, isVisible } = useIntersectionObserver<HTMLElement>({ threshold: 0.1 });
 
   return (
-    <section ref={ref} className="py-24 px-6 border-t border-white/10">
+    <section ref={ref} className="py-24 px-6 border-t border-white/5">
       <div className="mx-auto max-w-6xl">
         <div className={`text-center mb-16 animate-on-scroll ${isVisible ? "visible" : ""}`}>
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Our Values</h2>
-          <p className="text-lg text-white/60 max-w-2xl mx-auto">
+          <p className="text-lg text-white/50 max-w-2xl mx-auto">
             The principles that guide everything we build.
           </p>
         </div>
@@ -51,12 +51,12 @@ function ValuesSection() {
           {values.map((value, index) => (
             <div
               key={value.title}
-              className={`glass-card p-8 animate-on-scroll ${isVisible ? "visible" : ""}`}
+              className={`dark-card p-8 hover-lift animate-on-scroll ${isVisible ? "visible" : ""}`}
               style={{ transitionDelay: `${(index + 1) * 100}ms` }}
             >
               <div className="text-4xl mb-4">{value.icon}</div>
               <h3 className="text-xl font-semibold text-white mb-2">{value.title}</h3>
-              <p className="text-white/60">{value.description}</p>
+              <p className="text-white/50">{value.description}</p>
             </div>
           ))}
         </div>
@@ -69,7 +69,7 @@ function StatsSection() {
   const { ref, isVisible } = useIntersectionObserver<HTMLElement>({ threshold: 0.1 });
 
   return (
-    <section ref={ref} className="py-24 px-6 bg-slate-900/30">
+    <section ref={ref} className="py-24 px-6 bg-[#111]">
       <div className="mx-auto max-w-6xl">
         <div className={`grid grid-cols-2 md:grid-cols-4 gap-8 animate-on-scroll ${isVisible ? "visible" : ""}`}>
           {stats.map((stat, index) => (
@@ -79,7 +79,7 @@ function StatsSection() {
               style={{ transitionDelay: `${(index + 1) * 100}ms` }}
             >
               <p className="text-4xl md:text-5xl font-bold text-white mb-2">{stat.value}</p>
-              <p className="text-white/60">{stat.label}</p>
+              <p className="text-white/50">{stat.label}</p>
             </div>
           ))}
         </div>
@@ -92,19 +92,9 @@ export default function AboutPage() {
   const { ref: heroRef, isVisible: heroVisible } = useIntersectionObserver<HTMLElement>({ threshold: 0.1 });
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Background */}
-      <div
-        className="fixed inset-0 z-0"
-        style={{
-          backgroundImage: `url('https://plus.unsplash.com/premium_photo-1664443577580-dd2674e9d359?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-          backgroundAttachment: "fixed",
-        }}
-      />
-      <div className="fixed inset-0 z-0 bg-gradient-to-b from-slate-900/70 via-slate-900/50 to-slate-900/80" />
+    <div className="min-h-screen bg-[#0a0a0a] relative overflow-hidden">
+      {/* Grid pattern overlay */}
+      <div className="fixed inset-0 grid-pattern pointer-events-none" />
 
       <Header />
 
@@ -112,21 +102,21 @@ export default function AboutPage() {
         {/* Hero */}
         <section ref={heroRef} className="px-6 pb-24">
           <div className="mx-auto max-w-4xl text-center">
-            <h1 className={`text-4xl md:text-5xl font-bold text-white mb-6 animate-on-scroll ${heroVisible ? "visible" : ""}`}>
-              About PHOW
+            <h1 className={`text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight animate-on-scroll ${heroVisible ? "visible" : ""}`}>
+              About <span className="text-accent-blue">PHOW</span>
             </h1>
-            <p className={`text-xl text-white/70 mb-8 animate-on-scroll ${heroVisible ? "visible" : ""}`} style={{ transitionDelay: "100ms" }}>
+            <p className={`text-xl text-white/60 mb-8 animate-on-scroll ${heroVisible ? "visible" : ""}`} style={{ transitionDelay: "100ms" }}>
               We&apos;re on a mission to level the playing field for small business owners.
             </p>
           </div>
         </section>
 
         {/* Story */}
-        <section className="py-24 px-6 bg-slate-900/30">
+        <section className="py-24 px-6 bg-[#111]">
           <div className="mx-auto max-w-4xl">
-            <div className="glass-card p-8 md:p-12">
+            <div className="dark-card p-8 md:p-12 animate-fade-in-up">
               <h2 className="text-2xl md:text-3xl font-bold text-white mb-6">Our Story</h2>
-              <div className="space-y-4 text-white/70 text-lg">
+              <div className="space-y-4 text-white/60 text-lg">
                 <p>
                   PHOW started with a simple observation: big businesses have armies of analysts and expensive tools to make data-driven decisions. Small business owners? They rely on gut feelings and hope for the best.
                 </p>
@@ -150,21 +140,24 @@ export default function AboutPage() {
         {/* CTA */}
         <section className="py-24 px-6">
           <div className="mx-auto max-w-4xl text-center">
-            <div className="glass-card p-12">
+            <div className="dark-card p-12">
               <h2 className="text-3xl font-bold text-white mb-4">Join Our Mission</h2>
-              <p className="text-white/60 mb-8 max-w-xl mx-auto">
+              <p className="text-white/50 mb-8 max-w-xl mx-auto">
                 Help us democratize business intelligence. Try PHOW today and see the difference data-driven decisions can make.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link
                   href="/app"
-                  className="px-8 py-4 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 text-white font-semibold text-lg hover:from-sky-400 hover:to-blue-500 transition-all shadow-lg shadow-sky-500/25"
+                  className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-white text-black font-semibold text-lg hover:bg-white/90 transition-all"
                 >
                   Get Started Free
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
                 </Link>
                 <a
                   href="mailto:hello@phow.ai"
-                  className="px-8 py-4 rounded-xl bg-white/10 text-white font-semibold text-lg hover:bg-white/20 transition-all border border-white/20"
+                  className="inline-flex items-center justify-center px-8 py-4 rounded-xl bg-white/5 text-white font-semibold text-lg hover:bg-white/10 transition-all border border-white/10"
                 >
                   Contact Us
                 </a>

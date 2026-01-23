@@ -34,10 +34,10 @@ function formatRelativeTime(date: string): string {
 function CategoryBadge({ category }: { category: string | null }) {
   if (!category) return null;
   const colors: Record<string, string> = {
-    question: "bg-amber-500/20 text-amber-400 border-amber-500/30",
-    advice: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
-    update: "bg-sky-500/20 text-sky-400 border-sky-500/30",
-    discussion: "bg-purple-500/20 text-purple-400 border-purple-500/30",
+    question: "bg-amber-500/20 text-amber-400 border-amber-500/20",
+    advice: "bg-emerald-500/20 text-emerald-400 border-emerald-500/20",
+    update: "bg-blue-500/20 text-blue-400 border-blue-500/20",
+    discussion: "bg-purple-500/20 text-purple-400 border-purple-500/20",
   };
   return (
     <span className={`px-2 py-0.5 text-xs rounded-full border ${colors[category] || "bg-white/10 text-white/60"}`}>
@@ -51,20 +51,20 @@ function PostCard({ post }: { post: CommunityPost }) {
 
   return (
     <Link href={`/community/${post.id}`}>
-      <div className="glass-card p-5 cursor-pointer">
+      <div className="dark-card p-5 cursor-pointer hover-lift">
         <div className="flex items-start justify-between gap-3 mb-2">
           <h3 className="text-white font-semibold text-lg line-clamp-1">{post.title}</h3>
           <CategoryBadge category={post.category} />
         </div>
-        <p className="text-white/60 text-sm line-clamp-2 mb-3">{post.content}</p>
-        <div className="flex items-center justify-between text-xs text-white/40">
+        <p className="text-white/50 text-sm line-clamp-2 mb-3">{post.content}</p>
+        <div className="flex items-center justify-between text-xs text-white/30">
           <div className="flex items-center gap-3">
             <span>{authorName}</span>
-            <span className="text-white/30">•</span>
+            <span className="text-white/20">•</span>
             <span>{formatRelativeTime(post.created_at)}</span>
           </div>
           {post.comment_count > 0 && (
-            <span className="bg-white/10 px-2 py-0.5 rounded-full">
+            <span className="bg-white/5 px-2 py-0.5 rounded-full">
               {post.comment_count} {post.comment_count === 1 ? "comment" : "comments"}
             </span>
           )}
@@ -110,55 +110,55 @@ function CreatePostModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60">
-      <div className="glass-card p-6 w-full max-w-lg">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70">
+      <div className="dark-card p-6 w-full max-w-lg animate-scale-up">
         <h2 className="text-xl font-bold text-white mb-4">Create Post</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-white/60 text-sm mb-1">Category</label>
+            <label className="block text-white/50 text-sm mb-1">Category</label>
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-sky-400"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
             >
-              <option value="question">Question</option>
-              <option value="advice">Advice</option>
-              <option value="update">Update</option>
-              <option value="discussion">Discussion</option>
+              <option value="question" className="bg-[#111]">Question</option>
+              <option value="advice" className="bg-[#111]">Advice</option>
+              <option value="update" className="bg-[#111]">Update</option>
+              <option value="discussion" className="bg-[#111]">Discussion</option>
             </select>
           </div>
           <div>
-            <label className="block text-white/60 text-sm mb-1">Title</label>
+            <label className="block text-white/50 text-sm mb-1">Title</label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="What's on your mind?"
-              className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder:text-white/40 focus:outline-none focus:border-sky-400"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2.5 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
             />
           </div>
           <div>
-            <label className="block text-white/60 text-sm mb-1">Content</label>
+            <label className="block text-white/50 text-sm mb-1">Content</label>
             <textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="Share your thoughts..."
               rows={4}
-              className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder:text-white/40 focus:outline-none focus:border-sky-400 resize-none"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2.5 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-blue-500/50 resize-none"
             />
           </div>
           <div className="flex gap-3 justify-end">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm transition-all"
+              className="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white text-sm transition-all"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={submitting || !title.trim() || !content.trim()}
-              className="btn-primary text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 rounded-lg bg-white text-black text-sm font-medium hover:bg-white/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {submitting ? "Posting..." : "Post"}
             </button>
@@ -180,7 +180,6 @@ export default function CommunityPage() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [sortBy, setSortBy] = useState("newest");
 
-  // Debounce search input
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(search), 300);
     return () => clearTimeout(timer);
@@ -222,34 +221,26 @@ export default function CommunityPage() {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Background */}
-      <div
-        className="absolute inset-0 z-0"
-        style={{
-          backgroundImage: `url('https://plus.unsplash.com/premium_photo-1664443577580-dd2674e9d359?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      />
-      <div className="absolute inset-0 z-0 bg-gradient-to-b from-slate-900/40 via-transparent to-slate-900/60" />
+    <div className="min-h-screen bg-[#0a0a0a] relative overflow-hidden">
+      {/* Grid pattern overlay */}
+      <div className="fixed inset-0 grid-pattern pointer-events-none" />
 
       {/* Header */}
-      <header className="glass-header fixed top-0 left-0 right-0 z-50 px-6 py-4">
+      <header className="dark-header fixed top-0 left-0 right-0 z-50 px-6 py-4">
         <div className="mx-auto max-w-4xl flex items-center justify-between">
-          <Link href="/" className="text-2xl font-bold text-white hover:text-white/80 transition-colors">
+          <Link href="/" className="text-xl font-bold text-white hover:text-white/80 transition-colors tracking-tight">
             PHOW
           </Link>
           <div className="flex items-center gap-3">
             <Link
               href="/dashboard"
-              className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm font-medium transition-all border border-white/20"
+              className="px-4 py-2 text-white/70 hover:text-white text-sm font-medium transition-colors"
             >
               Dashboard
             </Link>
             <button
               onClick={() => setShowModal(true)}
-              className="btn-primary text-sm"
+              className="px-4 py-2 rounded-lg bg-white text-black text-sm font-medium hover:bg-white/90 transition-all"
             >
               New Post
             </button>
@@ -260,21 +251,21 @@ export default function CommunityPage() {
       {/* Main Content */}
       <main className="relative z-10 pt-24 pb-12 px-6">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold text-white mb-6">Community</h1>
+          <h1 className="text-3xl font-bold text-white mb-6 animate-fade-in-up">Community</h1>
 
           {/* Search */}
-          <div className="mb-4">
+          <div className="mb-4 animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search posts..."
-              className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2.5 text-white placeholder:text-white/40 focus:outline-none focus:border-sky-400"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
             />
           </div>
 
           {/* Category Tabs + Sort */}
-          <div className="flex items-center justify-between gap-4 mb-6">
+          <div className="flex items-center justify-between gap-4 mb-6 animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
             <div className="flex gap-2 overflow-x-auto pb-2">
               {CATEGORIES.map((cat) => (
                 <button
@@ -282,8 +273,8 @@ export default function CommunityPage() {
                   onClick={() => setCategory(cat.id)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
                     category === cat.id
-                      ? "bg-sky-500/30 text-sky-400 border border-sky-500/50"
-                      : "bg-white/10 text-white/70 border border-white/10 hover:bg-white/20"
+                      ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
+                      : "bg-white/5 text-white/60 border border-white/5 hover:bg-white/10"
                   }`}
                 >
                   {cat.label}
@@ -293,10 +284,10 @@ export default function CommunityPage() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-sky-400"
+              className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
             >
               {SORT_OPTIONS.map((opt) => (
-                <option key={opt.id} value={opt.id}>
+                <option key={opt.id} value={opt.id} className="bg-[#111]">
                   {opt.label}
                 </option>
               ))}
@@ -305,23 +296,28 @@ export default function CommunityPage() {
 
           {/* Posts */}
           {loading ? (
-            <div className="text-center py-12 text-white/60">Loading...</div>
+            <div className="text-center py-12 text-white/50">Loading...</div>
           ) : posts.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-white/50 mb-4">No posts yet. Be the first to share!</p>
-              <button onClick={() => setShowModal(true)} className="btn-primary text-sm">
+            <div className="text-center py-12 animate-fade-in-up">
+              <p className="text-white/40 mb-4">No posts yet. Be the first to share!</p>
+              <button
+                onClick={() => setShowModal(true)}
+                className="px-4 py-2 rounded-lg bg-white text-black text-sm font-medium hover:bg-white/90 transition-all"
+              >
                 Create Post
               </button>
             </div>
           ) : (
             <div className="space-y-4">
-              {posts.map((post) => (
-                <PostCard key={post.id} post={post} />
+              {posts.map((post, index) => (
+                <div key={post.id} className="animate-fade-in-up" style={{ animationDelay: `${(index % 10) * 0.05}s` }}>
+                  <PostCard post={post} />
+                </div>
               ))}
               {hasMore && (
                 <button
                   onClick={() => loadPosts(false)}
-                  className="w-full py-3 text-white/60 hover:text-white text-sm transition-colors"
+                  className="w-full py-3 text-white/50 hover:text-white text-sm transition-colors"
                 >
                   Load more
                 </button>
