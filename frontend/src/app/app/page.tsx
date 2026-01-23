@@ -65,7 +65,7 @@ export default function AppPage() {
   const [inputValue, setInputValue] = useState("");
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(true);
-  const [rightSidebarOpen, setRightSidebarOpen] = useState(true);
+  const [rightSidebarOpen, setRightSidebarOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
