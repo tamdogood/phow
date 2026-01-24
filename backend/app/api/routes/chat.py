@@ -22,6 +22,7 @@ async def chat(
                 tool_id=request.tool_id,
                 message=request.message,
                 conversation_id=request.conversation_id,
+                user_id=request.user_id,
             ):
                 if event_type == "chunk":
                     yield {
@@ -50,10 +51,11 @@ async def chat(
 @router.get("/conversations")
 async def list_conversations(
     session_id: str,
+    user_id: str | None = None,
     chat_service: ChatService = Depends(get_chat_service),
 ):
-    """List all conversations for a session."""
-    conversations = await chat_service.list_conversations(session_id)
+    """List conversations for a session or user."""
+    conversations = await chat_service.list_conversations(session_id, user_id)
     return {"conversations": conversations}
 
 
@@ -65,3 +67,14 @@ async def get_messages(
     """Get all messages in a conversation."""
     messages = await chat_service.get_messages(conversation_id)
     return {"messages": messages}
+
+
+@router.patch("/conversations/{conversation_id}/title")
+async def update_conversation_title(
+    conversation_id: str,
+    title: str,
+    chat_service: ChatService = Depends(get_chat_service),
+):
+    """Update conversation title."""
+    conversation = await chat_service.update_conversation_title(conversation_id, title)
+    return {"conversation": conversation}

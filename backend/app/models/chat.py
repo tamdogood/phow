@@ -10,6 +10,7 @@ class ChatRequest(BaseModel):
     conversation_id: str | None = None
     tool_id: str
     message: str
+    user_id: str | None = None
 
 
 class Message(BaseModel):

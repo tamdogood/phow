@@ -9,7 +9,8 @@ interface AuthContextType {
   session: Session | null;
   loading: boolean;
   isConfigured: boolean;
-  signInWithGoogle: () => Promise<void>;
+  signUp: (email: string, password: string) => Promise<{ error: string | null }>;
+  signIn: (email: string, password: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -46,19 +47,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signInWithGoogle = async () => {
-    if (!supabase) {
-      console.error(
-        "Supabase not configured. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_SERVICE_KEY in .env.local"
-      );
-      return;
-    }
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
+  const signUp = async (email: string, password: string) => {
+    if (!supabase) return { error: "Supabase not configured" };
+    const { error } = await supabase.auth.signUp({ email, password });
+    return { error: error?.message || null };
+  };
+
+  const signIn = async (email: string, password: string) => {
+    if (!supabase) return { error: "Supabase not configured" };
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    return { error: error?.message || null };
   };
 
   const signOut = async () => {
@@ -67,7 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, isConfigured, signInWithGoogle, signOut }}>
+    <AuthContext.Provider value={{ user, session, loading, isConfigured, signUp, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );

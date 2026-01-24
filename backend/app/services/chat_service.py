@@ -26,6 +26,7 @@ class ChatService:
         session_id: str,
         conversation_id: str | None,
         tool_id: str,
+        user_id: str | None = None,
     ) -> str:
         """Get existing conversation or create a new one."""
         if conversation_id:
@@ -33,11 +34,14 @@ class ChatService:
                 logger.debug("Using existing conversation", conversation_id=conversation_id)
                 return conversation_id
 
-        conversation = await self.conversation_repo.create(session_id=session_id, tool_id=tool_id)
+        conversation = await self.conversation_repo.create(
+            session_id=session_id, tool_id=tool_id, user_id=user_id
+        )
         logger.info(
             "Created new conversation",
             conversation_id=conversation["id"],
             tool_id=tool_id,
+            user_id=user_id,
         )
         return conversation["id"]
 
@@ -70,6 +74,7 @@ class ChatService:
         tool_id: str,
         message: str,
         conversation_id: str | None = None,
+        user_id: str | None = None,
     ) -> AsyncIterator[tuple[str, str | None]]:
         """Process a user message and stream the response."""
         logger.info(
@@ -79,8 +84,15 @@ class ChatService:
             message_length=len(message),
         )
 
-        conv_id = await self.get_or_create_conversation(session_id, conversation_id, tool_id)
+        conv_id = await self.get_or_create_conversation(
+            session_id, conversation_id, tool_id, user_id
+        )
         await self.save_message(conv_id, "user", message)
+
+        # Set title from first message if this is a new conversation
+        if not conversation_id:
+            title = message[:100] + ("..." if len(message) > 100 else "")
+            await self.conversation_repo.update_title(conv_id, title)
 
         tool = ToolRegistry.get(tool_id)
         if not tool:
@@ -143,10 +155,20 @@ class ChatService:
             logger.error("Error processing message", error=str(e), error_type=type(e).__name__)
             yield (f"Error processing message: {str(e)}", "error")
 
-    async def list_conversations(self, session_id: str, limit: int = 50) -> list[dict[str, Any]]:
-        """List all conversations for a session."""
+    async def list_conversations(
+        self, session_id: str, user_id: str | None = None, limit: int = 50
+    ) -> list[dict[str, Any]]:
+        """List conversations - by user_id if provided, else by session_id."""
+        if user_id:
+            return await self.conversation_repo.get_by_user(user_id, limit)
         return await self.conversation_repo.get_by_session(session_id, limit)
 
     async def get_messages(self, conversation_id: str) -> list[dict[str, Any]]:
         """Get all messages in a conversation."""
         return await self.message_repo.get_by_conversation(conversation_id)
+
+    async def update_conversation_title(
+        self, conversation_id: str, title: str
+    ) -> dict[str, Any] | None:
+        """Update conversation title."""
+        return await self.conversation_repo.update_title(conversation_id, title)

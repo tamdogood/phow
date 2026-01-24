@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { ChatMessage } from "@/components/chat/ChatMessage";
 import { ChatInput } from "@/components/chat/ChatInput";
-import { sendChatMessage, fetchConversations } from "@/lib/api";
+import { sendChatMessage, fetchConversations, updateConversationTitle } from "@/lib/api";
 import { getSessionId } from "@/lib/session";
 import { Conversation } from "@/types";
 
@@ -56,7 +56,7 @@ function detectTool(message: string): string {
 }
 
 export default function AppPage() {
-  const { user, loading: authLoading, isConfigured, signInWithGoogle } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [tools, setTools] = useState<Tool[]>([]);
   const [messages, setMessages] = useState<LocalMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -66,6 +66,8 @@ export default function AppPage() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(true);
   const [rightSidebarOpen, setRightSidebarOpen] = useState(false);
+  const [editingConvoId, setEditingConvoId] = useState<string | null>(null);
+  const [editingTitle, setEditingTitle] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -85,20 +87,21 @@ export default function AppPage() {
     fetchTools();
   }, []);
 
-  useEffect(() => {
-    async function loadConversations() {
-      if (!user) return;
-      const sessionId = getSessionId();
-      if (!sessionId) return;
-      try {
-        const convos = await fetchConversations(sessionId);
-        setConversations(convos);
-      } catch (error) {
-        console.error("Failed to fetch conversations:", error);
-      }
+  const loadConversations = useCallback(async () => {
+    if (!user) return;
+    const sessionId = getSessionId();
+    if (!sessionId) return;
+    try {
+      const convos = await fetchConversations(sessionId, user.id);
+      setConversations(convos);
+    } catch (error) {
+      console.error("Failed to fetch conversations:", error);
     }
-    loadConversations();
   }, [user]);
+
+  useEffect(() => {
+    loadConversations();
+  }, [loadConversations]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -134,34 +137,42 @@ export default function AppPage() {
     setInputValue("");
 
     let fullResponse = "";
-    await sendChatMessage(sessionId, toolId, message, conversationId, {
-      onChunk: (content) => {
-        fullResponse += content;
-        setStreamingContent(fullResponse);
+    await sendChatMessage(
+      sessionId,
+      toolId,
+      message,
+      conversationId,
+      {
+        onChunk: (content) => {
+          fullResponse += content;
+          setStreamingContent(fullResponse);
+        },
+        onDone: async (newConversationId) => {
+          setConversationId(newConversationId);
+          const assistantMessage: LocalMessage = {
+            id: crypto.randomUUID(),
+            role: "assistant",
+            content: fullResponse,
+          };
+          setMessages((prev) => [...prev, assistantMessage]);
+          setStreamingContent("");
+          setIsLoading(false);
+          await loadConversations();
+        },
+        onError: (error) => {
+          console.error("Chat error:", error);
+          const errorMessage: LocalMessage = {
+            id: crypto.randomUUID(),
+            role: "assistant",
+            content: `Error: ${error}. Please try again.`,
+          };
+          setMessages((prev) => [...prev, errorMessage]);
+          setStreamingContent("");
+          setIsLoading(false);
+        },
       },
-      onDone: (newConversationId) => {
-        setConversationId(newConversationId);
-        const assistantMessage: LocalMessage = {
-          id: crypto.randomUUID(),
-          role: "assistant",
-          content: fullResponse,
-        };
-        setMessages((prev) => [...prev, assistantMessage]);
-        setStreamingContent("");
-        setIsLoading(false);
-      },
-      onError: (error) => {
-        console.error("Chat error:", error);
-        const errorMessage: LocalMessage = {
-          id: crypto.randomUUID(),
-          role: "assistant",
-          content: `Error: ${error}. Please try again.`,
-        };
-        setMessages((prev) => [...prev, errorMessage]);
-        setStreamingContent("");
-        setIsLoading(false);
-      },
-    });
+      user?.id
+    );
   };
 
   const handleExampleClick = (prompt: string) => {
@@ -182,10 +193,54 @@ export default function AppPage() {
     window.print();
   };
 
+  const handleConversationClick = async (convo: Conversation) => {
+    try {
+      const { fetchMessages } = await import("@/lib/api");
+      const msgs = await fetchMessages(convo.id);
+      setConversationId(convo.id);
+      setMessages(
+        msgs.map((m) => ({
+          id: m.id,
+          role: m.role as "user" | "assistant",
+          content: m.content,
+        }))
+      );
+      setStreamingContent("");
+    } catch (error) {
+      console.error("Failed to load conversation:", error);
+    }
+  };
+
+  const handleStartEditTitle = (convo: Conversation, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingConvoId(convo.id);
+    setEditingTitle(convo.title || "");
+  };
+
+  const handleSaveTitle = async (convoId: string, e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!editingTitle.trim()) return;
+    try {
+      await updateConversationTitle(convoId, editingTitle.trim());
+      setConversations((prev) =>
+        prev.map((c) => (c.id === convoId ? { ...c, title: editingTitle.trim() } : c))
+      );
+      setEditingConvoId(null);
+      setEditingTitle("");
+    } catch (error) {
+      console.error("Failed to update title:", error);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingConvoId(null);
+    setEditingTitle("");
+  };
+
   const hasMessages = messages.length > 0 || streamingContent;
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] relative overflow-hidden flex flex-col">
+    <div className="h-screen bg-[#0a0a0a] relative flex flex-col">
       {/* Grid pattern overlay */}
       <div className="fixed inset-0 grid-pattern pointer-events-none" />
 
@@ -221,13 +276,12 @@ export default function AppPage() {
                   </>
                 ) : (
                   <>
-                    <button
-                      onClick={signInWithGoogle}
-                      disabled={!isConfigured}
-                      className="px-4 py-2 text-white/70 hover:text-white text-sm font-medium transition-colors disabled:opacity-50"
+                    <Link
+                      href="/auth/signin"
+                      className="px-4 py-2 text-white/70 hover:text-white text-sm font-medium transition-colors"
                     >
                       Sign In
-                    </button>
+                    </Link>
                     <Link
                       href="/"
                       className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white text-black text-sm font-medium hover:bg-white/90 transition-all"
@@ -243,12 +297,12 @@ export default function AppPage() {
       </header>
 
       {/* Main Layout with Sidebars */}
-      <div className="relative z-10 flex-1 flex pt-16">
+      <div className="relative z-10 flex-1 flex pt-16 min-h-0">
         {/* Left Sidebar - Chat History */}
         <aside
           className={`${
             leftSidebarOpen ? "w-64" : "w-0"
-          } transition-all duration-300 overflow-hidden flex-shrink-0`}
+          } transition-all duration-300 overflow-hidden flex-shrink-0 h-full`}
         >
           <div className="h-full w-64 bg-[#111] border-r border-white/5 p-4 flex flex-col">
             <div className="flex items-center justify-between mb-4">
@@ -268,19 +322,53 @@ export default function AppPage() {
               {user ? (
                 conversations.length > 0 ? (
                   conversations.map((convo) => (
-                    <button
+                    <div
                       key={convo.id}
-                      className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all ${
+                      className={`w-full rounded-lg text-sm transition-all ${
                         conversationId === convo.id
-                          ? "bg-white/10 text-white"
-                          : "text-white/50 hover:bg-white/5 hover:text-white/70"
+                          ? "bg-white/10"
+                          : "hover:bg-white/5"
                       }`}
                     >
-                      <p className="truncate">{convo.title || "New conversation"}</p>
-                      <p className="text-xs text-white/30 mt-0.5">
-                        {new Date(convo.created_at).toLocaleDateString()}
-                      </p>
-                    </button>
+                      {editingConvoId === convo.id ? (
+                        <form onSubmit={(e) => handleSaveTitle(convo.id, e)} className="p-2">
+                          <input
+                            type="text"
+                            value={editingTitle}
+                            onChange={(e) => setEditingTitle(e.target.value)}
+                            onBlur={() => handleSaveTitle(convo.id)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Escape") handleCancelEdit();
+                            }}
+                            autoFocus
+                            className="w-full bg-white/10 border border-white/20 rounded px-2 py-1 text-white text-sm focus:outline-none focus:border-blue-500"
+                          />
+                        </form>
+                      ) : (
+                        <div
+                          onClick={() => handleConversationClick(convo)}
+                          className="flex items-start gap-2 px-3 py-2 cursor-pointer group"
+                        >
+                          <div className="flex-1 min-w-0">
+                            <p className={`truncate ${conversationId === convo.id ? "text-white" : "text-white/50 group-hover:text-white/70"}`}>
+                              {convo.title || "New conversation"}
+                            </p>
+                            <p className="text-xs text-white/30 mt-0.5">
+                              {new Date(convo.created_at).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <button
+                            onClick={(e) => handleStartEditTitle(convo, e)}
+                            className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-white/10 transition-all flex-shrink-0"
+                            title="Edit title"
+                          >
+                            <svg className="w-3 h-3 text-white/50 hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                            </svg>
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   ))
                 ) : (
                   <p className="text-sm text-white/30 text-center py-4">No conversations yet</p>
@@ -288,13 +376,12 @@ export default function AppPage() {
               ) : (
                 <div className="text-center py-8">
                   <p className="text-sm text-white/30 mb-3">Sign in to save history</p>
-                  <button
-                    onClick={signInWithGoogle}
-                    disabled={!isConfigured}
-                    className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 text-xs font-medium transition-all border border-white/10 disabled:opacity-50"
+                  <Link
+                    href="/auth/signin"
+                    className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 text-xs font-medium transition-all border border-white/10"
                   >
                     Sign In
-                  </button>
+                  </Link>
                 </div>
               )}
             </div>
@@ -318,11 +405,11 @@ export default function AppPage() {
         </button>
 
         {/* Main Chat Area */}
-        <main className="flex-1 flex flex-col min-w-0 pb-6">
-          <div className="flex-1 max-w-3xl w-full mx-auto px-4 flex flex-col">
+        <main className="flex-1 flex flex-col min-w-0 min-h-0">
+          <div className="flex-1 max-w-3xl w-full mx-auto px-4 py-6 flex flex-col min-h-0">
             {!hasMessages ? (
               /* Welcome State */
-              <div className="flex-1 flex flex-col items-center justify-center py-8">
+              <div className="flex-1 overflow-y-auto flex flex-col items-center justify-center py-8 custom-scrollbar">
                 <div className="text-center mb-10 animate-fade-in-up">
                   <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">
                     What would you like to <span className="text-accent-blue">explore</span>?

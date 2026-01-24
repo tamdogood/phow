@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { user, loading: authLoading, isConfigured, signInWithGoogle } = useAuth();
+  const { user, loading: authLoading } = useAuth();
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 px-6 py-4 bg-[#0a0a0a]/80 backdrop-blur-md border-b border-white/5">
@@ -50,13 +50,12 @@ export function Header() {
                 </Link>
               ) : (
                 <>
-                  <button
-                    onClick={signInWithGoogle}
-                    disabled={!isConfigured}
-                    className="px-4 py-2 text-white/70 hover:text-white text-sm font-medium transition-colors disabled:opacity-50"
+                  <Link
+                    href="/auth/signin"
+                    className="px-4 py-2 text-white/70 hover:text-white text-sm font-medium transition-colors"
                   >
                     Sign In
-                  </button>
+                  </Link>
                   <Link
                     href="/app"
                     className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white text-black text-sm font-medium hover:bg-white/90 transition-all"
@@ -104,16 +103,13 @@ export function Header() {
                   </Link>
                 ) : (
                   <>
-                    <button
-                      onClick={() => {
-                        signInWithGoogle();
-                        setMobileMenuOpen(false);
-                      }}
-                      disabled={!isConfigured}
-                      className="px-4 py-2 text-white/70 hover:text-white text-sm font-medium text-left disabled:opacity-50"
+                    <Link
+                      href="/auth/signin"
+                      className="px-4 py-2 text-white/70 hover:text-white text-sm font-medium text-left"
+                      onClick={() => setMobileMenuOpen(false)}
                     >
                       Sign In
-                    </button>
+                    </Link>
                     <Link
                       href="/app"
                       className="px-4 py-2 rounded-lg bg-white text-black text-sm font-medium text-center"

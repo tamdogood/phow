@@ -47,6 +47,18 @@ class ConversationRepository(BaseRepository):
         )
         return result.data or []
 
+    async def get_by_user(self, user_id: str, limit: int = 50) -> list[dict[str, Any]]:
+        """Get all conversations for a user."""
+        result = (
+            self.db.table("conversations")
+            .select("*")
+            .eq("user_id", user_id)
+            .order("created_at", desc=True)
+            .limit(limit)
+            .execute()
+        )
+        return result.data or []
+
     async def update_title(self, conversation_id: str, title: str) -> dict[str, Any] | None:
         """Update conversation title."""
         result = (

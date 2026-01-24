@@ -151,7 +151,7 @@ export default function PostPage({ params }: { params: Promise<{ postId: string 
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
         <div className="text-white/60">Loading...</div>
       </div>
     );
@@ -159,7 +159,7 @@ export default function PostPage({ params }: { params: Promise<{ postId: string 
 
   if (!post) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
         <div className="text-center">
           <p className="text-white/60 mb-4">Post not found</p>
           <Link href="/community" className="text-sky-400 hover:underline">
@@ -174,27 +174,19 @@ export default function PostPage({ params }: { params: Promise<{ postId: string 
   const isOwner = post.session_id === sessionId;
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Background */}
-      <div
-        className="absolute inset-0 z-0"
-        style={{
-          backgroundImage: `url('https://plus.unsplash.com/premium_photo-1664443577580-dd2674e9d359?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      />
-      <div className="absolute inset-0 z-0 bg-gradient-to-b from-slate-900/40 via-transparent to-slate-900/60" />
+    <div className="min-h-screen bg-[#0a0a0a] relative overflow-hidden">
+      {/* Grid pattern overlay */}
+      <div className="fixed inset-0 grid-pattern pointer-events-none" />
 
       {/* Header */}
-      <header className="glass-header fixed top-0 left-0 right-0 z-50 px-6 py-4">
+      <header className="dark-header fixed top-0 left-0 right-0 z-50 px-6 py-4">
         <div className="mx-auto max-w-4xl flex items-center justify-between">
-          <Link href="/" className="text-2xl font-bold text-white hover:text-white/80 transition-colors">
+          <Link href="/" className="text-xl font-bold text-white hover:text-white/80 transition-colors tracking-tight">
             PHOW
           </Link>
           <Link
             href="/community"
-            className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm font-medium transition-all border border-white/20"
+            className="px-4 py-2 rounded-lg bg-white text-black text-sm font-medium hover:bg-white/90 transition-all"
           >
             Back to Community
           </Link>
@@ -205,33 +197,33 @@ export default function PostPage({ params }: { params: Promise<{ postId: string 
       <main className="relative z-10 pt-24 pb-12 px-6">
         <div className="max-w-4xl mx-auto">
           {/* Post */}
-          <div className="glass-card p-6 mb-6">
+          <div className="dark-card p-6 mb-6">
             {editing ? (
               <form onSubmit={handleEditPost} className="space-y-4">
                 <input
                   type="text"
                   value={editTitle}
                   onChange={(e) => setEditTitle(e.target.value)}
-                  className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2 text-white text-xl font-bold focus:outline-none focus:border-sky-400"
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white text-xl font-bold focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                 />
                 <textarea
                   value={editContent}
                   onChange={(e) => setEditContent(e.target.value)}
                   rows={6}
-                  className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2 text-white/80 focus:outline-none focus:border-sky-400 resize-none"
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white/80 focus:outline-none focus:ring-2 focus:ring-blue-500/50 resize-none"
                 />
                 <div className="flex gap-3 justify-end">
                   <button
                     type="button"
                     onClick={() => setEditing(false)}
-                    className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm"
+                    className="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white text-sm transition-all"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={submitting || !editTitle.trim() || !editContent.trim()}
-                    className="btn-primary text-sm disabled:opacity-50"
+                    className="px-4 py-2 rounded-lg bg-white text-black text-sm font-medium hover:bg-white/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {submitting ? "Saving..." : "Save"}
                   </button>
@@ -266,7 +258,7 @@ export default function PostPage({ params }: { params: Promise<{ postId: string 
           </div>
 
           {/* Comment Form */}
-          <div className="glass-card p-6 mb-6">
+          <div className="dark-card p-6 mb-6">
             <h2 className="text-lg font-semibold text-white mb-4">Add a Comment</h2>
             <form onSubmit={handleAddComment} className="flex gap-3">
               <input
@@ -274,12 +266,12 @@ export default function PostPage({ params }: { params: Promise<{ postId: string 
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
                 placeholder="Share your advice or thoughts..."
-                className="flex-1 bg-white/10 border border-white/20 rounded-lg px-4 py-2 text-white placeholder:text-white/40 focus:outline-none focus:border-sky-400"
+                className="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
               />
               <button
                 type="submit"
                 disabled={submitting || !commentText.trim()}
-                className="btn-primary text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 rounded-lg bg-white text-black text-sm font-medium hover:bg-white/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {submitting ? "..." : "Comment"}
               </button>
@@ -287,7 +279,7 @@ export default function PostPage({ params }: { params: Promise<{ postId: string 
           </div>
 
           {/* Comments */}
-          <div className="glass-card p-6">
+          <div className="dark-card p-6">
             <h2 className="text-lg font-semibold text-white mb-4">
               Comments ({post.comments.length})
             </h2>
