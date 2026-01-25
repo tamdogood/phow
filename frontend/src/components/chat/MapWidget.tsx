@@ -2,6 +2,8 @@
 
 import { useState, useCallback, useMemo } from "react";
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from "@react-google-maps/api";
+import { MapPin, Store, Train } from "lucide-react";
+import { LocationInfoCards } from "../widgets/LocationInfoCards";
 
 interface LocationData {
   lat: number;
@@ -15,12 +17,18 @@ interface NearbyPlace {
   vicinity?: string;
   rating?: number;
   user_ratings_total?: number;
+  price_level?: number;
 }
 
 interface MapWidgetProps {
   location: LocationData;
   competitors?: NearbyPlace[];
   transitStations?: NearbyPlace[];
+  analysisSummary?: {
+    competitor_count?: number;
+    transit_access?: boolean;
+    foot_traffic_indicators?: number;
+  };
 }
 
 const mapContainerStyle = {
@@ -51,6 +59,7 @@ export function MapWidget({
   location,
   competitors = [],
   transitStations = [],
+  analysisSummary,
 }: MapWidgetProps) {
   const [selectedMarker, setSelectedMarker] = useState<{
     position: google.maps.LatLngLiteral;
@@ -72,7 +81,7 @@ export function MapWidget({
 
   if (loadError) {
     return (
-      <div className="w-full h-[300px] bg-gray-100 rounded-xl flex items-center justify-center text-gray-500">
+      <div className="w-full h-[300px] bg-slate-900 rounded-xl flex items-center justify-center text-slate-400 border border-slate-800">
         Error loading map
       </div>
     );
@@ -80,7 +89,7 @@ export function MapWidget({
 
   if (!isLoaded) {
     return (
-      <div className="w-full h-[300px] bg-gray-100 rounded-xl flex items-center justify-center text-gray-500 animate-pulse">
+      <div className="w-full h-[300px] bg-slate-900 rounded-xl flex items-center justify-center text-slate-400 animate-pulse border border-slate-800">
         Loading map...
       </div>
     );
@@ -88,14 +97,15 @@ export function MapWidget({
 
   return (
     <div className="w-full my-3">
-      <GoogleMap
-        mapContainerStyle={mapContainerStyle}
-        center={center}
-        zoom={15}
-        options={defaultOptions}
-        onLoad={onLoad}
-        onUnmount={onUnmount}
-      >
+      <div className="widget-card p-4 mb-4">
+        <GoogleMap
+          mapContainerStyle={mapContainerStyle}
+          center={center}
+          zoom={15}
+          options={defaultOptions}
+          onLoad={onLoad}
+          onUnmount={onUnmount}
+        >
         {/* Main location marker */}
         <Marker
           position={center}
@@ -158,34 +168,44 @@ export function MapWidget({
             onCloseClick={() => setSelectedMarker(null)}
           >
             <div className="p-2">
-              <h3 className="font-semibold text-sm">{selectedMarker.title}</h3>
+              <h3 className="font-semibold text-sm text-slate-900">{selectedMarker.title}</h3>
               {selectedMarker.type === "main" && (
-                <p className="text-xs text-gray-500 mt-1">Your target location</p>
+                <p className="text-xs text-slate-600 mt-1">Your target location</p>
               )}
             </div>
           </InfoWindow>
         )}
       </GoogleMap>
 
-      {/* Legend */}
-      <div className="flex flex-wrap gap-4 mt-2 text-xs text-gray-600">
-        <div className="flex items-center gap-1">
-          <span className="w-3 h-3 rounded-full bg-red-500"></span>
+      {/* Enhanced Legend */}
+      <div className="flex flex-wrap gap-4 mt-3 text-xs text-slate-300">
+        <div className="flex items-center gap-2">
+          <MapPin className="w-4 h-4 text-red-400" />
           <span>Target Location</span>
         </div>
         {competitors.length > 0 && (
-          <div className="flex items-center gap-1">
-            <span className="w-3 h-3 rounded-full bg-orange-500"></span>
+          <div className="flex items-center gap-2">
+            <Store className="w-4 h-4 text-orange-400" />
             <span>Competitors ({competitors.length})</span>
           </div>
         )}
         {transitStations.length > 0 && (
-          <div className="flex items-center gap-1">
-            <span className="w-3 h-3 rounded-full bg-blue-500"></span>
+          <div className="flex items-center gap-2">
+            <Train className="w-4 h-4 text-blue-400" />
             <span>Transit ({transitStations.length})</span>
           </div>
         )}
       </div>
+      </div>
+
+      {/* Location Info Cards */}
+      <LocationInfoCards
+        data={{
+          competitors,
+          transit_stations: transitStations,
+          analysis_summary: analysisSummary,
+        }}
+      />
     </div>
   );
 }

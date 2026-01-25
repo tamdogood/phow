@@ -468,3 +468,49 @@
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
+
+/* Widget Styles */
+.widget-card {
+  background: #0f172a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  transition: all 0.3s ease;
+}
+
+.widget-card:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.metric-icon-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.5rem;
+  flex-shrink: 0;
+}
+
+/* Progress Bar Gradients */
+.progress-bar-gradient-green {
+  background: linear-gradient(90deg, #10b981, #34d399);
+}
+
+.progress-bar-gradient-blue {
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+}
+
+.progress-bar-gradient-yellow {
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+}
+
+.progress-bar-gradient-red {
+  background: linear-gradient(90deg, #ef4444, #f87171);
+}
+
+/* AI Insight Pill */
+.ai-insight-pill {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6, #a855f7);
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+}

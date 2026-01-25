@@ -1,6 +1,9 @@
 "use client";
 
 import { useMemo } from "react";
+import { Tag, Lightbulb, TrendingUp } from "lucide-react";
+import { RatingDisplay } from "../widgets/RatingDisplay";
+import { PriceLevel } from "../widgets/PriceLevel";
 
 interface CompetitorData {
   type: "competitor_data";
@@ -60,32 +63,20 @@ interface PositioningWidgetProps {
   data: PositioningData;
 }
 
-function RatingBadge({ rating }: { rating?: number }) {
-  if (!rating) return <span className="text-gray-400 text-xs">No rating</span>;
+function SourceBadge({ source }: { source?: string }) {
+  if (!source) return null;
 
-  const color =
-    rating >= 4.5
-      ? "bg-green-100 text-green-800"
-      : rating >= 4.0
-        ? "bg-green-50 text-green-700"
-        : rating >= 3.5
-          ? "bg-yellow-100 text-yellow-800"
-          : "bg-orange-100 text-orange-800";
+  const config = {
+    google: { label: "Google", color: "bg-blue-500/20 text-blue-400 border-blue-500/30" },
+    yelp: { label: "Yelp", color: "bg-red-500/20 text-red-400 border-red-500/30" },
+  };
 
-  return (
-    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${color}`}>
-      ★ {rating.toFixed(1)}
-    </span>
-  );
-}
-
-function PriceBadge({ level, priceStr }: { level?: number; priceStr?: string }) {
-  const price = priceStr || (level ? "$".repeat(level) : null);
-  if (!price) return null;
+  const sourceConfig = config[source.toLowerCase() as keyof typeof config];
+  if (!sourceConfig) return null;
 
   return (
-    <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
-      {price}
+    <span className={`text-xs px-2 py-0.5 rounded border ${sourceConfig.color}`}>
+      {sourceConfig.label}
     </span>
   );
 }
@@ -103,18 +94,18 @@ export function CompetitorWidget({ data }: CompetitorWidgetProps) {
   };
 
   return (
-    <div className="w-full bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden my-3">
+    <div className="w-full widget-card overflow-hidden my-3">
       {/* Header */}
-      <div className="bg-gradient-to-r from-orange-500 to-red-500 px-4 py-3">
+      <div className="bg-gradient-to-r from-orange-500 to-red-500 px-4 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-white font-semibold">Competitor Analysis</h3>
+            <h3 className="text-white font-semibold text-lg">Competitor Analysis</h3>
             <p className="text-orange-100 text-sm">
               {data.business_type} near {data.location?.formatted_address || "location"}
             </p>
           </div>
           <div className="text-right">
-            <div className="text-3xl font-bold text-white">{data.total_found}</div>
+            <div className="text-4xl font-bold text-white">{data.total_found}</div>
             <span className="text-orange-100 text-xs">competitors found</span>
           </div>
         </div>
@@ -122,46 +113,67 @@ export function CompetitorWidget({ data }: CompetitorWidgetProps) {
 
       {/* Source breakdown */}
       {data.sources && (
-        <div className="px-4 py-2 bg-gray-50 border-b border-gray-100 flex gap-4 text-xs text-gray-600">
+        <div className="px-4 py-3 bg-slate-800/50 border-b border-slate-800 flex gap-4 text-xs">
           {data.sources.google && (
-            <span>Google: {data.sources.google} results</span>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+              <span className="text-slate-300">Google: {data.sources.google}</span>
+            </div>
           )}
           {data.sources.yelp && (
-            <span>Yelp: {data.sources.yelp} results</span>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-red-400 rounded-full"></div>
+              <span className="text-slate-300">Yelp: {data.sources.yelp}</span>
+            </div>
           )}
         </div>
       )}
 
       {/* Competitors list */}
-      <div className="divide-y divide-gray-100 max-h-96 overflow-y-auto">
+      <div className="divide-y divide-slate-800 max-h-96 overflow-y-auto custom-scrollbar">
         {sortedCompetitors.map((competitor, idx) => (
           <div
             key={idx}
-            className="px-4 py-3 hover:bg-gray-50 transition-colors"
+            className="px-4 py-3 hover:bg-slate-800/50 transition-colors"
           >
-            <div className="flex items-start justify-between">
+            <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className="font-medium text-gray-900 truncate">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="font-medium text-white truncate">
                     {competitor.name}
                   </span>
-                  <RatingBadge rating={competitor.rating} />
-                  <PriceBadge
-                    level={competitor.price_level}
-                    priceStr={competitor.yelp_price}
-                  />
+                  <SourceBadge source={competitor.source} />
                 </div>
+
+                <div className="flex items-center gap-3 mb-2">
+                  {competitor.rating && (
+                    <RatingDisplay
+                      rating={competitor.rating}
+                      reviewCount={competitor.review_count}
+                      size="sm"
+                      showNumeric={false}
+                    />
+                  )}
+                  {(competitor.price_level || competitor.yelp_price) && (
+                    <PriceLevel
+                      level={competitor.price_level || (competitor.yelp_price?.length || 0)}
+                      size="sm"
+                    />
+                  )}
+                </div>
+
                 {competitor.address && (
-                  <p className="text-xs text-gray-500 mt-0.5 truncate">
+                  <p className="text-xs text-slate-500 mb-2 truncate">
                     {competitor.address}
                   </p>
                 )}
+
                 {competitor.categories && competitor.categories.length > 0 && (
-                  <div className="flex gap-1 mt-1 flex-wrap">
+                  <div className="flex gap-1 flex-wrap">
                     {competitor.categories.slice(0, 3).map((cat, catIdx) => (
                       <span
                         key={catIdx}
-                        className="text-xs bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded"
+                        className="text-xs bg-slate-700 text-slate-300 px-2 py-0.5 rounded border border-slate-600"
                       >
                         {cat}
                       </span>
@@ -169,11 +181,12 @@ export function CompetitorWidget({ data }: CompetitorWidgetProps) {
                   </div>
                 )}
               </div>
-              <div className="text-right ml-4">
-                <div className="text-sm font-medium text-gray-900">
+
+              <div className="text-right flex-shrink-0">
+                <div className="text-sm font-medium text-white">
                   {formatNumber(competitor.review_count)}
                 </div>
-                <div className="text-xs text-gray-500">reviews</div>
+                <div className="text-xs text-slate-500">reviews</div>
               </div>
             </div>
           </div>
@@ -181,10 +194,10 @@ export function CompetitorWidget({ data }: CompetitorWidgetProps) {
       </div>
 
       {/* Summary */}
-      <div className="px-4 py-3 bg-gray-50 border-t border-gray-100">
-        <div className="text-xs text-gray-600">
+      <div className="px-4 py-3 bg-slate-800/50 border-t border-slate-800">
+        <div className="text-xs text-slate-300">
           Top competitor:{" "}
-          <span className="font-medium text-gray-900">
+          <span className="font-medium text-white">
             {sortedCompetitors[0]?.name}
           </span>{" "}
           with {formatNumber(sortedCompetitors[0]?.review_count)} reviews
@@ -196,36 +209,36 @@ export function CompetitorWidget({ data }: CompetitorWidgetProps) {
 
 export function PositioningWidget({ data }: PositioningWidgetProps) {
   const quadrantLabels = {
-    premium: { label: "Premium", color: "bg-purple-100 text-purple-800", desc: "High Quality, High Price" },
-    value: { label: "Value", color: "bg-green-100 text-green-800", desc: "High Quality, Moderate Price" },
-    economy: { label: "Economy", color: "bg-blue-100 text-blue-800", desc: "Moderate Quality, Low Price" },
-    avoid: { label: "Risky", color: "bg-red-100 text-red-800", desc: "Low Quality, High Price" },
+    premium: { label: "Premium", color: "bg-purple-500/20 text-purple-400 border-purple-500/30", desc: "High Quality, High Price" },
+    value: { label: "Value", color: "bg-green-500/20 text-green-400 border-green-500/30", desc: "High Quality, Moderate Price" },
+    economy: { label: "Economy", color: "bg-blue-500/20 text-blue-400 border-blue-500/30", desc: "Moderate Quality, Low Price" },
+    avoid: { label: "Risky", color: "bg-red-500/20 text-red-400 border-red-500/30", desc: "Low Quality, High Price" },
   };
 
   return (
-    <div className="w-full bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden my-3">
+    <div className="w-full widget-card overflow-hidden my-3">
       {/* Header */}
-      <div className="bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-3">
-        <h3 className="text-white font-semibold">Competitive Positioning Map</h3>
+      <div className="bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-4">
+        <h3 className="text-white font-semibold text-lg">Competitive Positioning Map</h3>
         <p className="text-purple-100 text-sm">
           Price vs. Quality analysis for {data.business_type}
         </p>
       </div>
 
       {/* Quadrant Analysis */}
-      <div className="px-4 py-4 border-b border-gray-100">
-        <h4 className="text-sm font-medium text-gray-700 mb-3">Market Segments</h4>
+      <div className="px-4 py-4 border-b border-slate-800">
+        <h4 className="text-sm font-medium text-slate-300 mb-3">Market Segments</h4>
         <div className="grid grid-cols-2 gap-3">
           {Object.entries(data.quadrant_analysis).map(([quadrant, count]) => {
             const info = quadrantLabels[quadrant as keyof typeof quadrantLabels];
             return (
               <div
                 key={quadrant}
-                className={`rounded-lg p-3 ${info.color}`}
+                className={`rounded-lg p-3 border ${info.color}`}
               >
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between mb-1">
                   <span className="font-medium">{info.label}</span>
-                  <span className="text-lg font-bold">{count}</span>
+                  <span className="text-2xl font-bold">{count}</span>
                 </div>
                 <div className="text-xs opacity-75">{info.desc}</div>
               </div>
@@ -235,25 +248,25 @@ export function PositioningWidget({ data }: PositioningWidgetProps) {
       </div>
 
       {/* Competitors by Quadrant */}
-      <div className="px-4 py-4 border-b border-gray-100">
-        <h4 className="text-sm font-medium text-gray-700 mb-3">Competitor Positioning</h4>
+      <div className="px-4 py-4 border-b border-slate-800">
+        <h4 className="text-sm font-medium text-slate-300 mb-3">Competitor Positioning</h4>
         <div className="space-y-2">
           {data.positioning_data.slice(0, 8).map((comp, idx) => {
             const info = quadrantLabels[comp.quadrant as keyof typeof quadrantLabels];
             return (
               <div
                 key={idx}
-                className="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2"
+                className="flex items-center justify-between bg-slate-800 rounded-lg px-3 py-2 border border-slate-700 hover:border-slate-600 transition-colors"
               >
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-gray-900">{comp.name}</span>
-                  <span className={`text-xs px-1.5 py-0.5 rounded ${info.color}`}>
+                  <span className="text-sm font-medium text-white">{comp.name}</span>
+                  <span className={`text-xs px-2 py-0.5 rounded border ${info.color}`}>
                     {info.label}
                   </span>
                 </div>
-                <div className="flex items-center gap-3 text-xs text-gray-600">
-                  <span>★ {comp.rating.toFixed(1)}</span>
-                  <span>{"$".repeat(comp.price_level)}</span>
+                <div className="flex items-center gap-3">
+                  <RatingDisplay rating={comp.rating} size="sm" showNumeric={false} />
+                  <PriceLevel level={comp.price_level} size="sm" />
                 </div>
               </div>
             );
@@ -263,27 +276,32 @@ export function PositioningWidget({ data }: PositioningWidgetProps) {
 
       {/* Market Gaps */}
       {data.market_gaps.length > 0 && (
-        <div className="px-4 py-4 border-b border-gray-100">
-          <h4 className="text-sm font-medium text-green-700 mb-2 flex items-center gap-1">
-            <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+        <div className="px-4 py-4 border-b border-slate-800">
+          <h4 className="text-sm font-medium text-green-400 mb-3 flex items-center gap-2">
+            <Lightbulb className="w-4 h-4" />
             Market Gaps & Opportunities
           </h4>
-          <ul className="space-y-1">
+          <div className="space-y-2">
             {data.market_gaps.map((gap, idx) => (
-              <li key={idx} className="text-xs text-gray-600 flex items-start gap-2">
-                <span className="text-green-500 mt-0.5">→</span>
+              <div
+                key={idx}
+                className="text-sm text-slate-300 pl-3 py-2 border-l-2 border-green-500 bg-green-500/5 rounded-r"
+              >
                 {gap}
-              </li>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
       )}
 
       {/* Recommendation */}
       {data.recommendation && (
-        <div className="px-4 py-4 bg-indigo-50">
-          <h4 className="text-sm font-medium text-indigo-800 mb-1">Strategic Recommendation</h4>
-          <p className="text-xs text-indigo-700">{data.recommendation}</p>
+        <div className="px-4 py-4 bg-indigo-500/10 border-t border-indigo-500/20">
+          <h4 className="text-sm font-medium text-indigo-400 mb-2 flex items-center gap-2">
+            <TrendingUp className="w-4 h-4" />
+            Strategic Recommendation
+          </h4>
+          <p className="text-sm text-slate-300">{data.recommendation}</p>
         </div>
       )}
     </div>

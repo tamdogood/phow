@@ -10,6 +10,7 @@ class ToolContext(BaseModel):
 
     session_id: str
     conversation_id: str
+    conversation_history: list[dict] = []  # Previous messages for context
     business_type: str | None = None
     business_profile: dict | None = None  # Full business profile data
     tracking_service: Any | None = None  # TrackingService, avoid circular import

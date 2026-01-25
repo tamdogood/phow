@@ -1,6 +1,9 @@
 "use client";
 
 import { useMemo } from "react";
+import { Users, DollarSign, Store, TrendingUp, AlertCircle, CheckCircle } from "lucide-react";
+import { ScoreCard } from "../widgets/ScoreCard";
+import { RatingDisplay } from "../widgets/RatingDisplay";
 
 interface MarketData {
   type: "market_data";
@@ -48,47 +51,31 @@ interface MarketValidatorWidgetProps {
   data: MarketData;
 }
 
-function ScoreGauge({ score, label }: { score: number; label: string }) {
-  const getColor = (s: number) => {
-    if (s >= 70) return "text-green-600";
-    if (s >= 50) return "text-yellow-600";
-    if (s >= 35) return "text-orange-500";
-    return "text-red-500";
-  };
-
-  const getBgColor = (s: number) => {
-    if (s >= 70) return "bg-green-100";
-    if (s >= 50) return "bg-yellow-100";
-    if (s >= 35) return "bg-orange-100";
-    return "bg-red-100";
-  };
-
-  return (
-    <div className="flex flex-col items-center">
-      <div
-        className={`relative w-20 h-20 rounded-full ${getBgColor(score)} flex items-center justify-center`}
-      >
-        <span className={`text-2xl font-bold ${getColor(score)}`}>{score}</span>
-      </div>
-      <span className="text-xs text-gray-600 mt-1">{label}</span>
-    </div>
-  );
-}
-
-function StatCard({
+function MetricCard({
+  icon: Icon,
   label,
   value,
   subtext,
+  iconColor,
+  iconBgColor,
 }: {
+  icon: React.ElementType;
   label: string;
   value: string | number;
   subtext?: string;
+  iconColor: string;
+  iconBgColor: string;
 }) {
   return (
-    <div className="bg-gray-50 rounded-lg p-3">
-      <div className="text-xs text-gray-500 uppercase tracking-wide">{label}</div>
-      <div className="text-lg font-semibold text-gray-900">{value}</div>
-      {subtext && <div className="text-xs text-gray-500">{subtext}</div>}
+    <div className="bg-slate-800 rounded-lg p-3 border border-slate-700">
+      <div className="flex items-start gap-2 mb-2">
+        <div className={`metric-icon-badge ${iconBgColor}`}>
+          <Icon className={`w-4 h-4 ${iconColor}`} />
+        </div>
+        <div className="text-xs text-slate-400 uppercase tracking-wide">{label}</div>
+      </div>
+      <div className="text-lg font-semibold text-white">{value}</div>
+      {subtext && <div className="text-xs text-slate-500 mt-1">{subtext}</div>}
     </div>
   );
 }
@@ -97,15 +84,15 @@ export function MarketValidatorWidget({ data }: MarketValidatorWidgetProps) {
   const levelColor = useMemo(() => {
     switch (data.viability_level) {
       case "excellent":
-        return "bg-green-100 text-green-800";
+        return "bg-green-500/20 text-green-400 border-green-500/30";
       case "good":
-        return "bg-green-50 text-green-700";
+        return "bg-green-500/20 text-green-400 border-green-500/30";
       case "moderate":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
       case "challenging":
-        return "bg-orange-100 text-orange-800";
+        return "bg-orange-500/20 text-orange-400 border-orange-500/30";
       default:
-        return "bg-red-100 text-red-800";
+        return "bg-red-500/20 text-red-400 border-red-500/30";
     }
   }, [data.viability_level]);
 
@@ -124,105 +111,124 @@ export function MarketValidatorWidget({ data }: MarketValidatorWidgetProps) {
   };
 
   return (
-    <div className="w-full bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden my-3">
+    <div className="w-full widget-card overflow-hidden my-3">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-3">
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-white font-semibold">Market Viability Report</h3>
+            <h3 className="text-white font-semibold text-lg">Market Viability Report</h3>
             <p className="text-blue-100 text-sm">
               {data.business_type} at {data.location?.formatted_address || "Location"}
             </p>
           </div>
           <div className="text-right">
-            <div className="text-3xl font-bold text-white">{data.viability_score}</div>
-            <span className={`text-xs px-2 py-0.5 rounded-full ${levelColor}`}>
+            <div className="text-4xl font-bold text-white">{data.viability_score}</div>
+            <span className={`text-xs px-3 py-1 rounded-full border ${levelColor}`}>
               {data.viability_level.toUpperCase()}
             </span>
           </div>
         </div>
       </div>
 
-      {/* Score Breakdown */}
-      <div className="px-4 py-4 border-b border-gray-100">
-        <h4 className="text-sm font-medium text-gray-700 mb-3">Score Breakdown</h4>
-        <div className="flex justify-around">
-          <ScoreGauge
+      {/* Score Breakdown with Progress Bars */}
+      <div className="px-4 py-4 border-b border-slate-800">
+        <h4 className="text-sm font-medium text-slate-300 mb-3">Score Breakdown</h4>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <ScoreCard
             score={data.score_breakdown.demographics_score}
+            maxScore={100}
             label="Demographics"
           />
-          <ScoreGauge
+          <ScoreCard
             score={data.score_breakdown.competition_score}
+            maxScore={100}
             label="Competition"
           />
-          <ScoreGauge
+          <ScoreCard
             score={data.score_breakdown.foot_traffic_score}
+            maxScore={100}
             label="Foot Traffic"
           />
         </div>
       </div>
 
       {/* Key Metrics */}
-      <div className="px-4 py-4 border-b border-gray-100">
-        <h4 className="text-sm font-medium text-gray-700 mb-3">Key Metrics</h4>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-          <StatCard
+      <div className="px-4 py-4 border-b border-slate-800">
+        <h4 className="text-sm font-medium text-slate-300 mb-3">Key Metrics</h4>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <MetricCard
+            icon={Users}
             label="Population"
             value={formatNumber(data.demographics_summary.population)}
+            iconColor="text-purple-400"
+            iconBgColor="bg-purple-500/20"
           />
-          <StatCard
+          <MetricCard
+            icon={DollarSign}
             label="Median Income"
             value={formatCurrency(data.demographics_summary.median_income)}
+            iconColor="text-green-400"
+            iconBgColor="bg-green-500/20"
           />
-          <StatCard
+          <MetricCard
+            icon={Store}
             label="Competitors"
             value={data.competition_summary.competitor_count ?? "N/A"}
             subtext={data.competition_summary.saturation_level}
+            iconColor="text-orange-400"
+            iconBgColor="bg-orange-500/20"
           />
-          <StatCard
+          <MetricCard
+            icon={TrendingUp}
             label="Foot Traffic"
             value={data.foot_traffic_summary.level?.replace("_", " ") || "N/A"}
             subtext={data.foot_traffic_summary.transit_access ? "Transit nearby" : "No transit"}
+            iconColor="text-blue-400"
+            iconBgColor="bg-blue-500/20"
           />
         </div>
       </div>
 
       {/* Opportunities & Risks */}
-      <div className="px-4 py-4 border-b border-gray-100">
+      <div className="px-4 py-4 border-b border-slate-800">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Opportunities */}
           {data.opportunities.length > 0 && (
             <div>
-              <h4 className="text-sm font-medium text-green-700 mb-2 flex items-center gap-1">
-                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+              <h4 className="text-sm font-medium text-green-400 mb-3 flex items-center gap-2">
+                <CheckCircle className="w-4 h-4" />
                 Opportunities
               </h4>
-              <ul className="space-y-1">
+              <div className="space-y-2">
                 {data.opportunities.map((opp, idx) => (
-                  <li key={idx} className="text-xs text-gray-600 flex items-start gap-1">
-                    <span className="text-green-500 mt-0.5">+</span>
+                  <div
+                    key={idx}
+                    className="text-sm text-slate-300 pl-3 py-2 border-l-2 border-green-500 bg-green-500/5 rounded-r"
+                  >
                     {opp}
-                  </li>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </div>
           )}
 
           {/* Risks */}
           {data.risk_factors.length > 0 && (
             <div>
-              <h4 className="text-sm font-medium text-red-700 mb-2 flex items-center gap-1">
-                <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+              <h4 className="text-sm font-medium text-red-400 mb-3 flex items-center gap-2">
+                <AlertCircle className="w-4 h-4" />
                 Risk Factors
               </h4>
-              <ul className="space-y-1">
+              <div className="space-y-2">
                 {data.risk_factors.map((risk, idx) => (
-                  <li key={idx} className="text-xs text-gray-600 flex items-start gap-1">
-                    <span className="text-red-500 mt-0.5">!</span>
+                  <div
+                    key={idx}
+                    className="text-sm text-slate-300 pl-3 py-2 border-l-2 border-red-500 bg-red-500/5 rounded-r"
+                  >
                     {risk}
-                  </li>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </div>
           )}
         </div>
@@ -230,31 +236,27 @@ export function MarketValidatorWidget({ data }: MarketValidatorWidgetProps) {
 
       {/* Competitors */}
       {data.top_competitors.length > 0 && (
-        <div className="px-4 py-4 border-b border-gray-100">
-          <h4 className="text-sm font-medium text-gray-700 mb-2">Top Competitors</h4>
+        <div className="px-4 py-4 border-b border-slate-800">
+          <h4 className="text-sm font-medium text-slate-300 mb-3">Top Competitors</h4>
           <div className="space-y-2">
             {data.top_competitors.slice(0, 3).map((comp, idx) => (
               <div
                 key={idx}
-                className="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2"
+                className="flex items-center justify-between bg-slate-800 rounded-lg px-3 py-3 border border-slate-700 hover:border-slate-600 transition-colors"
               >
-                <div>
-                  <div className="text-sm font-medium text-gray-900">{comp.name}</div>
+                <div className="flex-1">
+                  <div className="text-sm font-medium text-white">{comp.name}</div>
                   {comp.address && (
-                    <div className="text-xs text-gray-500">{comp.address}</div>
+                    <div className="text-xs text-slate-500 mt-1">{comp.address}</div>
                   )}
                 </div>
-                <div className="text-right">
+                <div className="ml-4">
                   {comp.rating && (
-                    <div className="flex items-center gap-1">
-                      <span className="text-yellow-500">★</span>
-                      <span className="text-sm font-medium">{comp.rating}</span>
-                    </div>
-                  )}
-                  {comp.reviews && (
-                    <div className="text-xs text-gray-500">
-                      {formatNumber(comp.reviews)} reviews
-                    </div>
+                    <RatingDisplay
+                      rating={comp.rating}
+                      reviewCount={comp.reviews}
+                      size="sm"
+                    />
                   )}
                 </div>
               </div>
@@ -265,13 +267,16 @@ export function MarketValidatorWidget({ data }: MarketValidatorWidgetProps) {
 
       {/* Recommendations */}
       {data.recommendations.length > 0 && (
-        <div className="px-4 py-4 bg-blue-50">
-          <h4 className="text-sm font-medium text-blue-800 mb-2">Recommendations</h4>
-          <ul className="space-y-1">
+        <div className="px-4 py-4 bg-blue-500/10 border-t border-blue-500/20">
+          <h4 className="text-sm font-medium text-blue-400 mb-3 flex items-center gap-2">
+            <TrendingUp className="w-4 h-4" />
+            Recommendations
+          </h4>
+          <ul className="space-y-2">
             {data.recommendations.map((rec, idx) => (
-              <li key={idx} className="text-xs text-blue-700 flex items-start gap-2">
-                <span className="text-blue-500 font-bold">{idx + 1}.</span>
-                {rec}
+              <li key={idx} className="text-sm text-slate-300 flex items-start gap-3">
+                <span className="text-blue-400 font-bold text-base">{idx + 1}.</span>
+                <span className="flex-1">{rec}</span>
               </li>
             ))}
           </ul>

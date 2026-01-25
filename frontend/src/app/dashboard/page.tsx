@@ -1,22 +1,26 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
-import { getDashboard } from "@/lib/api";
+import { getDashboard, getCommunityFeed, triggerDashboardAnalysis, deleteCompetitor } from "@/lib/api";
 import { getSessionId } from "@/lib/session";
-import { DashboardData, TrackedCompetitor } from "@/types";
+import { DashboardData, TrackedCompetitor, CommunityPost } from "@/types";
+import { CommunityWidget } from "@/components/dashboard/CommunityWidget";
+import { AddCompetitorModal } from "@/components/dashboard/AddCompetitorModal";
 
 function ScoreCard({
   label,
   value,
   subtext,
   color,
+  loading,
 }: {
   label: string;
   value: string | number;
   subtext?: string;
   color?: "green" | "yellow" | "red" | "blue";
+  loading?: boolean;
 }) {
   const colorClasses = {
     green: "text-emerald-400",
@@ -28,16 +32,30 @@ function ScoreCard({
   return (
     <div className="dark-card p-6 text-center hover-lift">
       <p className="text-white/50 text-sm mb-2">{label}</p>
-      <p className={`text-3xl font-bold ${color ? colorClasses[color] : "text-white"}`}>
-        {value}
-      </p>
-      {subtext && <p className="text-white/30 text-xs mt-1">{subtext}</p>}
+      {loading ? (
+        <div className="flex items-center justify-center gap-2">
+          <div className="w-4 h-4 border-2 border-white/30 border-t-white/80 rounded-full animate-spin" />
+          <span className="text-white/50 text-sm">Analyzing...</span>
+        </div>
+      ) : (
+        <p className={`text-3xl font-bold ${color ? colorClasses[color] : "text-white"}`}>
+          {value}
+        </p>
+      )}
+      {!loading && subtext && <p className="text-white/30 text-xs mt-1">{subtext}</p>}
     </div>
   );
 }
 
-function CompetitorCard({ competitor }: { competitor: TrackedCompetitor }) {
+function CompetitorCard({
+  competitor,
+  onDelete,
+}: {
+  competitor: TrackedCompetitor;
+  onDelete?: (id: string) => void;
+}) {
   const [expanded, setExpanded] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const hasDetails =
     (competitor.strengths && competitor.strengths.length > 0) ||
     (competitor.weaknesses && competitor.weaknesses.length > 0);
@@ -46,8 +64,18 @@ function CompetitorCard({ competitor }: { competitor: TrackedCompetitor }) {
     ? "$".repeat(competitor.price_level)
     : null;
 
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (confirmDelete) {
+      onDelete?.(competitor.id);
+    } else {
+      setConfirmDelete(true);
+      setTimeout(() => setConfirmDelete(false), 3000);
+    }
+  };
+
   return (
-    <div className="py-3 border-b border-white/5 last:border-0">
+    <div className="py-3 border-b border-white/5 last:border-0 group">
       <div
         className={`flex items-center justify-between ${hasDetails ? "cursor-pointer" : ""}`}
         onClick={() => hasDetails && setExpanded(!expanded)}
@@ -75,6 +103,19 @@ function CompetitorCard({ competitor }: { competitor: TrackedCompetitor }) {
           )}
           {hasDetails && (
             <span className="text-white/30 text-sm">{expanded ? "▲" : "▼"}</span>
+          )}
+          {onDelete && (
+            <button
+              onClick={handleDelete}
+              className={`px-2 py-1 rounded text-xs transition-colors ${
+                confirmDelete
+                  ? "bg-red-500/20 text-red-400"
+                  : "opacity-0 group-hover:opacity-100 text-white/30 hover:text-red-400 hover:bg-red-500/10"
+              }`}
+              title={confirmDelete ? "Click again to confirm" : "Delete competitor"}
+            >
+              {confirmDelete ? "Confirm?" : "×"}
+            </button>
           )}
         </div>
       </div>
@@ -188,18 +229,61 @@ export default function DashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [communityPosts, setCommunityPosts] = useState<CommunityPost[]>([]);
+  const [communityLoading, setCommunityLoading] = useState(true);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [showAddCompetitor, setShowAddCompetitor] = useState(false);
+
+  const refreshDashboard = useCallback(async () => {
+    const sessionId = getSessionId();
+    const dashboardData = await getDashboard(sessionId, user?.id);
+    setData(dashboardData);
+  }, [user?.id]);
+
+  const handleDeleteCompetitor = async (competitorId: string) => {
+    const sessionId = getSessionId();
+    try {
+      await deleteCompetitor(competitorId, sessionId);
+      await refreshDashboard();
+    } catch (err) {
+      console.error("Failed to delete competitor:", err);
+    }
+  };
 
   useEffect(() => {
     async function loadDashboard() {
       try {
         const sessionId = getSessionId();
-        const dashboardData = await getDashboard(sessionId, user?.id);
+        const [dashboardData, posts] = await Promise.all([
+          getDashboard(sessionId, user?.id),
+          getCommunityFeed(5, 0).catch(() => []),
+        ]);
         setData(dashboardData);
+        setCommunityPosts(posts);
+
+        // Auto-trigger analysis if needed
+        const shouldAnalyze =
+          dashboardData.has_profile &&
+          dashboardData.business_profile?.location_address &&
+          (!dashboardData.market_analysis || !dashboardData.competitor_analysis);
+
+        if (shouldAnalyze) {
+          setAnalyzing(true);
+          try {
+            const updatedData = await triggerDashboardAnalysis(sessionId, user?.id);
+            setData(updatedData);
+          } catch (err) {
+            console.error("Auto-analysis failed:", err);
+          } finally {
+            setAnalyzing(false);
+          }
+        }
       } catch (err) {
         setError("Failed to load dashboard");
         console.error(err);
       } finally {
         setLoading(false);
+        setCommunityLoading(false);
       }
     }
     loadDashboard();
@@ -286,6 +370,9 @@ export default function DashboardPage() {
                 </p>
               </div>
 
+              {/* Community Widget */}
+              <CommunityWidget posts={communityPosts} loading={communityLoading} />
+
               {/* Score Cards */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                 <ScoreCard
@@ -297,17 +384,20 @@ export default function DashboardPage() {
                       ? getViabilityColor(data.market_analysis.viability_score)
                       : undefined
                   }
+                  loading={analyzing && !data.market_analysis}
                 />
                 <ScoreCard
                   label="Competitors Tracked"
                   value={data.tracked_competitors.length}
                   subtext={data.tracked_competitors.length > 0 ? "in your area" : "Run Competitor Analyzer"}
                   color="blue"
+                  loading={analyzing && data.tracked_competitors.length === 0}
                 />
                 <ScoreCard
                   label="Competition Level"
                   value={data.competitor_analysis?.overall_competition_level ?? "—"}
                   subtext={data.competitor_analysis ? "based on analysis" : "Run Competitor Analyzer"}
+                  loading={analyzing && !data.competitor_analysis}
                 />
               </div>
 
@@ -371,17 +461,29 @@ export default function DashboardPage() {
                 <div className="dark-card p-6">
                   <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-semibold text-white">Top Competitors</h2>
-                    <Link
-                      href="/app?tool=competitor_analyzer"
-                      className="text-blue-400 text-sm hover:underline"
-                    >
-                      Analyze More
-                    </Link>
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => setShowAddCompetitor(true)}
+                        className="text-emerald-400 text-sm hover:underline"
+                      >
+                        + Add
+                      </button>
+                      <Link
+                        href="/app?tool=competitor_analyzer"
+                        className="text-blue-400 text-sm hover:underline"
+                      >
+                        Analyze More
+                      </Link>
+                    </div>
                   </div>
                   {data.tracked_competitors.length > 0 ? (
                     <div>
                       {data.tracked_competitors.slice(0, 5).map((competitor) => (
-                        <CompetitorCard key={competitor.id} competitor={competitor} />
+                        <CompetitorCard
+                          key={competitor.id}
+                          competitor={competitor}
+                          onDelete={handleDeleteCompetitor}
+                        />
                       ))}
                       {data.tracked_competitors.length > 5 && (
                         <p className="text-white/30 text-sm mt-3 text-center">
@@ -392,12 +494,20 @@ export default function DashboardPage() {
                   ) : (
                     <div className="text-center py-8">
                       <p className="text-white/40 mb-4">No competitors tracked yet</p>
-                      <Link
-                        href="/app?tool=competitor_analyzer"
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 text-white text-sm hover:bg-white/10 transition-all"
-                      >
-                        Find Competitors
-                      </Link>
+                      <div className="flex gap-3 justify-center">
+                        <button
+                          onClick={() => setShowAddCompetitor(true)}
+                          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/10 text-emerald-400 text-sm hover:bg-emerald-500/20 transition-all"
+                        >
+                          Add Manually
+                        </button>
+                        <Link
+                          href="/app?tool=competitor_analyzer"
+                          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 text-white text-sm hover:bg-white/10 transition-all"
+                        >
+                          Find Competitors
+                        </Link>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -508,6 +618,14 @@ export default function DashboardPage() {
           )}
         </div>
       </main>
+
+      {showAddCompetitor && (
+        <AddCompetitorModal
+          sessionId={getSessionId()}
+          onClose={() => setShowAddCompetitor(false)}
+          onAdded={refreshDashboard}
+        />
+      )}
     </div>
   );
 }

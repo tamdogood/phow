@@ -44,6 +44,7 @@ class LocationScoutTool(BaseTool):
         """Process a location analysis request with streaming using the agent."""
         async for chunk in self.agent.process_stream(
             query=query,
+            conversation_history=context.conversation_history,
             tracking_service=context.tracking_service,
             session_id=context.session_id,
             conversation_id=context.conversation_id,

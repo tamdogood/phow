@@ -175,11 +175,112 @@ async def discover_neighborhood(
     results["nearby_food"] = results["nearby_food"][:10]
     results["nearby_retail"] = results["nearby_retail"][:10]
 
-    # Add summary
+    # Calculate metrics for enhanced summary
+    competitor_count = len(results["competitors"])
+    transit_station_count = len(results["transit_stations"])
+    foot_traffic_indicators = len(results["nearby_food"]) + len(results["nearby_retail"])
+
+    # Calculate competitor averages
+    competitors_with_rating = [c for c in results["competitors"] if c.get("rating")]
+    competitor_avg_rating = (
+        sum(c["rating"] for c in competitors_with_rating) / len(competitors_with_rating)
+        if competitors_with_rating
+        else 0
+    )
+
+    competitors_with_price = [c for c in results["competitors"] if c.get("price_level")]
+    competitor_avg_price = (
+        round(sum(c["price_level"] for c in competitors_with_price) / len(competitors_with_price))
+        if competitors_with_price
+        else 0
+    )
+
+    # Calculate transit grade
+    transit_grade = (
+        "A+"
+        if transit_station_count >= 5
+        else (
+            "A"
+            if transit_station_count >= 3
+            else "B" if transit_station_count == 2 else "C" if transit_station_count == 1 else "D"
+        )
+    )
+
+    # Extract unique transit types
+    transit_types = list(
+        set(
+            station.get("types", ["transit"])[0] if station.get("types") else "transit"
+            for station in results["transit_stations"]
+        )
+    )
+
+    # Calculate foot traffic level
+    foot_traffic_level = (
+        "High"
+        if foot_traffic_indicators >= 40
+        else "Medium" if foot_traffic_indicators >= 20 else "Low"
+    )
+
+    # Calculate location score (weighted: 40% competition, 30% foot traffic, 30% transit)
+    competition_score = min(100, (competitor_count / 15) * 100) if competitor_count > 0 else 0
+    foot_traffic_score = min(100, (foot_traffic_indicators / 50) * 100)
+    transit_score = (transit_station_count / 5) * 100
+
+    location_score = int(
+        (competition_score * 0.4) + (foot_traffic_score * 0.3) + (transit_score * 0.3)
+    )
+
+    # Calculate location grade
+    location_grade = (
+        "A+"
+        if location_score >= 90
+        else (
+            "A"
+            if location_score >= 85
+            else (
+                "B+"
+                if location_score >= 80
+                else (
+                    "B"
+                    if location_score >= 75
+                    else (
+                        "C+"
+                        if location_score >= 70
+                        else "C" if location_score >= 60 else "D" if location_score >= 50 else "F"
+                    )
+                )
+            )
+        )
+    )
+
+    # Generate key insight
+    if location_score >= 85:
+        key_insight = f"Excellent location with {foot_traffic_level.lower()} foot traffic and strong transit access ({transit_station_count} stations)"
+    elif location_score >= 70:
+        key_insight = (
+            f"Good location with {foot_traffic_level.lower()} foot traffic and moderate competition"
+        )
+    elif location_score >= 50:
+        key_insight = f"Moderate location with {competitor_count} competitors and {foot_traffic_level.lower()} foot traffic"
+    else:
+        key_insight = f"Challenging location with limited foot traffic and transit access"
+
+    # Enhanced summary
     results["analysis_summary"] = {
-        "competitor_count": len(results["competitors"]),
-        "transit_access": len(results["transit_stations"]) > 0,
-        "foot_traffic_indicators": len(results["nearby_food"]) + len(results["nearby_retail"]),
+        "competitor_count": competitor_count,
+        "transit_access": transit_station_count > 0,
+        "foot_traffic_indicators": foot_traffic_indicators,
+        "location_score": location_score,
+        "location_grade": location_grade,
+        "competitor_avg_rating": (
+            round(competitor_avg_rating, 1) if competitor_avg_rating > 0 else None
+        ),
+        "competitor_avg_price": competitor_avg_price if competitor_avg_price > 0 else None,
+        "transit_grade": transit_grade,
+        "transit_station_count": transit_station_count,
+        "transit_types": transit_types,
+        "foot_traffic_level": foot_traffic_level,
+        "key_insight": key_insight,
     }
 
     return results

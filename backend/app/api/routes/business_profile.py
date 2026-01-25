@@ -1,8 +1,10 @@
+import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from supabase import Client
 from ..deps import get_supabase
 from ...services.business_profile_service import BusinessProfileService
+from ...repositories.business_profile_repository import TrackedCompetitorRepository
 
 router = APIRouter(prefix="/business-profile", tags=["business-profile"])
 
@@ -70,4 +72,65 @@ async def delete_profile(
     if not profile:
         raise HTTPException(status_code=404, detail="Profile not found")
     await service.profile_repo.delete(profile["id"])
+    return {"deleted": True}
+
+
+class AddCompetitorRequest(BaseModel):
+    session_id: str
+    name: str
+    address: str | None = None
+    rating: float | None = None
+    review_count: int | None = None
+    price_level: int | None = None
+
+
+class DeleteCompetitorRequest(BaseModel):
+    session_id: str
+
+
+def get_competitor_repo(db: Client = Depends(get_supabase)) -> TrackedCompetitorRepository:
+    return TrackedCompetitorRepository(db)
+
+
+@router.post("/competitors")
+async def add_competitor(
+    request: AddCompetitorRequest,
+    service: BusinessProfileService = Depends(get_business_profile_service),
+    competitor_repo: TrackedCompetitorRepository = Depends(get_competitor_repo),
+):
+    """Add a competitor manually."""
+    profile = await service.get_profile(request.session_id)
+    if not profile:
+        raise HTTPException(status_code=404, detail="Business profile not found")
+
+    # Generate a unique place_id for manually added competitors
+    place_id = f"manual-{uuid.uuid4()}"
+
+    competitor = await competitor_repo.add_competitor(
+        business_profile_id=profile["id"],
+        place_id=place_id,
+        name=request.name,
+        address=request.address,
+        rating=request.rating,
+        review_count=request.review_count,
+        price_level=request.price_level,
+    )
+    return {"competitor": competitor}
+
+
+@router.delete("/competitors/{competitor_id}")
+async def delete_competitor(
+    competitor_id: str,
+    request: DeleteCompetitorRequest,
+    service: BusinessProfileService = Depends(get_business_profile_service),
+    competitor_repo: TrackedCompetitorRepository = Depends(get_competitor_repo),
+):
+    """Delete a tracked competitor."""
+    profile = await service.get_profile(request.session_id)
+    if not profile:
+        raise HTTPException(status_code=404, detail="Business profile not found")
+
+    deleted = await competitor_repo.delete_competitor(competitor_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Competitor not found")
     return {"deleted": True}

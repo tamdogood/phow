@@ -102,12 +102,14 @@ class ChatService:
 
         logger.info("Invoking tool", tool_id=tool_id, tool_name=tool.name)
 
-        # Fetch business profile for context
+        # Fetch business profile and conversation history for context
         business_profile = await self.business_profile_service.get_profile(session_id)
+        conversation_history = await self.get_conversation_history(conv_id, limit=10)
 
         context = ToolContext(
             session_id=session_id,
             conversation_id=conv_id,
+            conversation_history=conversation_history,
             business_profile=business_profile,
             business_type=business_profile.get("business_type") if business_profile else None,
             tracking_service=self.tracking_service,

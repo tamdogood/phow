@@ -318,6 +318,7 @@ export function ChatMessage({ role, content, isStreaming }: ChatMessageProps) {
             location={locationData.location}
             competitors={locationData.competitors}
             transitStations={locationData.transit_stations}
+            analysisSummary={locationData.analysis_summary}
           />
         </div>
       )}
