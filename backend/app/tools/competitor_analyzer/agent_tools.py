@@ -376,7 +376,7 @@ def _merge_competitors(google: list, yelp: list) -> list[dict]:
     # Sort by review count (most reviewed first)
     competitors = sorted(
         merged.values(),
-        key=lambda x: x.get("review_count", 0),
+        key=lambda x: x.get("review_count") or 0,
         reverse=True,
     )
 

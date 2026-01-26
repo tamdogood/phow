@@ -37,6 +37,7 @@ class CompetitiveAnalysisService:
         """Lazy load LLM service."""
         if self._llm_service is None:
             from ..core.llm import get_llm_service
+
             self._llm_service = get_llm_service()
         return self._llm_service
 
@@ -71,9 +72,7 @@ class CompetitiveAnalysisService:
         threats = self._identify_threats(location, business_type, market_data)
 
         # Calculate overall assessment
-        assessment = self._calculate_swot_assessment(
-            strengths, weaknesses, opportunities, threats
-        )
+        assessment = self._calculate_swot_assessment(strengths, weaknesses, opportunities, threats)
 
         return {
             "location": location.get("address") or f"{location.get('lat')}, {location.get('lng')}",
@@ -98,81 +97,103 @@ class CompetitiveAnalysisService:
         # Population density strength
         population = demographics.get("total_population", 0)
         if population > 50000:
-            strengths.append({
-                "factor": "Large population base",
-                "description": f"Area population of {population:,} provides substantial customer pool",
-                "impact": "high",
-                "data_source": "demographics",
-            })
+            strengths.append(
+                {
+                    "factor": "Large population base",
+                    "description": f"Area population of {population:,} provides substantial customer pool",
+                    "impact": "high",
+                    "data_source": "demographics",
+                }
+            )
         elif population > 20000:
-            strengths.append({
-                "factor": "Moderate population base",
-                "description": f"Area population of {population:,} supports business viability",
-                "impact": "medium",
-                "data_source": "demographics",
-            })
+            strengths.append(
+                {
+                    "factor": "Moderate population base",
+                    "description": f"Area population of {population:,} supports business viability",
+                    "impact": "medium",
+                    "data_source": "demographics",
+                }
+            )
 
         # Income level strength
         median_income = demographics.get("median_income", 0)
         if median_income > 80000:
-            strengths.append({
-                "factor": "High-income area",
-                "description": f"Median income of ${median_income:,} suggests strong purchasing power",
-                "impact": "high",
-                "data_source": "demographics",
-            })
+            strengths.append(
+                {
+                    "factor": "High-income area",
+                    "description": f"Median income of ${median_income:,} suggests strong purchasing power",
+                    "impact": "high",
+                    "data_source": "demographics",
+                }
+            )
         elif median_income > 60000:
-            strengths.append({
-                "factor": "Above-average income",
-                "description": f"Median income of ${median_income:,} supports premium offerings",
-                "impact": "medium",
-                "data_source": "demographics",
-            })
+            strengths.append(
+                {
+                    "factor": "Above-average income",
+                    "description": f"Median income of ${median_income:,} supports premium offerings",
+                    "impact": "medium",
+                    "data_source": "demographics",
+                }
+            )
 
         # Low competition strength
         comp_count = len(competitors)
         if comp_count < 3:
-            strengths.append({
-                "factor": "Limited direct competition",
-                "description": f"Only {comp_count} direct competitors in the area",
-                "impact": "high",
-                "data_source": "competitors",
-            })
+            strengths.append(
+                {
+                    "factor": "Limited direct competition",
+                    "description": f"Only {comp_count} direct competitors in the area",
+                    "impact": "high",
+                    "data_source": "competitors",
+                }
+            )
         elif comp_count < 6:
-            strengths.append({
-                "factor": "Manageable competition",
-                "description": f"{comp_count} competitors - room for differentiation",
-                "impact": "medium",
-                "data_source": "competitors",
-            })
+            strengths.append(
+                {
+                    "factor": "Manageable competition",
+                    "description": f"{comp_count} competitors - room for differentiation",
+                    "impact": "medium",
+                    "data_source": "competitors",
+                }
+            )
 
         # Foot traffic strength
         traffic_score = foot_traffic.get("score", 0)
         if traffic_score > 70:
-            strengths.append({
-                "factor": "High foot traffic",
-                "description": "Location benefits from strong pedestrian activity",
-                "impact": "high",
-                "data_source": "foot_traffic",
-            })
+            strengths.append(
+                {
+                    "factor": "High foot traffic",
+                    "description": "Location benefits from strong pedestrian activity",
+                    "impact": "high",
+                    "data_source": "foot_traffic",
+                }
+            )
 
         # Market gaps from positioning
         positioning = market_data.get("positioning", {})
         gaps = positioning.get("market_gaps", [])
         if gaps:
-            strengths.append({
-                "factor": "Market gaps available",
-                "description": f"Identified gaps: {gaps[0] if gaps else 'multiple segments'}",
-                "impact": "medium",
-                "data_source": "positioning",
-            })
+            strengths.append(
+                {
+                    "factor": "Market gaps available",
+                    "description": f"Identified gaps: {gaps[0] if gaps else 'multiple segments'}",
+                    "impact": "medium",
+                    "data_source": "positioning",
+                }
+            )
 
-        return strengths if strengths else [{
-            "factor": "Location selected",
-            "description": "Market research indicates viable location",
-            "impact": "low",
-            "data_source": "general",
-        }]
+        return (
+            strengths
+            if strengths
+            else [
+                {
+                    "factor": "Location selected",
+                    "description": "Market research indicates viable location",
+                    "impact": "low",
+                    "data_source": "general",
+                }
+            ]
+        )
 
     def _identify_weaknesses(
         self, location: dict, business_type: str, market_data: dict
@@ -186,66 +207,84 @@ class CompetitiveAnalysisService:
         # Population weakness
         population = demographics.get("total_population", 0)
         if population < 10000:
-            weaknesses.append({
-                "factor": "Limited population",
-                "description": f"Small population of {population:,} may limit customer base",
-                "impact": "high",
-                "data_source": "demographics",
-            })
+            weaknesses.append(
+                {
+                    "factor": "Limited population",
+                    "description": f"Small population of {population:,} may limit customer base",
+                    "impact": "high",
+                    "data_source": "demographics",
+                }
+            )
 
         # High competition weakness
         comp_count = len(competitors)
         if comp_count > 15:
-            weaknesses.append({
-                "factor": "High competition density",
-                "description": f"{comp_count} direct competitors creates market saturation",
-                "impact": "high",
-                "data_source": "competitors",
-            })
+            weaknesses.append(
+                {
+                    "factor": "High competition density",
+                    "description": f"{comp_count} direct competitors creates market saturation",
+                    "impact": "high",
+                    "data_source": "competitors",
+                }
+            )
         elif comp_count > 10:
-            weaknesses.append({
-                "factor": "Competitive market",
-                "description": f"{comp_count} competitors - differentiation critical",
-                "impact": "medium",
-                "data_source": "competitors",
-            })
+            weaknesses.append(
+                {
+                    "factor": "Competitive market",
+                    "description": f"{comp_count} competitors - differentiation critical",
+                    "impact": "medium",
+                    "data_source": "competitors",
+                }
+            )
 
         # Established competitors
         high_rated = [c for c in competitors if (c.get("rating") or 0) >= 4.5]
         if len(high_rated) >= 3:
-            weaknesses.append({
-                "factor": "Strong established competitors",
-                "description": f"{len(high_rated)} competitors with 4.5+ ratings dominate market",
-                "impact": "high",
-                "data_source": "competitors",
-            })
+            weaknesses.append(
+                {
+                    "factor": "Strong established competitors",
+                    "description": f"{len(high_rated)} competitors with 4.5+ ratings dominate market",
+                    "impact": "high",
+                    "data_source": "competitors",
+                }
+            )
 
         # Labor market weakness
         hiring_difficulty = labor.get("hiring_difficulty", {}).get("score", 50)
         if hiring_difficulty > 70:
-            weaknesses.append({
-                "factor": "Tight labor market",
-                "description": "High hiring difficulty may impact staffing",
-                "impact": "medium",
-                "data_source": "labor_market",
-            })
+            weaknesses.append(
+                {
+                    "factor": "Tight labor market",
+                    "description": "High hiring difficulty may impact staffing",
+                    "impact": "medium",
+                    "data_source": "labor_market",
+                }
+            )
 
         # Income weakness
         median_income = demographics.get("median_income", 0)
         if median_income < 40000:
-            weaknesses.append({
-                "factor": "Lower income area",
-                "description": f"Median income of ${median_income:,} may limit pricing",
-                "impact": "medium",
-                "data_source": "demographics",
-            })
+            weaknesses.append(
+                {
+                    "factor": "Lower income area",
+                    "description": f"Median income of ${median_income:,} may limit pricing",
+                    "impact": "medium",
+                    "data_source": "demographics",
+                }
+            )
 
-        return weaknesses if weaknesses else [{
-            "factor": "New market entrant",
-            "description": "As new entrant, will need to build brand awareness",
-            "impact": "low",
-            "data_source": "general",
-        }]
+        return (
+            weaknesses
+            if weaknesses
+            else [
+                {
+                    "factor": "New market entrant",
+                    "description": "As new entrant, will need to build brand awareness",
+                    "impact": "low",
+                    "data_source": "general",
+                }
+            ]
+        )
 
     def _identify_opportunities(
         self, location: dict, business_type: str, market_data: dict
@@ -262,52 +301,66 @@ class CompetitiveAnalysisService:
         trend_direction = trends.get("trend_direction", "stable")
         if trend_direction in ["growing", "strongly_growing"]:
             growth_rate = trends.get("employment_growth_rate", 0)
-            opportunities.append({
-                "factor": "Growing industry",
-                "description": f"Industry is {trend_direction} with {growth_rate:.1f}% growth",
-                "impact": "high",
-                "data_source": "trends",
-            })
+            opportunities.append(
+                {
+                    "factor": "Growing industry",
+                    "description": f"Industry is {trend_direction} with {growth_rate:.1f}% growth",
+                    "impact": "high",
+                    "data_source": "trends",
+                }
+            )
 
         # Favorable economic conditions
         outlook = economic.get("outlook", {})
         if outlook.get("level") == "favorable":
-            opportunities.append({
-                "factor": "Favorable economic conditions",
-                "description": "Economic indicators support new business formation",
-                "impact": "high",
-                "data_source": "economic",
-            })
+            opportunities.append(
+                {
+                    "factor": "Favorable economic conditions",
+                    "description": "Economic indicators support new business formation",
+                    "impact": "high",
+                    "data_source": "economic",
+                }
+            )
 
         # Competitor pain points
         if pain_points:
-            top_pain = pain_points[0] if isinstance(pain_points[0], str) else pain_points[0].get("issue", "")
-            opportunities.append({
-                "factor": "Unmet customer needs",
-                "description": f"Competitor weakness: {top_pain}",
-                "impact": "medium",
-                "data_source": "pain_points",
-            })
+            top_pain = (
+                pain_points[0]
+                if isinstance(pain_points[0], str)
+                else pain_points[0].get("issue", "")
+            )
+            opportunities.append(
+                {
+                    "factor": "Unmet customer needs",
+                    "description": f"Competitor weakness: {top_pain}",
+                    "impact": "medium",
+                    "data_source": "pain_points",
+                }
+            )
 
         # Market gaps from positioning
         gaps = positioning.get("market_gaps", [])
         for gap in gaps[:2]:
-            opportunities.append({
-                "factor": "Market gap",
-                "description": gap,
-                "impact": "medium",
-                "data_source": "positioning",
-            })
+            opportunities.append(
+                {
+                    "factor": "Market gap",
+                    "description": gap,
+                    "impact": "medium",
+                    "data_source": "positioning",
+                }
+            )
 
         # Low-rated competitors opportunity
         low_rated = [c for c in competitors if (c.get("rating") or 5) < 3.5]
         if len(low_rated) >= 2:
-            opportunities.append({
-                "factor": "Quality differentiation",
-                "description": f"{len(low_rated)} competitors have low ratings - quality focus could win customers",
-                "impact": "medium",
-                "data_source": "competitors",
-            })
+            opportunities.append(
+                {
+                    "factor": "Quality differentiation",
+                    "description": f"{len(low_rated)} competitors have low ratings - quality focus could win customers",
+                    "impact": "medium",
+                    "data_source": "competitors",
+                }
+            )
 
         # Underserved segments
         demographics = market_data.get("demographics", {})
@@ -316,19 +369,27 @@ class CompetitiveAnalysisService:
             # Check for large demographic segments
             young_adults = age_distribution.get("18-34", 0)
             if young_adults > 30:
-                opportunities.append({
-                    "factor": "Young adult demographic",
-                    "description": f"{young_adults:.0f}% of population is 18-34 - target with modern offerings",
-                    "impact": "medium",
-                    "data_source": "demographics",
-                })
+                opportunities.append(
+                    {
+                        "factor": "Young adult demographic",
+                        "description": f"{young_adults:.0f}% of population is 18-34 - target with modern offerings",
+                        "impact": "medium",
+                        "data_source": "demographics",
+                    }
+                )
 
-        return opportunities if opportunities else [{
-            "factor": "Market entry",
-            "description": "Opportunity to establish presence in the market",
-            "impact": "low",
-            "data_source": "general",
-        }]
+        return (
+            opportunities
+            if opportunities
+            else [
+                {
+                    "factor": "Market entry",
+                    "description": "Opportunity to establish presence in the market",
+                    "impact": "low",
+                    "data_source": "general",
+                }
+            ]
+        )
 
     def _identify_threats(
         self, location: dict, business_type: str, market_data: dict
@@ -343,70 +404,88 @@ class CompetitiveAnalysisService:
         # Declining industry threat
         trend_direction = trends.get("trend_direction", "stable")
         if trend_direction == "declining":
-            threats.append({
-                "factor": "Declining industry",
-                "description": "Industry trends show decline - differentiation critical",
-                "impact": "high",
-                "data_source": "trends",
-            })
+            threats.append(
+                {
+                    "factor": "Declining industry",
+                    "description": "Industry trends show decline - differentiation critical",
+                    "impact": "high",
+                    "data_source": "trends",
+                }
+            )
 
         # Economic headwinds
         outlook = economic.get("outlook", {})
         if outlook.get("level") == "challenging":
-            threats.append({
-                "factor": "Economic headwinds",
-                "description": "Challenging economic conditions may impact consumer spending",
-                "impact": "high",
-                "data_source": "economic",
-            })
+            threats.append(
+                {
+                    "factor": "Economic headwinds",
+                    "description": "Challenging economic conditions may impact consumer spending",
+                    "impact": "high",
+                    "data_source": "economic",
+                }
+            )
 
         # Strong dominant competitor
         if competitors:
             top_comp = max(competitors, key=lambda x: x.get("review_count", 0), default={})
             if top_comp.get("review_count", 0) > 500 and top_comp.get("rating", 0) >= 4.5:
-                threats.append({
-                    "factor": "Dominant competitor",
-                    "description": f"{top_comp.get('name', 'Competitor')} has strong market position",
-                    "impact": "high",
-                    "data_source": "competitors",
-                })
+                threats.append(
+                    {
+                        "factor": "Dominant competitor",
+                        "description": f"{top_comp.get('name', 'Competitor')} has strong market position",
+                        "impact": "high",
+                        "data_source": "competitors",
+                    }
+                )
 
         # New entrant threat (recent openings)
         recent_competitors = [c for c in competitors if c.get("review_count", 0) < 20]
         if len(recent_competitors) >= 3:
-            threats.append({
-                "factor": "New market entrants",
-                "description": f"{len(recent_competitors)} recent competitors suggest attractive market",
-                "impact": "medium",
-                "data_source": "competitors",
-            })
+            threats.append(
+                {
+                    "factor": "New market entrants",
+                    "description": f"{len(recent_competitors)} recent competitors suggest attractive market",
+                    "impact": "medium",
+                    "data_source": "competitors",
+                }
+            )
 
         # Seasonal volatility
         variability = seasonality.get("variability", 0)
         if variability > 0.3:
-            threats.append({
-                "factor": "Seasonal volatility",
-                "description": "High seasonal variation requires cash flow management",
-                "impact": "medium",
-                "data_source": "seasonality",
-            })
+            threats.append(
+                {
+                    "factor": "Seasonal volatility",
+                    "description": "High seasonal variation requires cash flow management",
+                    "impact": "medium",
+                    "data_source": "seasonality",
+                }
+            )
 
         # Price pressure from competitors
         price_levels = [c.get("price_level") or 0 for c in competitors if c.get("price_level")]
         if price_levels and sum(price_levels) / len(price_levels) < 2:
-            threats.append({
-                "factor": "Price pressure",
-                "description": "Competitors compete on low prices - margin pressure",
-                "impact": "medium",
-                "data_source": "competitors",
-            })
+            threats.append(
+                {
+                    "factor": "Price pressure",
+                    "description": "Competitors compete on low prices - margin pressure",
+                    "impact": "medium",
+                    "data_source": "competitors",
+                }
+            )
 
-        return threats if threats else [{
-            "factor": "Market competition",
-            "description": "Standard competitive pressures in the market",
-            "impact": "low",
-            "data_source": "general",
-        }]
+        return (
+            threats
+            if threats
+            else [
+                {
+                    "factor": "Market competition",
+                    "description": "Standard competitive pressures in the market",
+                    "impact": "low",
+                    "data_source": "general",
+                }
+            ]
+        )
 
     def _calculate_swot_assessment(
         self,
@@ -421,15 +500,11 @@ class CompetitiveAnalysisService:
 
         positive_score = sum(
             impact_weights.get(s.get("impact", "low"), 1) for s in strengths
-        ) + sum(
-            impact_weights.get(o.get("impact", "low"), 1) for o in opportunities
-        )
+        ) + sum(impact_weights.get(o.get("impact", "low"), 1) for o in opportunities)
 
         negative_score = sum(
             impact_weights.get(w.get("impact", "low"), 1) for w in weaknesses
-        ) + sum(
-            impact_weights.get(t.get("impact", "low"), 1) for t in threats
-        )
+        ) + sum(impact_weights.get(t.get("impact", "low"), 1) for t in threats)
 
         # Normalize to 0-100 scale
         total = positive_score + negative_score
@@ -517,8 +592,8 @@ class CompetitiveAnalysisService:
     def _analyze_competitive_rivalry(self, competitors: list, trends: dict) -> dict:
         """Analyze competitive rivalry force."""
         comp_count = len(competitors)
-        ratings = [c.get("rating", 0) for c in competitors if c.get("rating")]
-        rating_spread = max(ratings) - min(ratings) if ratings else 0
+        ratings = [c.get("rating") for c in competitors if c.get("rating") is not None]
+        rating_spread = max(ratings) - min(ratings) if len(ratings) > 1 else 0
         trend = trends.get("trend_direction", "stable")
 
         # Score: 0 = low rivalry, 100 = high rivalry
@@ -720,22 +795,26 @@ class CompetitiveAnalysisService:
 
             # Weighted score
             score = (
-                (review_count ** 0.7) * MARKET_SHARE_WEIGHTS["review_count"]
+                (review_count**0.7) * MARKET_SHARE_WEIGHTS["review_count"]
                 + (rating * 20) * MARKET_SHARE_WEIGHTS["rating"]
                 + (has_price * 50) * MARKET_SHARE_WEIGHTS["price_presence"]
             )
 
-            shares.append({
-                "name": comp.get("name", "Unknown"),
-                "score": score,
-                "review_count": review_count,
-                "rating": rating,
-            })
+            shares.append(
+                {
+                    "name": comp.get("name", "Unknown"),
+                    "score": score,
+                    "review_count": review_count,
+                    "rating": rating,
+                }
+            )
             total_score += score
 
         # Convert to percentages
         for share in shares:
-            share["share_percent"] = round((share["score"] / total_score) * 100, 1) if total_score > 0 else 0
+            share["share_percent"] = (
+                round((share["score"] / total_score) * 100, 1) if total_score > 0 else 0
+            )
             del share["score"]
 
         # Sort by share
@@ -750,7 +829,11 @@ class CompetitiveAnalysisService:
             "market_leader": leader,
             "concentration": {
                 "top_3_share": round(concentration, 1),
-                "level": "concentrated" if concentration > 70 else "moderate" if concentration > 50 else "fragmented",
+                "level": (
+                    "concentrated"
+                    if concentration > 70
+                    else "moderate" if concentration > 50 else "fragmented"
+                ),
             },
             "methodology": {
                 "description": "Market share estimated using review volume, ratings, and price presence as proxies",
@@ -785,14 +868,20 @@ class CompetitiveAnalysisService:
         # Extract pricing data
         pricing_data = []
         for comp in competitors:
-            price_level = comp.get("price_level") or self._price_string_to_level(comp.get("yelp_price"))
+            price_level = comp.get("price_level") or self._price_string_to_level(
+                comp.get("yelp_price")
+            )
             if price_level:
-                pricing_data.append({
-                    "name": comp.get("name", "Unknown"),
-                    "price_level": price_level,
-                    "rating": comp.get("rating") or comp.get("yelp_rating") or 0,
-                    "review_count": comp.get("review_count") or comp.get("yelp_review_count") or 0,
-                })
+                pricing_data.append(
+                    {
+                        "name": comp.get("name", "Unknown"),
+                        "price_level": price_level,
+                        "rating": comp.get("rating") or comp.get("yelp_rating") or 0,
+                        "review_count": comp.get("review_count")
+                        or comp.get("yelp_review_count")
+                        or 0,
+                    }
+                )
 
         if not pricing_data:
             return {
@@ -804,11 +893,15 @@ class CompetitiveAnalysisService:
         # Analyze distribution
         distribution = {1: 0, 2: 0, 3: 0, 4: 0}
         for p in pricing_data:
-            level = min(4, max(1, p["price_level"]))
+            level = min(4, max(1, p.get("price_level") or 1))
             distribution[level] += 1
 
         # Price-quality correlation
-        price_quality_pairs = [(p["price_level"], p["rating"]) for p in pricing_data if p["rating"] > 0]
+        price_quality_pairs = [
+            (p.get("price_level") or 0, p.get("rating") or 0)
+            for p in pricing_data
+            if (p.get("rating") or 0) > 0
+        ]
 
         # Find gaps
         gaps = []
@@ -827,8 +920,16 @@ class CompetitiveAnalysisService:
         tier_names = {1: "budget", 2: "value", 3: "premium", 4: "luxury"}
 
         # Price-quality analysis
-        high_value = [p for p in pricing_data if p["price_level"] <= 2 and p["rating"] >= 4.0]
-        premium_justified = [p for p in pricing_data if p["price_level"] >= 3 and p["rating"] >= 4.3]
+        high_value = [
+            p
+            for p in pricing_data
+            if (p.get("price_level") or 0) <= 2 and (p.get("rating") or 0) >= 4.0
+        ]
+        premium_justified = [
+            p
+            for p in pricing_data
+            if (p.get("price_level") or 0) >= 3 and (p.get("rating") or 0) >= 4.3
+        ]
 
         return {
             "distribution": {
@@ -899,13 +1000,20 @@ class CompetitiveAnalysisService:
         # Calculate competitor averages
         ratings = [c.get("rating", 0) for c in competitors if c.get("rating")]
         review_counts = [c.get("review_count", 0) for c in competitors if c.get("review_count")]
-        price_levels = [c.get("price_level") or self._price_string_to_level(c.get("yelp_price")) or 0 for c in competitors]
+        price_levels = [
+            c.get("price_level") or self._price_string_to_level(c.get("yelp_price")) or 0
+            for c in competitors
+        ]
         price_levels = [p for p in price_levels if p > 0]
 
         benchmarks = {
             "avg_rating": round(sum(ratings) / len(ratings), 2) if ratings else 0,
-            "avg_review_count": round(sum(review_counts) / len(review_counts)) if review_counts else 0,
-            "avg_price_level": round(sum(price_levels) / len(price_levels), 1) if price_levels else 0,
+            "avg_review_count": (
+                round(sum(review_counts) / len(review_counts)) if review_counts else 0
+            ),
+            "avg_price_level": (
+                round(sum(price_levels) / len(price_levels), 1) if price_levels else 0
+            ),
             "top_rating": max(ratings) if ratings else 0,
             "top_review_count": max(review_counts) if review_counts else 0,
         }
@@ -918,37 +1026,71 @@ class CompetitiveAnalysisService:
         gaps = []
 
         # Quality-based advantages
-        if planned_quality == "high" and benchmarks["avg_rating"] < 4.0:
-            advantages.append({
-                "factor": "Quality differentiation",
-                "description": f"Competitors average {benchmarks['avg_rating']} rating - room for quality leadership",
-            })
+        avg_rating = benchmarks.get("avg_rating", 0)
+        if planned_quality == "high" and avg_rating and avg_rating < 4.0:
+            advantages.append(
+                {
+                    "factor": "Quality differentiation",
+                    "description": f"Competitors average {avg_rating} rating - room for quality leadership",
+                }
+            )
 
         # Pricing-based analysis
-        if planned_price < benchmarks["avg_price_level"]:
-            advantages.append({
-                "factor": "Price advantage",
-                "description": f"Below average market price point of {benchmarks['avg_price_level']:.0f}",
-            })
-        elif planned_price > benchmarks["avg_price_level"]:
-            gaps.append({
-                "factor": "Premium pricing",
-                "description": "Higher price point requires strong quality differentiation",
-            })
+        avg_price_level = benchmarks.get("avg_price_level")
+        if (
+            planned_price is not None
+            and avg_price_level is not None
+            and planned_price < avg_price_level
+        ):
+            advantages.append(
+                {
+                    "factor": "Price advantage",
+                    "description": f"Below average market price point of {avg_price_level:.0f}",
+                }
+            )
+        elif (
+            planned_price is not None
+            and avg_price_level is not None
+            and planned_price > avg_price_level
+        ):
+            gaps.append(
+                {
+                    "factor": "Premium pricing",
+                    "description": "Higher price point requires strong quality differentiation",
+                }
+            )
 
         # Market penetration analysis
-        if benchmarks["top_review_count"] > 500:
-            gaps.append({
-                "factor": "Established competitors",
-                "description": f"Top competitor has {benchmarks['top_review_count']} reviews - brand building needed",
-            })
+        top_review_count = benchmarks.get("top_review_count", 0)
+        if top_review_count and top_review_count > 500:
+            gaps.append(
+                {
+                    "factor": "Established competitors",
+                    "description": f"Top competitor has {top_review_count} reviews - brand building needed",
+                }
+            )
 
         return {
             "benchmarks": benchmarks,
             "business_profile": business_profile,
-            "competitive_advantages": advantages if advantages else [{"factor": "New entrant", "description": "Fresh perspective and modern approach"}],
-            "competitive_gaps": gaps if gaps else [{"factor": "Market entry", "description": "Standard new business challenges"}],
-            "recommendations": self._generate_benchmark_recommendations(advantages, gaps, benchmarks),
+            "competitive_advantages": (
+                advantages
+                if advantages
+                else [
+                    {
+                        "factor": "New entrant",
+                        "description": "Fresh perspective and modern approach",
+                    }
+                ]
+            ),
+            "competitive_gaps": (
+                gaps
+                if gaps
+                else [{"factor": "Market entry", "description": "Standard new business challenges"}]
+            ),
+            "recommendations": self._generate_benchmark_recommendations(
+                advantages, gaps, benchmarks
+            ),
         }
 
     def _generate_benchmark_recommendations(
@@ -961,7 +1103,9 @@ class CompetitiveAnalysisService:
             recommendations.append(f"Leverage identified advantages: {advantages[0]['factor']}")
 
         if gaps:
-            recommendations.append(f"Address gaps through: focused differentiation on {gaps[0]['factor']}")
+            recommendations.append(
+                f"Address gaps through: focused differentiation on {gaps[0]['factor']}"
+            )
 
         if benchmarks.get("avg_rating", 0) < 4.0:
             recommendations.append("Target 4.5+ rating through exceptional service quality")
@@ -969,7 +1113,11 @@ class CompetitiveAnalysisService:
         if benchmarks.get("top_review_count", 0) > 500:
             recommendations.append("Invest in customer engagement to build reviews quickly")
 
-        return recommendations if recommendations else ["Focus on consistent quality and customer experience"]
+        return (
+            recommendations
+            if recommendations
+            else ["Focus on consistent quality and customer experience"]
+        )
 
 
 # Singleton instance
