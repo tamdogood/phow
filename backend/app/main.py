@@ -14,6 +14,7 @@ from .core.logging import setup_logging, get_logger
 from .tools.market_research import MarketResearchTool
 from .tools.social_media_coach import SocialMediaCoachTool
 from .tools.review_responder import ReviewResponderTool
+from .tools.business_advisor import BusinessAdvisorTool
 
 logger = get_logger("main")
 
@@ -28,6 +29,7 @@ async def lifespan(app: FastAPI):
     ToolRegistry.register(MarketResearchTool())
     ToolRegistry.register(SocialMediaCoachTool())
     ToolRegistry.register(ReviewResponderTool())
+    ToolRegistry.register(BusinessAdvisorTool())
     logger.info("Registered tools", tools=ToolRegistry.list_tools())
 
     yield

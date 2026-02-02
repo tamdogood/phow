@@ -29,6 +29,7 @@ const TOOL_COLORS: Record<string, string> = {
   competitor_analyzer: "bg-orange-500/20 text-orange-400",
   social_media_coach: "bg-pink-500/20 text-pink-400",
   review_responder: "bg-emerald-500/20 text-emerald-400",
+  business_advisor: "bg-amber-500/20 text-amber-400",
 };
 
 const EXAMPLE_PROMPTS = [
@@ -40,6 +41,23 @@ const EXAMPLE_PROMPTS = [
 
 function detectTool(message: string): string {
   const lower = message.toLowerCase();
+
+  // Check for "lost/unsure" phrases first - route to business_advisor
+  if (
+    lower.includes("don't know where to start") ||
+    lower.includes("help me get started") ||
+    lower.includes("what should i do") ||
+    lower.includes("not sure where to begin") ||
+    lower.includes("confused") ||
+    lower.includes("overwhelmed") ||
+    lower.includes("what can you help") ||
+    lower.includes("what tools") ||
+    lower.includes("recommend") ||
+    lower.includes("figure out what i need")
+  ) {
+    return "business_advisor";
+  }
+
   if (lower.includes("review") || lower.includes("respond") || lower.includes("reply")) {
     return "review_responder";
   }
@@ -418,6 +436,25 @@ export default function AppPage() {
                     Ask anything about your business - locations, markets, competitors, and more.
                   </p>
                 </div>
+
+                {/* Help Me Get Started Card */}
+                <button
+                  onClick={() => setInputValue("I don't know where to start")}
+                  className="w-full max-w-2xl mb-6 p-4 dark-card hover-lift animate-fade-in-up border border-amber-500/30 bg-amber-500/5"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-lg flex items-center justify-center text-2xl bg-amber-500/20 text-amber-400">
+                      🧭
+                    </div>
+                    <div className="text-left">
+                      <p className="text-base font-medium text-white">Not sure where to start?</p>
+                      <p className="text-sm text-white/50">Tell us about your business and we&apos;ll guide you to the right tools</p>
+                    </div>
+                    <svg className="w-5 h-5 text-white/30 ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                </button>
 
                 {/* Tool Suggestion Cards */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 w-full max-w-2xl mb-10">

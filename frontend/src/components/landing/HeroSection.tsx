@@ -43,15 +43,6 @@ export function HeroSection() {
             Get Started Free
             <span className="px-2 py-0.5 rounded bg-black/10 text-xs font-mono">FREE</span>
           </Link>
-          <Link
-            href="#demo"
-            className="inline-flex items-center gap-2 px-6 py-3.5 rounded-lg bg-transparent text-white font-semibold border border-white/20 hover:bg-white/5 transition-all"
-          >
-            See Demo
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </Link>
         </div>
 
         {/* Monospace Tagline */}
