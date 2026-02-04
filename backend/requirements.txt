@@ -33,7 +33,7 @@ numpy<2  # Required for torch/transformers compatibility
 
 # Location Intelligence & RAG
 pytrends>=4.9.0  # Google Trends
-python-geohash>=0.8.5  # Geohash encoding
+geohash2
 beautifulsoup4>=4.12.0  # Web scraping
 lxml>=5.0.0  # HTML parsing
 pgvector>=0.2.0  # PostgreSQL vector support

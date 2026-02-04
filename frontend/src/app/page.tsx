@@ -11,9 +11,9 @@ import {
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-[#0a0a0a] relative">
+    <div className="min-h-screen bg-white relative">
       {/* Grid pattern overlay */}
-      <div className="fixed inset-0 grid-pattern pointer-events-none" />
+      <div className="fixed inset-0 grid-pattern-light pointer-events-none" />
 
       <Header />
       <main className="relative z-10">

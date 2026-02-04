@@ -9,14 +9,14 @@ export function Header() {
   const { user, loading: authLoading } = useAuth();
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 px-6 py-4 bg-[#0a0a0a]/80 backdrop-blur-md border-b border-white/5">
+    <header className="fixed top-0 left-0 right-0 z-50 px-6 py-4 bg-white/80 backdrop-blur-md border-b border-gray-100">
       <div className="mx-auto max-w-6xl flex items-center justify-between">
         {/* Logo + Badge */}
         <div className="flex items-center gap-3">
-          <Link href="/" className="text-xl font-bold text-white hover:text-white/80 transition-colors tracking-tight">
+          <Link href="/" className="text-xl font-bold text-gray-900 hover:text-gray-700 transition-colors tracking-tight">
             PHOW
           </Link>
-          <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded bg-white/10 text-[10px] font-mono text-white/60 uppercase tracking-wider">
+          <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded bg-gray-100 text-[10px] font-mono text-gray-500 uppercase tracking-wider">
             AI Analytics
           </span>
         </div>
@@ -28,7 +28,7 @@ export function Header() {
             href="https://github.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="p-2 text-white/50 hover:text-white transition-colors"
+            className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
             aria-label="GitHub"
           >
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -41,7 +41,7 @@ export function Header() {
               {user ? (
                 <Link
                   href="/app"
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white text-black text-sm font-medium hover:bg-white/90 transition-all"
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-900 text-white text-sm font-medium hover:bg-gray-800 transition-all"
                 >
                   Go to App
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -52,13 +52,13 @@ export function Header() {
                 <>
                   <Link
                     href="/auth/signin"
-                    className="px-4 py-2 text-white/70 hover:text-white text-sm font-medium transition-colors"
+                    className="px-4 py-2 text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors"
                   >
                     Sign In
                   </Link>
                   <Link
                     href="/app"
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white text-black text-sm font-medium hover:bg-white/90 transition-all"
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-900 text-white text-sm font-medium hover:bg-gray-800 transition-all"
                   >
                     Get Started
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -74,7 +74,7 @@ export function Header() {
         {/* Mobile Menu Button */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden p-2 text-white hover:bg-white/10 rounded-lg transition-colors"
+          className="md:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
           aria-label="Toggle menu"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -89,14 +89,14 @@ export function Header() {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden mt-4 pb-4 border-t border-white/10">
+        <div className="md:hidden mt-4 pb-4 border-t border-gray-100">
           <nav className="flex flex-col gap-2 mt-4">
             {!authLoading && (
               <>
                 {user ? (
                   <Link
                     href="/app"
-                    className="px-4 py-2 rounded-lg bg-white text-black text-sm font-medium text-center"
+                    className="px-4 py-2 rounded-lg bg-gray-900 text-white text-sm font-medium text-center"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Go to App
@@ -105,14 +105,14 @@ export function Header() {
                   <>
                     <Link
                       href="/auth/signin"
-                      className="px-4 py-2 text-white/70 hover:text-white text-sm font-medium text-left"
+                      className="px-4 py-2 text-gray-600 hover:text-gray-900 text-sm font-medium text-left"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       Sign In
                     </Link>
                     <Link
                       href="/app"
-                      className="px-4 py-2 rounded-lg bg-white text-black text-sm font-medium text-center"
+                      className="px-4 py-2 rounded-lg bg-gray-900 text-white text-sm font-medium text-center"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       Get Started

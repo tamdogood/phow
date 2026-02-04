@@ -40,7 +40,7 @@ function ValuesSection() {
   return (
     <section ref={ref} className="py-24 px-6 border-t border-white/5">
       <div className="mx-auto max-w-6xl">
-        <div className={`text-center mb-16 animate-on-scroll ${isVisible ? "visible" : ""}`}>
+        <div className={`text-center mb-8 animate-on-scroll ${isVisible ? "visible" : ""}`}>
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Our Values</h2>
           <p className="text-lg text-white/50 max-w-2xl mx-auto">
             The principles that guide everything we build.
