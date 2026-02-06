@@ -23,26 +23,26 @@ function ScoreCard({
   loading?: boolean;
 }) {
   const colorClasses = {
-    green: "text-emerald-400",
-    yellow: "text-amber-400",
-    red: "text-red-400",
-    blue: "text-blue-400",
+    green: "text-emerald-600",
+    yellow: "text-amber-600",
+    red: "text-red-600",
+    blue: "text-blue-600",
   };
 
   return (
-    <div className="dark-card p-6 text-center hover-lift">
-      <p className="text-white/50 text-sm mb-2">{label}</p>
+    <div className="light-card p-6 text-center">
+      <p className="text-gray-600 text-sm mb-2">{label}</p>
       {loading ? (
         <div className="flex items-center justify-center gap-2">
-          <div className="w-4 h-4 border-2 border-white/30 border-t-white/80 rounded-full animate-spin" />
-          <span className="text-white/50 text-sm">Analyzing...</span>
+          <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
+          <span className="text-gray-600 text-sm">Analyzing...</span>
         </div>
       ) : (
-        <p className={`text-3xl font-bold ${color ? colorClasses[color] : "text-white"}`}>
+        <p className={`text-3xl font-bold ${color ? colorClasses[color] : "text-gray-900"}`}>
           {value}
         </p>
       )}
-      {!loading && subtext && <p className="text-white/30 text-xs mt-1">{subtext}</p>}
+      {!loading && subtext && <p className="text-gray-500 text-xs mt-1">{subtext}</p>}
     </div>
   );
 }
@@ -75,42 +75,42 @@ function CompetitorCard({
   };
 
   return (
-    <div className="py-3 border-b border-white/5 last:border-0 group">
+    <div className="py-3 border-b border-gray-100 last:border-0 group">
       <div
         className={`flex items-center justify-between ${hasDetails ? "cursor-pointer" : ""}`}
         onClick={() => hasDetails && setExpanded(!expanded)}
       >
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <p className="text-white font-medium">{competitor.name}</p>
+            <p className="text-gray-900 font-medium">{competitor.name}</p>
             {priceLevel && (
-              <span className="text-emerald-400 text-sm">{priceLevel}</span>
+              <span className="text-emerald-600 text-sm">{priceLevel}</span>
             )}
           </div>
           {competitor.address && (
-            <p className="text-white/40 text-sm truncate max-w-xs">{competitor.address}</p>
+            <p className="text-gray-500 text-sm truncate max-w-xs">{competitor.address}</p>
           )}
         </div>
         <div className="flex items-center gap-3">
           {competitor.rating && (
-            <div className="flex items-center gap-1 text-amber-400">
+            <div className="flex items-center gap-1 text-amber-500">
               <span>★</span>
               <span className="font-medium">{competitor.rating.toFixed(1)}</span>
               {competitor.review_count && (
-                <span className="text-white/30 text-xs">({competitor.review_count})</span>
+                <span className="text-gray-500 text-xs">({competitor.review_count})</span>
               )}
             </div>
           )}
           {hasDetails && (
-            <span className="text-white/30 text-sm">{expanded ? "▲" : "▼"}</span>
+            <span className="text-gray-500 text-sm">{expanded ? "▲" : "▼"}</span>
           )}
           {onDelete && (
             <button
               onClick={handleDelete}
               className={`px-2 py-1 rounded text-xs transition-colors ${
                 confirmDelete
-                  ? "bg-red-500/20 text-red-400"
-                  : "opacity-0 group-hover:opacity-100 text-white/30 hover:text-red-400 hover:bg-red-500/10"
+                  ? "bg-red-100 text-red-600"
+                  : "opacity-0 group-hover:opacity-100 text-gray-500 hover:text-red-600 hover:bg-red-50"
               }`}
               title={confirmDelete ? "Click again to confirm" : "Delete competitor"}
             >
@@ -121,15 +121,15 @@ function CompetitorCard({
       </div>
 
       {expanded && hasDetails && (
-        <div className="mt-3 pt-3 border-t border-white/5">
+        <div className="mt-3 pt-3 border-t border-gray-100">
           {competitor.strengths && competitor.strengths.length > 0 && (
             <div className="mb-2">
-              <p className="text-white/40 text-xs mb-1">Strengths</p>
+              <p className="text-gray-600 text-xs mb-1">Strengths</p>
               <div className="flex flex-wrap gap-2">
                 {competitor.strengths.map((s, idx) => (
                   <span
                     key={idx}
-                    className="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded"
+                    className="text-xs bg-emerald-50 text-emerald-700 px-2 py-1 rounded"
                   >
                     {s}
                   </span>
@@ -139,12 +139,12 @@ function CompetitorCard({
           )}
           {competitor.weaknesses && competitor.weaknesses.length > 0 && (
             <div>
-              <p className="text-white/40 text-xs mb-1">Weaknesses</p>
+              <p className="text-gray-600 text-xs mb-1">Weaknesses</p>
               <div className="flex flex-wrap gap-2">
                 {competitor.weaknesses.map((w, idx) => (
                   <span
                     key={idx}
-                    className="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded"
+                    className="text-xs bg-red-50 text-red-700 px-2 py-1 rounded"
                   >
                     {w}
                   </span>
@@ -182,14 +182,14 @@ function ConversationCard({
   });
 
   return (
-    <div className="flex items-center justify-between py-3 border-b border-white/5 last:border-0">
+    <div className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
       <div>
-        <p className="text-white/50 text-sm">{toolNames[toolId] || toolId}</p>
-        <p className="text-white font-medium truncate max-w-sm">
+        <p className="text-gray-600 text-sm">{toolNames[toolId] || toolId}</p>
+        <p className="text-gray-900 font-medium truncate max-w-sm">
           {title || "New conversation"}
         </p>
       </div>
-      <p className="text-white/30 text-sm">{formattedDate}</p>
+      <p className="text-gray-500 text-sm">{formattedDate}</p>
     </div>
   );
 }
@@ -204,7 +204,7 @@ function RecommendationItem({ text }: { text: string }) {
         className={`w-5 h-5 rounded border flex-shrink-0 flex items-center justify-center mt-0.5 transition-colors ${
           done
             ? "bg-emerald-500 border-emerald-500"
-            : "border-white/20 hover:border-white/40"
+            : "border-gray-300 hover:border-gray-400"
         }`}
       >
         {done && (
@@ -213,7 +213,7 @@ function RecommendationItem({ text }: { text: string }) {
           </svg>
         )}
       </button>
-      <span className={`text-white/70 ${done ? "line-through" : ""}`}>{text}</span>
+      <span className={`text-gray-700 ${done ? "line-through" : ""}`}>{text}</span>
     </li>
   );
 }
@@ -224,6 +224,8 @@ function getViabilityColor(score: number): "green" | "yellow" | "red" {
   return "red";
 }
 
+type Tab = "overview" | "competitors" | "market" | "insights" | "activity";
+
 export default function DashboardPage() {
   const { user } = useAuth();
   const [data, setData] = useState<DashboardData | null>(null);
@@ -233,6 +235,7 @@ export default function DashboardPage() {
   const [communityLoading, setCommunityLoading] = useState(true);
   const [analyzing, setAnalyzing] = useState(false);
   const [showAddCompetitor, setShowAddCompetitor] = useState(false);
+  const [activeTab, setActiveTab] = useState<Tab>("overview");
 
   const refreshDashboard = useCallback(async () => {
     const sessionId = getSessionId();
@@ -290,37 +293,37 @@ export default function DashboardPage() {
   }, [user]);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] relative overflow-hidden">
+    <div className="min-h-screen bg-white relative overflow-hidden">
       {/* Grid pattern overlay */}
-      <div className="fixed inset-0 grid-pattern pointer-events-none" />
+      <div className="fixed inset-0 grid-pattern-light pointer-events-none" />
 
       {/* Header */}
-      <header className="dark-header fixed top-0 left-0 right-0 z-50 px-6 py-4">
+      <header className="light-header fixed top-0 left-0 right-0 z-50 px-6 py-4">
         <div className="mx-auto max-w-6xl flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/" className="text-xl font-bold text-white hover:text-white/80 transition-colors tracking-tight">
+            <Link href="/" className="text-xl font-bold text-gray-900 hover:text-gray-700 transition-colors tracking-tight">
               PHOW
             </Link>
-            <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded bg-white/10 text-[10px] font-mono text-white/60 uppercase tracking-wider">
+            <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded bg-gray-100 text-[10px] font-mono text-gray-600 uppercase tracking-wider">
               Dashboard
             </span>
           </div>
           <div className="flex items-center gap-3">
             <Link
               href="/community"
-              className="px-4 py-2 text-white/70 hover:text-white text-sm font-medium transition-colors"
+              className="px-4 py-2 text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors"
             >
               Community
             </Link>
             <Link
               href="/business-setup"
-              className="px-4 py-2 text-white/70 hover:text-white text-sm font-medium transition-colors"
+              className="px-4 py-2 text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors"
             >
               My Business
             </Link>
             <Link
               href="/app"
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white text-black text-sm font-medium hover:bg-white/90 transition-all"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-900 text-white text-sm font-medium hover:bg-gray-800 transition-all shadow-sm"
             >
               New Analysis
             </Link>
@@ -333,22 +336,22 @@ export default function DashboardPage() {
         <div className="max-w-6xl mx-auto">
           {loading ? (
             <div className="flex items-center justify-center min-h-[60vh]">
-              <div className="text-white/50">Loading dashboard...</div>
+              <div className="text-gray-500">Loading dashboard...</div>
             </div>
           ) : error ? (
             <div className="flex items-center justify-center min-h-[60vh]">
-              <div className="text-red-400">{error}</div>
+              <div className="text-red-600">{error}</div>
             </div>
           ) : !data?.has_profile ? (
             <div className="flex flex-col items-center justify-center min-h-[60vh] text-center animate-fade-in-up">
-              <h1 className="text-3xl font-bold text-white mb-4">Welcome to <span className="text-accent-blue">PHOW</span></h1>
-              <p className="text-white/50 mb-8 max-w-md">
+              <h1 className="text-3xl font-bold text-gray-900 mb-4">Welcome to <span className="text-accent-blue">PHOW</span></h1>
+              <p className="text-gray-600 mb-8 max-w-md">
                 Set up your business profile to start getting insights about your market,
                 competitors, and location.
               </p>
               <Link
                 href="/business-setup"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-white text-black font-semibold hover:bg-white/90 transition-all"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-gray-900 text-white font-semibold hover:bg-gray-800 transition-all shadow-sm"
               >
                 Set Up Business Profile
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -360,18 +363,79 @@ export default function DashboardPage() {
             <>
               {/* Business Header */}
               <div className="mb-8 animate-fade-in-up">
-                <h1 className="text-3xl font-bold text-white">
+                <h1 className="text-3xl font-bold text-gray-900">
                   {data.business_profile?.business_name || "Your Business"}
                 </h1>
-                <p className="text-white/50 mt-1">
+                <p className="text-gray-600 mt-1">
                   {data.business_profile?.business_type}
                   {data.business_profile?.location_address &&
                     ` • ${data.business_profile.location_address}`}
                 </p>
               </div>
 
-              {/* Community Widget */}
-              <CommunityWidget posts={communityPosts} loading={communityLoading} />
+              {/* Tabs Navigation */}
+              <div className="mb-6">
+                <div className="border-b border-gray-200">
+                  <nav className="flex gap-6 overflow-x-auto">
+                    <button
+                      onClick={() => setActiveTab("overview")}
+                      className={`pb-3 px-1 font-medium text-sm whitespace-nowrap transition-colors border-b-2 ${
+                        activeTab === "overview"
+                          ? "border-blue-500 text-blue-600"
+                          : "border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300"
+                      }`}
+                    >
+                      Overview
+                    </button>
+                    <button
+                      onClick={() => setActiveTab("competitors")}
+                      className={`pb-3 px-1 font-medium text-sm whitespace-nowrap transition-colors border-b-2 ${
+                        activeTab === "competitors"
+                          ? "border-blue-500 text-blue-600"
+                          : "border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300"
+                      }`}
+                    >
+                      Competitors
+                    </button>
+                    <button
+                      onClick={() => setActiveTab("market")}
+                      className={`pb-3 px-1 font-medium text-sm whitespace-nowrap transition-colors border-b-2 ${
+                        activeTab === "market"
+                          ? "border-blue-500 text-blue-600"
+                          : "border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300"
+                      }`}
+                    >
+                      Market Insights
+                    </button>
+                    <button
+                      onClick={() => setActiveTab("insights")}
+                      className={`pb-3 px-1 font-medium text-sm whitespace-nowrap transition-colors border-b-2 ${
+                        activeTab === "insights"
+                          ? "border-blue-500 text-blue-600"
+                          : "border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300"
+                      }`}
+                    >
+                      Competitive Advantages
+                    </button>
+                    <button
+                      onClick={() => setActiveTab("activity")}
+                      className={`pb-3 px-1 font-medium text-sm whitespace-nowrap transition-colors border-b-2 ${
+                        activeTab === "activity"
+                          ? "border-blue-500 text-blue-600"
+                          : "border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300"
+                      }`}
+                    >
+                      Recent Activity
+                    </button>
+                  </nav>
+                </div>
+              </div>
+
+              {/* Overview Tab */}
+              {activeTab === "overview" && (
+                <>
+                  {/* Community Widget */}
+                  <CommunityWidget posts={communityPosts} loading={communityLoading} />
 
               {/* Score Cards */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
@@ -405,14 +469,14 @@ export default function DashboardPage() {
               {(data.market_analysis?.risk_factors?.length || data.market_analysis?.opportunities?.length) && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                   {data.market_analysis?.risk_factors && data.market_analysis.risk_factors.length > 0 && (
-                    <div className="dark-card p-6 border-l-4 border-red-500">
-                      <h3 className="text-red-400 font-semibold mb-3 flex items-center gap-2">
+                    <div className="light-card p-6 border-l-4 border-red-500">
+                      <h3 className="text-red-600 font-semibold mb-3 flex items-center gap-2">
                         <span>⚠️</span> Top Risks
                       </h3>
                       <ul className="space-y-2">
                         {data.market_analysis.risk_factors.slice(0, 3).map((risk, idx) => (
-                          <li key={idx} className="flex items-start gap-2 text-white/70 text-sm">
-                            <span className="text-red-400 mt-1">•</span>
+                          <li key={idx} className="flex items-start gap-2 text-gray-700 text-sm">
+                            <span className="text-red-600 mt-1">•</span>
                             <span>{risk}</span>
                           </li>
                         ))}
@@ -421,14 +485,14 @@ export default function DashboardPage() {
                   )}
 
                   {data.market_analysis?.opportunities && data.market_analysis.opportunities.length > 0 && (
-                    <div className="dark-card p-6 border-l-4 border-emerald-500">
-                      <h3 className="text-emerald-400 font-semibold mb-3 flex items-center gap-2">
+                    <div className="light-card p-6 border-l-4 border-emerald-500">
+                      <h3 className="text-emerald-600 font-semibold mb-3 flex items-center gap-2">
                         <span>✨</span> Top Opportunities
                       </h3>
                       <ul className="space-y-2">
                         {data.market_analysis.opportunities.slice(0, 3).map((opp, idx) => (
-                          <li key={idx} className="flex items-start gap-2 text-white/70 text-sm">
-                            <span className="text-emerald-400 mt-1">•</span>
+                          <li key={idx} className="flex items-start gap-2 text-gray-700 text-sm">
+                            <span className="text-emerald-600 mt-1">•</span>
                             <span>{opp}</span>
                           </li>
                         ))}
@@ -438,39 +502,45 @@ export default function DashboardPage() {
                 </div>
               )}
 
-              {/* Demographics Section */}
-              {data.market_analysis?.demographics && Object.keys(data.market_analysis.demographics).length > 0 && (
-                <div className="dark-card p-6 mb-6">
-                  <h2 className="text-xl font-semibold text-white mb-4">Market Demographics</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {Object.entries(data.market_analysis.demographics).map(([key, value]) => (
-                      <div key={key} className="bg-white/5 rounded-lg p-4">
-                        <p className="text-white/40 text-sm mb-2 capitalize">
-                          {key.replace(/_/g, " ")}
-                        </p>
-                        <p className="text-white font-medium">{String(value)}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+              {/* Quick Actions */}
+              <div className="flex flex-wrap gap-4 justify-center">
+                <Link
+                  href="/app?tool=market_validator"
+                  className="px-6 py-3 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-medium transition-all border border-emerald-200"
+                >
+                  Validate Market
+                </Link>
+                <Link
+                  href="/app?tool=competitor_analyzer"
+                  className="px-6 py-3 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium transition-all border border-blue-200"
+                >
+                  Analyze Competitors
+                </Link>
+                <Link
+                  href="/app?tool=location_scout"
+                  className="px-6 py-3 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-700 font-medium transition-all border border-purple-200"
+                >
+                  Scout Location
+                </Link>
+              </div>
+                </>
               )}
 
-              {/* Two Column Layout */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Competitors */}
-                <div className="dark-card p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-semibold text-white">Top Competitors</h2>
+              {/* Competitors Tab */}
+              {activeTab === "competitors" && (
+                <div className="light-card p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-2xl font-semibold text-gray-900">Top Competitors</h2>
                     <div className="flex items-center gap-3">
                       <button
                         onClick={() => setShowAddCompetitor(true)}
-                        className="text-emerald-400 text-sm hover:underline"
+                        className="px-4 py-2 rounded-lg bg-emerald-50 text-emerald-700 text-sm font-medium hover:bg-emerald-100 transition-all border border-emerald-200"
                       >
-                        + Add
+                        + Add Competitor
                       </button>
                       <Link
                         href="/app?tool=competitor_analyzer"
-                        className="text-blue-400 text-sm hover:underline"
+                        className="px-4 py-2 rounded-lg bg-blue-50 text-blue-700 text-sm font-medium hover:bg-blue-100 transition-all border border-blue-200"
                       >
                         Analyze More
                       </Link>
@@ -478,32 +548,27 @@ export default function DashboardPage() {
                   </div>
                   {data.tracked_competitors.length > 0 ? (
                     <div>
-                      {data.tracked_competitors.slice(0, 5).map((competitor) => (
+                      {data.tracked_competitors.map((competitor) => (
                         <CompetitorCard
                           key={competitor.id}
                           competitor={competitor}
                           onDelete={handleDeleteCompetitor}
                         />
                       ))}
-                      {data.tracked_competitors.length > 5 && (
-                        <p className="text-white/30 text-sm mt-3 text-center">
-                          +{data.tracked_competitors.length - 5} more competitors
-                        </p>
-                      )}
                     </div>
                   ) : (
-                    <div className="text-center py-8">
-                      <p className="text-white/40 mb-4">No competitors tracked yet</p>
+                    <div className="text-center py-12">
+                      <p className="text-gray-500 mb-4">No competitors tracked yet</p>
                       <div className="flex gap-3 justify-center">
                         <button
                           onClick={() => setShowAddCompetitor(true)}
-                          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/10 text-emerald-400 text-sm hover:bg-emerald-500/20 transition-all"
+                          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-50 text-emerald-700 text-sm font-medium hover:bg-emerald-100 transition-all border border-emerald-200"
                         >
                           Add Manually
                         </button>
                         <Link
                           href="/app?tool=competitor_analyzer"
-                          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 text-white text-sm hover:bg-white/10 transition-all"
+                          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition-all"
                         >
                           Find Competitors
                         </Link>
@@ -511,15 +576,140 @@ export default function DashboardPage() {
                     </div>
                   )}
                 </div>
+              )}
 
-                {/* Recent Activity */}
-                <div className="dark-card p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-semibold text-white">Recent Activity</h2>
+              {/* Market Insights Tab */}
+              {activeTab === "market" && (
+                <div className="space-y-6">
+                  {/* Demographics */}
+                  {data.market_analysis?.demographics && Object.keys(data.market_analysis.demographics).length > 0 && (
+                    <div className="light-card p-6">
+                      <h2 className="text-2xl font-semibold text-gray-900 mb-4">Market Demographics</h2>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {Object.entries(data.market_analysis.demographics).map(([key, value]) => (
+                          <div key={key} className="bg-gray-50 rounded-lg p-4 border border-gray-100">
+                            <p className="text-gray-600 text-sm mb-2 capitalize">
+                              {key.replace(/_/g, " ")}
+                            </p>
+                            <p className="text-gray-900 font-medium">{String(value)}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Risks and Opportunities */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {data.market_analysis?.risk_factors && data.market_analysis.risk_factors.length > 0 && (
+                      <div className="light-card p-6 border-l-4 border-red-500">
+                        <h3 className="text-red-600 font-semibold mb-4 flex items-center gap-2">
+                          <span>⚠️</span> Risk Factors
+                        </h3>
+                        <ul className="space-y-3">
+                          {data.market_analysis.risk_factors.map((risk, idx) => (
+                            <li key={idx} className="flex items-start gap-2 text-gray-700 text-sm">
+                              <span className="text-red-600 mt-1">•</span>
+                              <span>{risk}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {data.market_analysis?.opportunities && data.market_analysis.opportunities.length > 0 && (
+                      <div className="light-card p-6 border-l-4 border-emerald-500">
+                        <h3 className="text-emerald-600 font-semibold mb-4 flex items-center gap-2">
+                          <span>✨</span> Opportunities
+                        </h3>
+                        <ul className="space-y-3">
+                          {data.market_analysis.opportunities.map((opp, idx) => (
+                            <li key={idx} className="flex items-start gap-2 text-gray-700 text-sm">
+                              <span className="text-emerald-600 mt-1">•</span>
+                              <span>{opp}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Action Items */}
+                  {data.market_analysis?.recommendations && data.market_analysis.recommendations.length > 0 && (
+                    <div className="light-card p-6">
+                      <h2 className="text-2xl font-semibold text-gray-900 mb-4">Recommended Actions</h2>
+                      <ul className="space-y-3">
+                        {data.market_analysis.recommendations.map((rec, idx) => (
+                          <RecommendationItem key={idx} text={rec} />
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Competitive Advantages Tab */}
+              {activeTab === "insights" && (
+                <div className="space-y-6">
+                  {/* Market Gaps */}
+                  {data.competitor_analysis?.market_gaps && Object.keys(data.competitor_analysis.market_gaps).length > 0 && (
+                    <div className="light-card p-6">
+                      <h2 className="text-2xl font-semibold text-gray-900 mb-2">Your Competitive Advantages</h2>
+                      <p className="text-gray-600 text-sm mb-6">
+                        Gaps in the market where you can differentiate
+                      </p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {Object.entries(data.competitor_analysis.market_gaps).map(([key, value]) => (
+                          <div key={key} className="bg-blue-50 rounded-lg p-4 border-l-4 border-blue-500">
+                            <p className="text-blue-700 text-sm font-medium capitalize mb-1">
+                              {key.replace(/_/g, " ")}
+                            </p>
+                            <p className="text-gray-700 text-sm">{String(value)}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Differentiation Suggestions */}
+                  {data.competitor_analysis?.differentiation_suggestions && data.competitor_analysis.differentiation_suggestions.length > 0 && (
+                    <div className="light-card p-6">
+                      <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+                        Differentiation Strategies
+                      </h2>
+                      <ul className="space-y-3">
+                        {data.competitor_analysis.differentiation_suggestions.map((sug, idx) => (
+                          <li key={idx} className="flex items-start gap-3">
+                            <span className="text-blue-600 mt-1 font-bold">→</span>
+                            <span className="text-gray-700">{sug}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {(!data.competitor_analysis?.market_gaps && !data.competitor_analysis?.differentiation_suggestions) && (
+                    <div className="light-card p-12 text-center">
+                      <p className="text-gray-500 mb-4">No competitive insights yet</p>
+                      <Link
+                        href="/app?tool=competitor_analyzer"
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-50 text-blue-700 text-sm font-medium hover:bg-blue-100 transition-all border border-blue-200"
+                      >
+                        Analyze Competitors
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Recent Activity Tab */}
+              {activeTab === "activity" && (
+                <div className="light-card p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-2xl font-semibold text-gray-900">Recent Activity</h2>
                   </div>
                   {data.recent_conversations.length > 0 ? (
                     <div>
-                      {data.recent_conversations.slice(0, 5).map((conversation) => (
+                      {data.recent_conversations.map((conversation) => (
                         <ConversationCard
                           key={conversation.id}
                           toolId={conversation.tool_id}
@@ -529,91 +719,19 @@ export default function DashboardPage() {
                       ))}
                     </div>
                   ) : (
-                    <div className="text-center py-8">
-                      <p className="text-white/40 mb-4">No analyses yet</p>
+                    <div className="text-center py-12">
+                      <p className="text-gray-500 mb-4">No analyses yet</p>
                       <Link
                         href="/app"
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 text-white text-sm hover:bg-white/10 transition-all"
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition-all"
                       >
                         Start Your First Analysis
                       </Link>
                     </div>
                   )}
                 </div>
-              </div>
-
-              {/* Market Gaps */}
-              {data.competitor_analysis?.market_gaps && Object.keys(data.competitor_analysis.market_gaps).length > 0 && (
-                <div className="dark-card p-6 mt-6">
-                  <h2 className="text-xl font-semibold text-white mb-2">Your Competitive Advantages</h2>
-                  <p className="text-white/40 text-sm mb-4">
-                    Gaps in the market where you can differentiate
-                  </p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {Object.entries(data.competitor_analysis.market_gaps).map(([key, value]) => (
-                      <div key={key} className="bg-white/5 rounded-lg p-4 border-l-2 border-blue-500">
-                        <p className="text-blue-400 text-sm font-medium capitalize mb-1">
-                          {key.replace(/_/g, " ")}
-                        </p>
-                        <p className="text-white/70 text-sm">{String(value)}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
               )}
 
-              {/* Differentiation Suggestions */}
-              {data.competitor_analysis?.differentiation_suggestions &&
-                data.competitor_analysis.differentiation_suggestions.length > 0 && (
-                  <div className="dark-card p-6 mt-6">
-                    <h2 className="text-xl font-semibold text-white mb-4">
-                      Differentiation Strategies
-                    </h2>
-                    <ul className="space-y-2">
-                      {data.competitor_analysis.differentiation_suggestions.map((sug, idx) => (
-                        <li key={idx} className="flex items-start gap-3">
-                          <span className="text-blue-400 mt-1">→</span>
-                          <span className="text-white/70">{sug}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-              {/* Recommendations */}
-              {data.market_analysis?.recommendations &&
-                data.market_analysis.recommendations.length > 0 && (
-                  <div className="dark-card p-6 mt-6">
-                    <h2 className="text-xl font-semibold text-white mb-4">Action Items</h2>
-                    <ul className="space-y-3">
-                      {data.market_analysis.recommendations.map((rec, idx) => (
-                        <RecommendationItem key={idx} text={rec} />
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-              {/* Quick Actions */}
-              <div className="flex flex-wrap gap-4 mt-8 justify-center">
-                <Link
-                  href="/app?tool=market_validator"
-                  className="px-6 py-3 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 font-medium transition-all border border-emerald-500/20"
-                >
-                  Validate Market
-                </Link>
-                <Link
-                  href="/app?tool=competitor_analyzer"
-                  className="px-6 py-3 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 font-medium transition-all border border-blue-500/20"
-                >
-                  Analyze Competitors
-                </Link>
-                <Link
-                  href="/app?tool=location_scout"
-                  className="px-6 py-3 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 font-medium transition-all border border-purple-500/20"
-                >
-                  Scout Location
-                </Link>
-              </div>
             </>
           )}
         </div>
