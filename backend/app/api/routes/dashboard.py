@@ -3,8 +3,11 @@ from supabase import Client
 from ..deps import get_supabase
 from ...services.business_profile_service import BusinessProfileService
 from ...services.analysis_service import AnalysisService
+from ...services.demographics_service import get_demographics_service
 from ...repositories.conversation_repository import ConversationRepository
+from ...core.logging import get_logger
 
+logger = get_logger("dashboard")
 router = APIRouter(prefix="/dashboard", tags=["dashboard"])
 
 
@@ -46,6 +49,7 @@ async def get_dashboard(
             "competitor_analysis": None,
             "tracked_competitors": [],
             "recent_conversations": [],
+            "demographics": None,
         }
 
     profile_id = profile["id"]
@@ -60,6 +64,28 @@ async def get_dashboard(
     if session_id:
         conversations = await conversation_repo.get_by_session(session_id, limit=10)
 
+    # Get demographics if location address exists
+    demographics_data = None
+    address = profile.get("location_address")
+    if address:
+        try:
+            demographics_service = get_demographics_service()
+            result = await demographics_service.get_demographics_for_address(address)
+            if result.get("error"):
+                logger.warning("Demographics fetch error", address=address, error=result.get("error"))
+            elif result.get("demographics"):
+                business_type = profile.get("business_type", "")
+                demographics_data = {
+                    "demographics": result["demographics"],
+                    "summary": await demographics_service.get_demographics_summary(result["demographics"]),
+                    "fit_analysis": demographics_service.calculate_demographic_fit_score(
+                        result["demographics"], business_type
+                    ) if business_type else None,
+                }
+        except Exception as e:
+            logger.error("Demographics exception", address=address, error=str(e))
+            pass  # Demographics are optional, don't fail the dashboard
+
     return {
         "has_profile": True,
         "business_profile": profile,
@@ -67,6 +93,7 @@ async def get_dashboard(
         "competitor_analysis": competitor_analysis,
         "tracked_competitors": tracked_competitors,
         "recent_conversations": conversations,
+        "demographics": demographics_data,
     }
 
 
@@ -108,6 +135,28 @@ async def trigger_analysis(
     if session_id:
         conversations = await conversation_repo.get_by_session(session_id, limit=10)
 
+    # Get demographics if location address exists
+    demographics_data = None
+    address = profile.get("location_address")
+    if address:
+        try:
+            demographics_service = get_demographics_service()
+            result = await demographics_service.get_demographics_for_address(address)
+            if result.get("error"):
+                logger.warning("Demographics fetch error", address=address, error=result.get("error"))
+            elif result.get("demographics"):
+                business_type = profile.get("business_type", "")
+                demographics_data = {
+                    "demographics": result["demographics"],
+                    "summary": await demographics_service.get_demographics_summary(result["demographics"]),
+                    "fit_analysis": demographics_service.calculate_demographic_fit_score(
+                        result["demographics"], business_type
+                    ) if business_type else None,
+                }
+        except Exception as e:
+            logger.error("Demographics exception", address=address, error=str(e))
+            pass
+
     return {
         "has_profile": True,
         "analyzed": analysis_result.get("analyzed", False),
@@ -116,4 +165,92 @@ async def trigger_analysis(
         "competitor_analysis": competitor_analysis,
         "tracked_competitors": tracked_competitors,
         "recent_conversations": conversations,
+        "demographics": demographics_data,
+    }
+
+
+@router.get("/demographics")
+async def get_demographics(
+    address: str,
+    business_type: str | None = None,
+):
+    """
+    Get comprehensive demographic data for an address.
+
+    Returns Census data including:
+    - Population & density
+    - Income distribution
+    - Age breakdown
+    - Education levels
+    - Race/ethnicity
+    - Household composition
+    - Employment & industry
+    - Commute patterns
+    """
+    if not address:
+        raise HTTPException(status_code=400, detail="address is required")
+
+    demographics_service = get_demographics_service()
+    result = await demographics_service.get_demographics_for_address(address)
+
+    if result.get("error"):
+        raise HTTPException(status_code=404, detail=result["error"])
+
+    response = {
+        "demographics": result["demographics"],
+        "summary": await demographics_service.get_demographics_summary(result["demographics"]),
+    }
+
+    # Add demographic fit score if business type provided
+    if business_type:
+        response["fit_analysis"] = demographics_service.calculate_demographic_fit_score(
+            result["demographics"], business_type
+        )
+
+    return response
+
+
+@router.get("/demographics/profile")
+async def get_demographics_for_profile(
+    session_id: str | None = None,
+    user_id: str | None = None,
+    service: BusinessProfileService = Depends(get_business_profile_service),
+):
+    """Get demographics for the user's business profile location."""
+    if not session_id and not user_id:
+        raise HTTPException(status_code=400, detail="session_id or user_id required")
+
+    # Get business profile
+    profile = None
+    if user_id:
+        profile = await service.get_profile_by_user(user_id)
+    if not profile and session_id:
+        profile = await service.get_profile(session_id)
+
+    if not profile:
+        raise HTTPException(status_code=404, detail="Business profile not found")
+
+    address = profile.get("location_address")
+    if not address:
+        raise HTTPException(status_code=400, detail="Business profile has no location address")
+
+    business_type = profile.get("business_type", "")
+
+    demographics_service = get_demographics_service()
+    result = await demographics_service.get_demographics_for_address(address)
+
+    if result.get("error"):
+        raise HTTPException(status_code=404, detail=result["error"])
+
+    return {
+        "demographics": result["demographics"],
+        "summary": await demographics_service.get_demographics_summary(result["demographics"]),
+        "fit_analysis": demographics_service.calculate_demographic_fit_score(
+            result["demographics"], business_type
+        ),
+        "business_profile": {
+            "name": profile.get("business_name"),
+            "type": business_type,
+            "address": address,
+        },
     }
