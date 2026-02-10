@@ -82,6 +82,57 @@ export interface CompetitorAnalysis {
   created_at: string;
 }
 
+export interface DemographicsData {
+  demographics: {
+    population?: { total?: number; density?: number };
+    income?: { median_household?: number; per_capita?: number };
+    age_distribution?: {
+      median_age?: number;
+      under_18_percent?: number;
+      age_18_34_percent?: number;
+      age_35_54_percent?: number;
+      age_55_plus_percent?: number;
+    };
+    education?: {
+      high_school_plus_percent?: number;
+      bachelors_plus_percent?: number;
+    };
+    race_ethnicity?: Record<string, number>;
+    households?: {
+      total_households?: number;
+      average_household_size?: number;
+      family_households_percent?: number;
+      married_couples_percent?: number;
+      single_person_percent?: number;
+    };
+    employment?: {
+      labor_force_participation?: number;
+      employment_rate?: number;
+      unemployment_rate?: number;
+      industry_breakdown?: Record<string, number>;
+    };
+    commute?: {
+      drive_alone_percent?: number;
+      carpool_percent?: number;
+      public_transit_percent?: number;
+      walk_bike_percent?: number;
+      work_from_home_percent?: number;
+      long_commute_percent?: number;
+    };
+  };
+  summary?: {
+    income_level?: string;
+    age_profile?: string;
+    education_level?: string;
+    density_type?: string;
+  };
+  fit_analysis?: {
+    score: number;
+    fit_level: string;
+    factors?: string[];
+  };
+}
+
 export interface DashboardData {
   has_profile: boolean;
   business_profile: BusinessProfile | null;
@@ -89,6 +140,7 @@ export interface DashboardData {
   competitor_analysis: CompetitorAnalysis | null;
   tracked_competitors: TrackedCompetitor[];
   recent_conversations: Conversation[];
+  demographics: DemographicsData | null;
 }
 
 export interface PostAuthor {

@@ -224,7 +224,7 @@ function getViabilityColor(score: number): "green" | "yellow" | "red" {
   return "red";
 }
 
-type Tab = "overview" | "competitors" | "market" | "insights" | "activity";
+type Tab = "overview" | "competitors" | "demographics" | "market" | "insights" | "activity";
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -396,6 +396,16 @@ export default function DashboardPage() {
                       }`}
                     >
                       Competitors
+                    </button>
+                    <button
+                      onClick={() => setActiveTab("demographics")}
+                      className={`pb-3 px-1 font-medium text-sm whitespace-nowrap transition-colors border-b-2 ${
+                        activeTab === "demographics"
+                          ? "border-blue-500 text-blue-600"
+                          : "border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300"
+                      }`}
+                    >
+                      Demographics
                     </button>
                     <button
                       onClick={() => setActiveTab("market")}
@@ -573,6 +583,325 @@ export default function DashboardPage() {
                           Find Competitors
                         </Link>
                       </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Demographics Tab */}
+              {activeTab === "demographics" && (
+                <div className="space-y-6">
+                  {data.demographics ? (
+                    <>
+                      {/* Fit Score Card */}
+                      {data.demographics.fit_analysis && (
+                        <div className="light-card p-6">
+                          <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-2xl font-semibold text-gray-900">Location Fit Score</h2>
+                            <div className={`px-4 py-2 rounded-full text-sm font-medium ${
+                              data.demographics.fit_analysis.fit_level === "excellent" ? "bg-emerald-100 text-emerald-700" :
+                              data.demographics.fit_analysis.fit_level === "good" ? "bg-blue-100 text-blue-700" :
+                              data.demographics.fit_analysis.fit_level === "moderate" ? "bg-amber-100 text-amber-700" :
+                              "bg-red-100 text-red-700"
+                            }`}>
+                              {data.demographics.fit_analysis.fit_level?.charAt(0).toUpperCase() + data.demographics.fit_analysis.fit_level?.slice(1)} Fit
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-6">
+                            <div className="text-5xl font-bold text-gray-900">{data.demographics.fit_analysis.score}</div>
+                            <div className="flex-1">
+                              <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+                                <div
+                                  className={`h-full rounded-full ${
+                                    data.demographics.fit_analysis.score >= 75 ? "bg-emerald-500" :
+                                    data.demographics.fit_analysis.score >= 50 ? "bg-blue-500" :
+                                    data.demographics.fit_analysis.score >= 25 ? "bg-amber-500" : "bg-red-500"
+                                  }`}
+                                  style={{ width: `${data.demographics.fit_analysis.score}%` }}
+                                />
+                              </div>
+                              {data.demographics.fit_analysis.factors && data.demographics.fit_analysis.factors.length > 0 && (
+                                <div className="mt-3 flex flex-wrap gap-2">
+                                  {data.demographics.fit_analysis.factors.map((factor: string, idx: number) => (
+                                    <span key={idx} className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
+                                      {factor}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Summary Cards */}
+                      {data.demographics.summary && (
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                          {data.demographics.summary.income_level && (
+                            <div className="light-card p-4 text-center">
+                              <p className="text-gray-600 text-xs mb-1">Income Level</p>
+                              <p className="text-lg font-semibold text-gray-900 capitalize">{data.demographics.summary.income_level}</p>
+                            </div>
+                          )}
+                          {data.demographics.summary.age_profile && (
+                            <div className="light-card p-4 text-center">
+                              <p className="text-gray-600 text-xs mb-1">Age Profile</p>
+                              <p className="text-lg font-semibold text-gray-900 capitalize">{data.demographics.summary.age_profile.replace(/_/g, " ")}</p>
+                            </div>
+                          )}
+                          {data.demographics.summary.education_level && (
+                            <div className="light-card p-4 text-center">
+                              <p className="text-gray-600 text-xs mb-1">Education</p>
+                              <p className="text-lg font-semibold text-gray-900 capitalize">{data.demographics.summary.education_level}</p>
+                            </div>
+                          )}
+                          {data.demographics.summary.density_type && (
+                            <div className="light-card p-4 text-center">
+                              <p className="text-gray-600 text-xs mb-1">Area Type</p>
+                              <p className="text-lg font-semibold text-gray-900 capitalize">{data.demographics.summary.density_type}</p>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Detailed Demographics Grid */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Population & Income */}
+                        <div className="light-card p-6">
+                          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                            <span className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
+                              <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                              </svg>
+                            </span>
+                            Population & Income
+                          </h3>
+                          <div className="space-y-3">
+                            {data.demographics.demographics.population?.total && (
+                              <div className="flex justify-between">
+                                <span className="text-gray-600 text-sm">Population</span>
+                                <span className="text-gray-900 font-medium">{data.demographics.demographics.population.total.toLocaleString()}</span>
+                              </div>
+                            )}
+                            {data.demographics.demographics.population?.density && (
+                              <div className="flex justify-between">
+                                <span className="text-gray-600 text-sm">Density</span>
+                                <span className="text-gray-900 font-medium">{data.demographics.demographics.population.density.toLocaleString()}/sq mi</span>
+                              </div>
+                            )}
+                            {data.demographics.demographics.income?.median_household && (
+                              <div className="flex justify-between">
+                                <span className="text-gray-600 text-sm">Median Household Income</span>
+                                <span className="text-gray-900 font-medium">${data.demographics.demographics.income.median_household.toLocaleString()}</span>
+                              </div>
+                            )}
+                            {data.demographics.demographics.income?.per_capita && (
+                              <div className="flex justify-between">
+                                <span className="text-gray-600 text-sm">Per Capita Income</span>
+                                <span className="text-gray-900 font-medium">${data.demographics.demographics.income.per_capita.toLocaleString()}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Age Distribution */}
+                        <div className="light-card p-6">
+                          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                            <span className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center">
+                              <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                              </svg>
+                            </span>
+                            Age Distribution
+                          </h3>
+                          <div className="space-y-3">
+                            {data.demographics.demographics.age_distribution?.median_age && (
+                              <div className="flex justify-between">
+                                <span className="text-gray-600 text-sm">Median Age</span>
+                                <span className="text-gray-900 font-medium">{data.demographics.demographics.age_distribution.median_age} years</span>
+                              </div>
+                            )}
+                            {data.demographics.demographics.age_distribution?.under_18_percent !== undefined && (
+                              <div className="flex justify-between">
+                                <span className="text-gray-600 text-sm">Under 18</span>
+                                <span className="text-gray-900 font-medium">{data.demographics.demographics.age_distribution.under_18_percent}%</span>
+                              </div>
+                            )}
+                            {data.demographics.demographics.age_distribution?.age_18_34_percent !== undefined && (
+                              <div className="flex justify-between">
+                                <span className="text-gray-600 text-sm">18-34</span>
+                                <span className="text-gray-900 font-medium">{data.demographics.demographics.age_distribution.age_18_34_percent}%</span>
+                              </div>
+                            )}
+                            {data.demographics.demographics.age_distribution?.age_35_54_percent !== undefined && (
+                              <div className="flex justify-between">
+                                <span className="text-gray-600 text-sm">35-54</span>
+                                <span className="text-gray-900 font-medium">{data.demographics.demographics.age_distribution.age_35_54_percent}%</span>
+                              </div>
+                            )}
+                            {data.demographics.demographics.age_distribution?.age_55_plus_percent !== undefined && (
+                              <div className="flex justify-between">
+                                <span className="text-gray-600 text-sm">55+</span>
+                                <span className="text-gray-900 font-medium">{data.demographics.demographics.age_distribution.age_55_plus_percent}%</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Employment */}
+                        {data.demographics.demographics.employment && Object.keys(data.demographics.demographics.employment).length > 0 && (
+                          <div className="light-card p-6">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                              <span className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center">
+                                <svg className="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                              </span>
+                              Employment
+                            </h3>
+                            <div className="space-y-3">
+                              {data.demographics.demographics.employment.employment_rate !== undefined && (
+                                <div className="flex justify-between">
+                                  <span className="text-gray-600 text-sm">Employment Rate</span>
+                                  <span className="text-gray-900 font-medium">{data.demographics.demographics.employment.employment_rate}%</span>
+                                </div>
+                              )}
+                              {data.demographics.demographics.employment.labor_force_participation !== undefined && (
+                                <div className="flex justify-between">
+                                  <span className="text-gray-600 text-sm">Labor Force Participation</span>
+                                  <span className="text-gray-900 font-medium">{data.demographics.demographics.employment.labor_force_participation}%</span>
+                                </div>
+                              )}
+                              {data.demographics.demographics.employment.unemployment_rate !== undefined && (
+                                <div className="flex justify-between">
+                                  <span className="text-gray-600 text-sm">Unemployment Rate</span>
+                                  <span className="text-gray-900 font-medium">{data.demographics.demographics.employment.unemployment_rate}%</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Commute */}
+                        {data.demographics.demographics.commute && Object.keys(data.demographics.demographics.commute).length > 0 && (
+                          <div className="light-card p-6">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                              <span className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center">
+                                <svg className="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                                </svg>
+                              </span>
+                              Commute Patterns
+                            </h3>
+                            <div className="space-y-3">
+                              {data.demographics.demographics.commute.drive_alone_percent !== undefined && (
+                                <div className="flex justify-between">
+                                  <span className="text-gray-600 text-sm">Drive Alone</span>
+                                  <span className="text-gray-900 font-medium">{data.demographics.demographics.commute.drive_alone_percent}%</span>
+                                </div>
+                              )}
+                              {data.demographics.demographics.commute.public_transit_percent !== undefined && (
+                                <div className="flex justify-between">
+                                  <span className="text-gray-600 text-sm">Public Transit</span>
+                                  <span className="text-gray-900 font-medium">{data.demographics.demographics.commute.public_transit_percent}%</span>
+                                </div>
+                              )}
+                              {data.demographics.demographics.commute.work_from_home_percent !== undefined && (
+                                <div className="flex justify-between">
+                                  <span className="text-gray-600 text-sm">Work from Home</span>
+                                  <span className="text-gray-900 font-medium">{data.demographics.demographics.commute.work_from_home_percent}%</span>
+                                </div>
+                              )}
+                              {data.demographics.demographics.commute.walk_bike_percent !== undefined && (
+                                <div className="flex justify-between">
+                                  <span className="text-gray-600 text-sm">Walk/Bike</span>
+                                  <span className="text-gray-900 font-medium">{data.demographics.demographics.commute.walk_bike_percent}%</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Households */}
+                        {data.demographics.demographics.households && Object.keys(data.demographics.demographics.households).length > 0 && (
+                          <div className="light-card p-6">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                              <span className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center">
+                                <svg className="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                </svg>
+                              </span>
+                              Households
+                            </h3>
+                            <div className="space-y-3">
+                              {data.demographics.demographics.households.total_households && (
+                                <div className="flex justify-between">
+                                  <span className="text-gray-600 text-sm">Total Households</span>
+                                  <span className="text-gray-900 font-medium">{data.demographics.demographics.households.total_households.toLocaleString()}</span>
+                                </div>
+                              )}
+                              {data.demographics.demographics.households.average_household_size && (
+                                <div className="flex justify-between">
+                                  <span className="text-gray-600 text-sm">Avg Household Size</span>
+                                  <span className="text-gray-900 font-medium">{data.demographics.demographics.households.average_household_size}</span>
+                                </div>
+                              )}
+                              {data.demographics.demographics.households.family_households_percent !== undefined && (
+                                <div className="flex justify-between">
+                                  <span className="text-gray-600 text-sm">Family Households</span>
+                                  <span className="text-gray-900 font-medium">{data.demographics.demographics.households.family_households_percent}%</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Education */}
+                        {data.demographics.demographics.education && Object.keys(data.demographics.demographics.education).length > 0 && (
+                          <div className="light-card p-6">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                              <span className="w-8 h-8 rounded-lg bg-rose-100 flex items-center justify-center">
+                                <svg className="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path d="M12 14l9-5-9-5-9 5 9 5z" />
+                                  <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
+                                </svg>
+                              </span>
+                              Education
+                            </h3>
+                            <div className="space-y-3">
+                              {data.demographics.demographics.education.high_school_plus_percent !== undefined && (
+                                <div className="flex justify-between">
+                                  <span className="text-gray-600 text-sm">High School+</span>
+                                  <span className="text-gray-900 font-medium">{data.demographics.demographics.education.high_school_plus_percent}%</span>
+                                </div>
+                              )}
+                              {data.demographics.demographics.education.bachelors_plus_percent !== undefined && (
+                                <div className="flex justify-between">
+                                  <span className="text-gray-600 text-sm">Bachelor&apos;s+</span>
+                                  <span className="text-gray-900 font-medium">{data.demographics.demographics.education.bachelors_plus_percent}%</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="light-card p-12 text-center">
+                      <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                      </div>
+                      <p className="text-gray-500 mb-2">No demographic data available</p>
+                      <p className="text-gray-400 text-sm mb-4">Add a location address to your business profile to see demographics</p>
+                      <Link
+                        href="/business-setup"
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition-all"
+                      >
+                        Update Business Profile
+                      </Link>
                     </div>
                   )}
                 </div>
