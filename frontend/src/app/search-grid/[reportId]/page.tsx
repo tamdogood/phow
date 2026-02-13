@@ -16,8 +16,32 @@ import {
   deleteSearchGridReport,
   triggerSearchGridRun,
   fetchSearchGridRunResults,
+  fetchSearchGridResultDetail,
+  fetchSearchGridCompetitors,
+  addCompetitor,
 } from "@/lib/api";
-import { SearchGridReportWithResults, SearchGridResult } from "@/types";
+import { getSessionId } from "@/lib/session";
+import { useAuth } from "@/contexts/AuthContext";
+import { SearchGridReportWithResults, SearchGridResult, SearchGridResultDetail, AggregatedCompetitor } from "@/types";
+import { GOOGLE_MAPS_LIBRARIES, GOOGLE_MAPS_API_KEY } from "@/lib/google-maps";
+
+// ---------------------------------------------------------------------------
+// Haversine distance
+// ---------------------------------------------------------------------------
+
+function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function formatDistance(km: number): string {
+  return km < 1 ? `${Math.round(km * 1000)}m` : `${km.toFixed(1)}km`;
+}
 
 // ---------------------------------------------------------------------------
 // Grid calculation
@@ -48,19 +72,36 @@ function calculateGridPoints(
 }
 
 // ---------------------------------------------------------------------------
-// Color helpers
+// Score helpers
 // ---------------------------------------------------------------------------
 
-function rankColor(rank: number | null): string {
-  if (rank === null) return "#6b7280";
-  if (rank <= 3) return "#22c55e";
-  if (rank <= 10) return "#f59e0b";
+function computeFallbackScore(rank: number | null, totalResults: number): number {
+  let visibility = 0;
+  if (rank !== null && rank >= 1 && rank <= 20) {
+    visibility = Math.round(50 - (rank - 1) * (47 / 19));
+  }
+  let opportunity = 5;
+  if (totalResults === 0) opportunity = 30;
+  else if (totalResults <= 5) opportunity = 25;
+  else if (totalResults <= 10) opportunity = 15;
+  return Math.max(0, Math.min(100, visibility + opportunity + 10));
+}
+
+function getScore(result: SearchGridResult | SearchGridResultDetail | null | undefined): number | null {
+  if (!result) return null;
+  return result.score ?? computeFallbackScore(result.rank, result.total_results);
+}
+
+function scoreColor(score: number | null): string {
+  if (score == null) return "#6b7280";
+  if (score >= 70) return "#22c55e";
+  if (score >= 45) return "#3b82f6";
+  if (score >= 25) return "#f59e0b";
   return "#ef4444";
 }
 
-function rankLabel(rank: number | null): string {
-  if (rank === null) return "N/F";
-  return `#${rank}`;
+function scoreLabel(score: number | null): string {
+  return score != null ? `${score}` : "—";
 }
 
 // ---------------------------------------------------------------------------
@@ -115,6 +156,7 @@ function StatusBadge({ status }: { status: string }) {
 export default function SearchGridReportPage() {
   const router = useRouter();
   const params = useParams();
+  const { user } = useAuth();
   const reportId = params.reportId as string;
 
   // State
@@ -128,6 +170,12 @@ export default function SearchGridReportPage() {
   const [triggering, setTriggering] = useState(false);
   const [selectedKeyword, setSelectedKeyword] = useState<string>("all");
   const [hoveredPoint, setHoveredPoint] = useState<SearchGridResult | null>(null);
+  const [detailPanel, setDetailPanel] = useState<SearchGridResultDetail | null>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [competitors, setCompetitors] = useState<AggregatedCompetitor[]>([]);
+  const [competitorsLoading, setCompetitorsLoading] = useState(false);
+  const [trackedIds, setTrackedIds] = useState<Set<string>>(new Set());
+  const [trackingId, setTrackingId] = useState<string | null>(null);
 
   // Editable fields
   const [name, setName] = useState("");
@@ -141,7 +189,8 @@ export default function SearchGridReportPage() {
 
   // Google Maps
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
+    googleMapsApiKey: GOOGLE_MAPS_API_KEY,
+    libraries: GOOGLE_MAPS_LIBRARIES,
   });
 
   // -------------------------------------------------------------------
@@ -206,6 +255,27 @@ export default function SearchGridReportPage() {
   }, [report?.latest_run?.status, report?.status, loadReport]);
 
   // -------------------------------------------------------------------
+  // Fetch aggregated competitors
+  // -------------------------------------------------------------------
+
+  useEffect(() => {
+    const runId = report?.latest_run?.id;
+    const runStatus = report?.latest_run?.status;
+    if (!runId || runStatus !== "completed") {
+      setCompetitors([]);
+      return;
+    }
+    let cancelled = false;
+    setCompetitorsLoading(true);
+    const kw = selectedKeyword === "all" ? undefined : selectedKeyword;
+    fetchSearchGridCompetitors(runId, kw)
+      .then((data) => { if (!cancelled) setCompetitors(data); })
+      .catch(() => { if (!cancelled) setCompetitors([]); })
+      .finally(() => { if (!cancelled) setCompetitorsLoading(false); });
+    return () => { cancelled = true; };
+  }, [report?.latest_run?.id, report?.latest_run?.status, selectedKeyword]);
+
+  // -------------------------------------------------------------------
   // Filtered results
   // -------------------------------------------------------------------
 
@@ -245,13 +315,19 @@ export default function SearchGridReportPage() {
 
   const stats = useMemo(() => {
     const ranked = filteredResults.filter((r) => r.rank !== null);
-    if (ranked.length === 0) return { avgRank: null, top3Pct: 0, coverage: 0 };
-    const avg = ranked.reduce((s, r) => s + (r.rank ?? 0), 0) / ranked.length;
+    const withScores = filteredResults.map((r) => ({ ...r, _score: getScore(r) })).filter((r) => r._score != null);
+    const avgRank = ranked.length
+      ? Math.round((ranked.reduce((s, r) => s + (r.rank ?? 0), 0) / ranked.length) * 10) / 10
+      : null;
     const top3 = ranked.filter((r) => r.rank !== null && r.rank <= 3).length;
+    const avgScore = withScores.length
+      ? Math.round(withScores.reduce((s, r) => s + r._score!, 0) / withScores.length)
+      : null;
     return {
-      avgRank: Math.round(avg * 10) / 10,
-      top3Pct: Math.round((top3 / filteredResults.length) * 100),
-      coverage: Math.round((ranked.length / filteredResults.length) * 100),
+      avgRank,
+      avgScore,
+      top3Pct: filteredResults.length ? Math.round((top3 / filteredResults.length) * 100) : 0,
+      coverage: filteredResults.length ? Math.round((ranked.length / filteredResults.length) * 100) : 0,
     };
   }, [filteredResults]);
 
@@ -310,6 +386,38 @@ export default function SearchGridReportPage() {
 
   function removeKeyword(kw: string) {
     setKeywords(keywords.filter((k) => k !== kw));
+  }
+
+  async function handleGridPointClick(result: SearchGridResult) {
+    if (!result.id) return;
+    setDetailLoading(true);
+    try {
+      const detail = await fetchSearchGridResultDetail(result.id);
+      setDetailPanel(detail);
+    } catch {
+      setDetailPanel(null);
+    } finally {
+      setDetailLoading(false);
+    }
+  }
+
+  async function handleTrackCompetitor(comp: AggregatedCompetitor) {
+    if (!comp.place_id || trackedIds.has(comp.place_id)) return;
+    setTrackingId(comp.place_id);
+    try {
+      await addCompetitor({
+        session_id: user?.id || getSessionId(),
+        place_id: comp.place_id,
+        name: comp.name,
+        rating: comp.rating ?? undefined,
+        review_count: comp.user_ratings_total ?? undefined,
+      });
+      setTrackedIds((prev) => new Set(prev).add(comp.place_id));
+    } catch {
+      // silently fail — user can retry
+    } finally {
+      setTrackingId(null);
+    }
   }
 
   // -------------------------------------------------------------------
@@ -413,7 +521,13 @@ export default function SearchGridReportPage() {
 
           {/* Stats */}
           {filteredResults.length > 0 && (
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="dark-card p-3 text-center">
+                <p className="text-xs text-white/50">Avg Score</p>
+                <p className="text-lg font-bold" style={{ color: scoreColor(stats.avgScore) }}>
+                  {stats.avgScore ?? "--"}
+                </p>
+              </div>
               <div className="dark-card p-3 text-center">
                 <p className="text-xs text-white/50">Avg Rank</p>
                 <p className="text-lg font-bold text-white">{stats.avgRank ?? "--"}</p>
@@ -654,8 +768,8 @@ export default function SearchGridReportPage() {
               {gridPoints.map((pt) => {
                 const key = `${pt.row}-${pt.col}`;
                 const result = resultLookup.get(key);
-                const rank = result?.rank ?? null;
-                const color = rankColor(rank);
+                const score = getScore(result);
+                const color = scoreColor(score);
 
                 return (
                   <OverlayView
@@ -679,10 +793,11 @@ export default function SearchGridReportPage() {
                         color: "#fff",
                         textShadow: "0 1px 2px rgba(0,0,0,0.5)",
                       }}
+                      onClick={() => result && handleGridPointClick(result)}
                       onMouseEnter={() => result && setHoveredPoint(result)}
                       onMouseLeave={() => setHoveredPoint(null)}
                     >
-                      {result ? rankLabel(rank) : ""}
+                      {result ? scoreLabel(score) : ""}
                     </div>
                   </OverlayView>
                 );
@@ -698,11 +813,12 @@ export default function SearchGridReportPage() {
                   <div className="text-xs text-gray-900 space-y-1 min-w-[160px]">
                     <p className="font-semibold">{hoveredPoint.keyword}</p>
                     <p>
-                      Rank:{" "}
-                      <span className="font-bold">
-                        {hoveredPoint.rank !== null ? `#${hoveredPoint.rank}` : "Not found"}
-                      </span>
+                      Score: <span className="font-bold">{scoreLabel(getScore(hoveredPoint))}</span>
+                      {hoveredPoint.rank !== null && (
+                        <span className="ml-2 text-gray-500">Rank #{hoveredPoint.rank}</span>
+                      )}
                     </p>
+                    <p className="text-gray-500">{hoveredPoint.total_results} competitors nearby</p>
                     {hoveredPoint.top_result_name && (
                       <p className="text-gray-500">Top: {hoveredPoint.top_result_name}</p>
                     )}
@@ -714,19 +830,17 @@ export default function SearchGridReportPage() {
 
           {/* Map legend */}
           <div className="absolute bottom-6 left-6 dark-card p-4 space-y-2 pointer-events-auto">
-            <p className="text-xs font-medium text-white/80">Rank Legend</p>
+            <p className="text-xs font-medium text-white/80">Score</p>
             <div className="flex items-center gap-3 text-xs">
               {[
-                { color: "#22c55e", label: "1-3" },
-                { color: "#f59e0b", label: "4-10" },
-                { color: "#ef4444", label: "11+" },
-                { color: "#6b7280", label: "N/F" },
+                { color: "#22c55e", label: "70+" },
+                { color: "#3b82f6", label: "45-69" },
+                { color: "#f59e0b", label: "25-44" },
+                { color: "#ef4444", label: "<25" },
+                { color: "#6b7280", label: "N/A" },
               ].map((item) => (
                 <div key={item.label} className="flex items-center gap-1.5">
-                  <span
-                    className="inline-block w-3 h-3 rounded-full"
-                    style={{ backgroundColor: item.color }}
-                  />
+                  <span className="inline-block w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
                   <span className="text-white/60">{item.label}</span>
                 </div>
               ))}
@@ -744,6 +858,189 @@ export default function SearchGridReportPage() {
             </div>
           )}
         </main>
+
+        {/* Detail slide-out panel */}
+        {(detailPanel || detailLoading) ? (
+          <aside className="w-[400px] flex-shrink-0 border-l border-white/10 overflow-y-auto bg-[#0a0a0a]">
+            {detailLoading ? (
+              <div className="flex items-center justify-center h-40">
+                <div className="w-5 h-5 border-2 border-white/20 border-t-white/80 rounded-full animate-spin" />
+              </div>
+            ) : detailPanel ? (
+              <div className="p-5 space-y-4">
+                {/* Header */}
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-white">{detailPanel.keyword}</p>
+                    <p className="text-xs text-white/40">
+                      Grid ({detailPanel.grid_row}, {detailPanel.grid_col}) &middot;{" "}
+                      <span className="font-medium" style={{ color: scoreColor(getScore(detailPanel)) }}>
+                        Score {scoreLabel(getScore(detailPanel))}
+                      </span>
+                      {detailPanel.rank !== null && (
+                        <span className="text-emerald-400 font-medium ml-1">&middot; Rank #{detailPanel.rank}</span>
+                      )}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setDetailPanel(null)}
+                    className="text-white/40 hover:text-white text-lg leading-none"
+                  >
+                    &times;
+                  </button>
+                </div>
+
+                {/* Nearby businesses list */}
+                {detailPanel.nearby_places && detailPanel.nearby_places.length > 0 ? (
+                  <div className="space-y-1">
+                    {(() => {
+                      const seen = new Set<string>();
+                      const unique = detailPanel.nearby_places.filter((p) => {
+                        if (seen.has(p.place_id)) return false;
+                        seen.add(p.place_id);
+                        return true;
+                      });
+                      return (
+                        <>
+                    <p className="text-xs text-white/50 font-medium mb-2">
+                      Nearby businesses ({unique.length})
+                    </p>
+                    {unique.map((place, idx) => {
+                      const isUserBiz =
+                        report?.place_id != null && place.place_id === report.place_id;
+                      const dist =
+                        place.lat != null && place.lng != null
+                          ? haversineKm(detailPanel.point_lat, detailPanel.point_lng, place.lat, place.lng)
+                          : null;
+                      return (
+                        <div
+                          key={place.place_id}
+                          className={`flex items-start gap-3 rounded-lg px-3 py-2.5 text-sm ${
+                            isUserBiz
+                              ? "bg-blue-500/15 border border-blue-500/30"
+                              : "bg-white/5 border border-transparent"
+                          }`}
+                        >
+                          <span className="text-white/40 text-xs font-mono w-5 text-right flex-shrink-0 pt-0.5">
+                            {idx + 1}
+                          </span>
+                          <div className="min-w-0 flex-1">
+                            <p className={`font-medium truncate ${isUserBiz ? "text-blue-300" : "text-white/90"}`}>
+                              {place.name}
+                            </p>
+                            <div className="flex items-center gap-2 text-xs text-white/50 mt-0.5">
+                              {place.rating != null && (
+                                <span>
+                                  {place.rating.toFixed(1)} ({place.user_ratings_total ?? 0})
+                                </span>
+                              )}
+                              {dist !== null && <span>{formatDistance(dist)}</span>}
+                            </div>
+                            {place.vicinity && (
+                              <p className="text-xs text-white/30 truncate mt-0.5">{place.vicinity}</p>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                        </>
+                      );
+                    })()}
+                  </div>
+                ) : (
+                  <p className="text-sm text-white/40">
+                    No nearby places data. Run a new analysis to populate.
+                  </p>
+                )}
+              </div>
+            ) : null}
+          </aside>
+        ) : (competitors.length > 0 || competitorsLoading) && (
+          <aside className="w-[400px] flex-shrink-0 border-l border-white/10 overflow-y-auto bg-[#0a0a0a]">
+            <div className="p-5 space-y-4">
+              <div>
+                <p className="text-sm font-medium text-white">Top Competitors</p>
+                <p className="text-xs text-white/40">
+                  {selectedKeyword === "all" ? "All keywords" : selectedKeyword}
+                  {competitors.length > 0 && ` \u00b7 ${competitors.length} businesses`}
+                </p>
+              </div>
+              {competitorsLoading ? (
+                <div className="flex items-center justify-center h-40">
+                  <div className="w-5 h-5 border-2 border-white/20 border-t-white/80 rounded-full animate-spin" />
+                </div>
+              ) : (
+                <div className="space-y-1">
+                  {competitors.map((comp, idx) => {
+                    const isUserBiz = report?.place_id != null && comp.place_id === report.place_id;
+                    const rankColor =
+                      idx < 3 ? "#22c55e" : idx < 7 ? "#3b82f6" : idx < 12 ? "#f59e0b" : "#ef4444";
+                    const isTracked = trackedIds.has(comp.place_id);
+                    const isTracking = trackingId === comp.place_id;
+                    return (
+                      <div
+                        key={comp.place_id}
+                        className={`flex items-start gap-3 rounded-lg px-3 py-2.5 text-sm ${
+                          isUserBiz
+                            ? "bg-blue-500/15 border border-blue-500/30"
+                            : "bg-white/5 border border-transparent"
+                        }`}
+                      >
+                        <div className="flex items-center gap-1.5 flex-shrink-0 pt-0.5">
+                          <span
+                            className="inline-block w-2.5 h-2.5 rounded-full"
+                            style={{ backgroundColor: rankColor }}
+                          />
+                          <span className="text-white/40 text-xs font-mono w-4 text-right">
+                            {idx + 1}
+                          </span>
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className={`font-medium truncate ${isUserBiz ? "text-blue-300" : "text-white/90"}`}>
+                            {comp.name}
+                          </p>
+                          <div className="flex items-center gap-2 text-xs text-white/50 mt-0.5 flex-wrap">
+                            <span>Avg rank {comp.avg_rank}</span>
+                            <span>
+                              seen in {comp.appearances}/{comp.total_points} points
+                            </span>
+                          </div>
+                          {comp.rating != null && (
+                            <div className="text-xs text-white/40 mt-0.5">
+                              {comp.rating.toFixed(1)} ({comp.user_ratings_total ?? 0} reviews)
+                            </div>
+                          )}
+                        </div>
+                        {!isUserBiz && (
+                          <button
+                            onClick={() => handleTrackCompetitor(comp)}
+                            disabled={isTracked || isTracking}
+                            className={`flex-shrink-0 mt-0.5 w-6 h-6 flex items-center justify-center rounded-md text-xs transition-colors ${
+                              isTracked
+                                ? "bg-emerald-500/20 text-emerald-400 cursor-default"
+                                : isTracking
+                                ? "bg-white/5 text-white/30 cursor-wait"
+                                : "bg-white/5 text-white/40 hover:bg-white/10 hover:text-white/70"
+                            }`}
+                            title={isTracked ? "Tracked" : "Track competitor"}
+                          >
+                            {isTracking ? (
+                              <span className="w-3 h-3 border border-white/30 border-t-white/70 rounded-full animate-spin" />
+                            ) : isTracked ? (
+                              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                            ) : (
+                              "+"
+                            )}
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </aside>
+        )}
       </div>
     </div>
   );

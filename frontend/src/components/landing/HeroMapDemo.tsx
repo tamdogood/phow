@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
+import { GOOGLE_MAPS_LIBRARIES, GOOGLE_MAPS_API_KEY } from "@/lib/google-maps";
 
 const mapContainerStyle = {
   width: "100%",
@@ -51,7 +52,8 @@ const DEMO_TRANSIT = [
 
 export function HeroMapDemo() {
   const { isLoaded, loadError } = useJsApiLoader({
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
+    googleMapsApiKey: GOOGLE_MAPS_API_KEY,
+    libraries: GOOGLE_MAPS_LIBRARIES,
   });
 
   const center = useMemo(() => SF_CENTER, []);

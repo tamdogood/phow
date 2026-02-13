@@ -151,6 +151,7 @@ export interface SearchGridRun {
   report_id: string;
   status: string;
   avg_rank: number | null;
+  avg_score: number | null;
   top3_pct: number | null;
   points_completed: number;
   points_total: number;
@@ -159,6 +160,7 @@ export interface SearchGridRun {
 }
 
 export interface SearchGridResult {
+  id: string;
   keyword: string;
   grid_row: number;
   grid_col: number;
@@ -167,6 +169,32 @@ export interface SearchGridResult {
   rank: number | null;
   total_results: number;
   top_result_name: string | null;
+  score: number | null;
+}
+
+export interface NearbyPlace {
+  name: string;
+  place_id: string;
+  rating: number | null;
+  user_ratings_total: number | null;
+  vicinity: string | null;
+  lat: number | null;
+  lng: number | null;
+  business_status: string | null;
+}
+
+export interface SearchGridResultDetail extends SearchGridResult {
+  nearby_places: NearbyPlace[] | null;
+}
+
+export interface AggregatedCompetitor {
+  name: string;
+  place_id: string;
+  avg_rank: number;
+  appearances: number;
+  total_points: number;
+  rating: number | null;
+  user_ratings_total: number | null;
 }
 
 export interface SearchGridReportWithResults extends SearchGridReport {

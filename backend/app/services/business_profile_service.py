@@ -48,11 +48,17 @@ class BusinessProfileService:
         user_id: str | None = None,
     ) -> dict[str, Any]:
         """Create a new business profile or update existing one for session/user."""
-        # Geocode address if coordinates not provided
+        # If place_id provided but no coords, resolve via find_place or geocode
+        if location_place_id and not (location_lat and location_lng) and location_address:
+            location_lat, location_lng, _ = await self._geocode_address(location_address)
+
+        # Geocode address if coordinates still not provided
         if location_address and not (location_lat and location_lng):
-            location_lat, location_lng, location_place_id = await self._geocode_address(
+            location_lat, location_lng, geo_place_id = await self._geocode_address(
                 location_address
             )
+            if not location_place_id:
+                location_place_id = geo_place_id
 
         # Check if profile already exists - try user_id first, then session_id
         existing = None

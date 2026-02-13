@@ -163,3 +163,11 @@ class SearchGridService:
 
     async def get_runs(self, report_id: str, limit: int = 10) -> list[dict[str, Any]]:
         return await self.repo.get_runs(report_id, limit)
+
+    async def get_result_detail(self, result_id: str) -> dict[str, Any] | None:
+        return await self.repo.get_result_detail(result_id)
+
+    async def get_aggregated_competitors(
+        self, run_id: str, keyword: str | None = None
+    ) -> list[dict[str, Any]]:
+        return await self.repo.get_aggregated_competitors(run_id, keyword)

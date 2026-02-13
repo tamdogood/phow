@@ -22,6 +22,7 @@ import {
   SearchGridReportWithResults,
   SearchGridResult,
 } from "@/types";
+import { GOOGLE_MAPS_LIBRARIES, GOOGLE_MAPS_API_KEY } from "@/lib/google-maps";
 
 function calculateGridPoints(
   centerLat: number,
@@ -149,7 +150,8 @@ export default function SearchGridPage() {
   const [error, setError] = useState<string | null>(null);
 
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
+    googleMapsApiKey: GOOGLE_MAPS_API_KEY,
+    libraries: GOOGLE_MAPS_LIBRARIES,
   });
 
   const keywords = useMemo(

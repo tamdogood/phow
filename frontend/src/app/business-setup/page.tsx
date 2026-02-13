@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useJsApiLoader } from "@react-google-maps/api";
 import { getSessionId } from "@/lib/session";
-import { saveBusinessProfile, getBusinessProfile } from "@/lib/api";
+import { saveBusinessProfile, getBusinessProfile, resolveMapsUrl } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
+import { GOOGLE_MAPS_LIBRARIES, GOOGLE_MAPS_API_KEY } from "@/lib/google-maps";
 
 const BUSINESS_TYPES = [
   { value: "coffee_shop", label: "Coffee Shop" },
@@ -37,6 +39,20 @@ export default function BusinessSetupPage() {
   const [error, setError] = useState<string | null>(null);
   const [step, setStep] = useState(0);
 
+  // Place input state
+  const [locationMode, setLocationMode] = useState<"search" | "url">("search");
+  const [placeId, setPlaceId] = useState<string | null>(null);
+  const [placeName, setPlaceName] = useState<string | null>(null);
+  const [mapsUrl, setMapsUrl] = useState("");
+  const [resolving, setResolving] = useState(false);
+  const [resolveError, setResolveError] = useState<string | null>(null);
+  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
+
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: GOOGLE_MAPS_API_KEY,
+    libraries: GOOGLE_MAPS_LIBRARIES,
+  });
+
   const [formData, setFormData] = useState({
     business_name: "",
     business_type: "",
@@ -46,6 +62,40 @@ export default function BusinessSetupPage() {
     num_locations: "1",
     goals: [] as string[],
   });
+
+  // Callback ref: attaches Autocomplete when the input mounts
+  const autocompleteInputRef = useCallback(
+    (node: HTMLInputElement | null) => {
+      if (!node || !isLoaded) return;
+      // Avoid re-attaching to the same element
+      if (autocompleteRef.current) return;
+      const ac = new google.maps.places.Autocomplete(node, {
+        types: ["establishment"],
+        fields: ["place_id", "name", "formatted_address"],
+      });
+      ac.addListener("place_changed", () => {
+        const place = ac.getPlace();
+        if (place.place_id) {
+          setPlaceId(place.place_id);
+          setPlaceName(place.name || null);
+          setFormData((prev) => ({
+            ...prev,
+            location_address: place.formatted_address || place.name || "",
+            business_name: prev.business_name || place.name || "",
+          }));
+        }
+      });
+      autocompleteRef.current = ac;
+    },
+    [isLoaded]
+  );
+
+  // Clear autocomplete instance when switching to URL mode
+  useEffect(() => {
+    if (locationMode === "url") {
+      autocompleteRef.current = null;
+    }
+  }, [locationMode]);
 
   useEffect(() => {
     async function loadProfile() {
@@ -70,6 +120,10 @@ export default function BusinessSetupPage() {
             target_customers: profile.target_customers || "",
             business_description: profile.business_description || "",
           }));
+          if (profile.location_place_id) {
+            setPlaceId(profile.location_place_id);
+            setPlaceName(profile.business_name || null);
+          }
         }
       } catch {
         // Ignore
@@ -79,6 +133,30 @@ export default function BusinessSetupPage() {
     }
     loadProfile();
   }, [user, authLoading]);
+
+  const handleResolveUrl = async () => {
+    if (!mapsUrl.trim()) return;
+    setResolving(true);
+    setResolveError(null);
+    try {
+      const place = await resolveMapsUrl(mapsUrl.trim());
+      if (place.place_id) {
+        setPlaceId(place.place_id);
+        setPlaceName(place.name || null);
+        setFormData((prev) => ({
+          ...prev,
+          location_address: place.name || `${place.lat}, ${place.lng}`,
+          business_name: prev.business_name || place.name || "",
+        }));
+      } else {
+        setResolveError("Could not find a business at this URL. Try searching instead.");
+      }
+    } catch {
+      setResolveError("Failed to resolve URL. Check the link and try again.");
+    } finally {
+      setResolving(false);
+    }
+  };
 
   const handleSubmit = async () => {
     setError(null);
@@ -91,6 +169,7 @@ export default function BusinessSetupPage() {
         business_name: formData.business_name,
         business_type: formData.business_type,
         location_address: formData.location_address,
+        google_maps_place_id: placeId || undefined,
         target_customers: formData.target_customers || undefined,
         business_description: formData.business_description || undefined,
       });
@@ -119,7 +198,7 @@ export default function BusinessSetupPage() {
 
   const canAdvance =
     step === 0
-      ? formData.business_name && formData.business_type && formData.location_address
+      ? formData.business_name && formData.business_type && placeId
       : true;
 
   const handleNext = () => {
@@ -176,7 +255,94 @@ export default function BusinessSetupPage() {
             {step === 0 && (
               <div className="space-y-5">
                 <h2 className="text-xl font-bold text-white">Business Info</h2>
-                <p className="text-white/50 text-sm">Tell us the basics about your business.</p>
+                <p className="text-white/50 text-sm">Find your business on Google Maps so we can track your rankings.</p>
+
+                {/* Location mode toggle */}
+                <div>
+                  <label className="block text-sm font-medium text-white/70 mb-2">
+                    Find Your Business *
+                  </label>
+                  <div className="flex gap-2 mb-3">
+                    <button
+                      type="button"
+                      onClick={() => { setLocationMode("search"); setResolveError(null); }}
+                      className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-colors border ${
+                        locationMode === "search"
+                          ? "bg-blue-500/20 border-blue-500/50 text-blue-400"
+                          : "bg-white/5 border-white/10 text-white/50 hover:bg-white/10"
+                      }`}
+                    >
+                      Search
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setLocationMode("url"); setResolveError(null); }}
+                      className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-colors border ${
+                        locationMode === "url"
+                          ? "bg-blue-500/20 border-blue-500/50 text-blue-400"
+                          : "bg-white/5 border-white/10 text-white/50 hover:bg-white/10"
+                      }`}
+                    >
+                      Paste Google Maps link
+                    </button>
+                  </div>
+
+                  {locationMode === "search" ? (
+                    <input
+                      ref={autocompleteInputRef}
+                      type="text"
+                      placeholder="Search for your business on Google Maps..."
+                      className={inputClass}
+                      defaultValue={placeName || formData.location_address || ""}
+                    />
+                  ) : (
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={mapsUrl}
+                        onChange={(e) => setMapsUrl(e.target.value)}
+                        placeholder="https://maps.app.goo.gl/... or Google Maps URL"
+                        className={`flex-1 ${inputClass}`}
+                        onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleResolveUrl())}
+                      />
+                      <button
+                        type="button"
+                        onClick={handleResolveUrl}
+                        disabled={resolving || !mapsUrl.trim()}
+                        className="px-4 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-sm font-medium transition-colors"
+                      >
+                        {resolving ? "..." : "Resolve"}
+                      </button>
+                    </div>
+                  )}
+
+                  {resolveError && (
+                    <p className="text-xs text-red-400 mt-1">{resolveError}</p>
+                  )}
+
+                  {/* Selected place indicator */}
+                  {placeId && (
+                    <div className="mt-2 flex items-center gap-2 px-3 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+                      <span className="text-emerald-400 text-xs font-medium">Verified</span>
+                      <span className="text-white/70 text-xs truncate">
+                        {placeName || formData.location_address}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => { setPlaceId(null); setPlaceName(null); }}
+                        className="ml-auto text-white/40 hover:text-white/80 text-xs"
+                      >
+                        Clear
+                      </button>
+                    </div>
+                  )}
+
+                  {!placeId && (
+                    <p className="text-xs text-white/30 mt-1">
+                      Select your business from the search results to verify your Google Maps listing.
+                    </p>
+                  )}
+                </div>
 
                 <div>
                   <label htmlFor="business_name" className="block text-sm font-medium text-white/70 mb-1">
@@ -213,22 +379,6 @@ export default function BusinessSetupPage() {
                       </option>
                     ))}
                   </select>
-                </div>
-
-                <div>
-                  <label htmlFor="location_address" className="block text-sm font-medium text-white/70 mb-1">
-                    Business Address *
-                  </label>
-                  <input
-                    type="text"
-                    id="location_address"
-                    name="location_address"
-                    value={formData.location_address}
-                    onChange={handleChange}
-                    required
-                    className={inputClass}
-                    placeholder="e.g., 123 Main St, Austin, TX"
-                  />
                 </div>
               </div>
             )}

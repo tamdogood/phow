@@ -1,3 +1,4 @@
+import re
 import httpx
 from typing import Any
 from ...core.cache import cached
@@ -20,7 +21,7 @@ class GoogleMapsClient:
     async def geocode(self, address: str) -> dict[str, Any] | None:
         """Convert an address to coordinates."""
         logger.info("Geocoding address", address=address)
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=30.0) as client:
             response = await client.get(
                 f"{self.BASE_URL}/geocode/json",
                 params={"address": address, "key": self.api_key},
@@ -69,7 +70,7 @@ class GoogleMapsClient:
         if keyword:
             params["keyword"] = keyword
 
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=30.0) as client:
             response = await client.get(
                 f"{self.BASE_URL}/place/nearbysearch/json",
                 params=params,
@@ -86,6 +87,8 @@ class GoogleMapsClient:
                     "rating": place.get("rating"),
                     "user_ratings_total": place.get("user_ratings_total"),
                     "vicinity": place.get("vicinity"),
+                    "lat": place.get("geometry", {}).get("location", {}).get("lat"),
+                    "lng": place.get("geometry", {}).get("location", {}).get("lng"),
                     "price_level": place.get("price_level"),
                     "business_status": place.get("business_status"),
                 }
@@ -100,7 +103,7 @@ class GoogleMapsClient:
     async def find_place(self, query: str, lat: float, lng: float) -> dict[str, Any] | None:
         """Find a specific business by name near a location. Returns the place_id of the listing."""
         logger.info("Find place", query=query, lat=lat, lng=lng)
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=30.0) as client:
             response = await client.get(
                 f"{self.BASE_URL}/place/findplacefromtext/json",
                 params={
@@ -137,7 +140,7 @@ class GoogleMapsClient:
             "current_opening_hours",
         ]
 
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=30.0) as client:
             response = await client.get(
                 f"{self.BASE_URL}/place/details/json",
                 params={
@@ -195,6 +198,43 @@ class GoogleMapsClient:
             )
 
         return result
+
+    async def resolve_maps_url(self, url: str) -> dict[str, Any] | None:
+        """Resolve a Google Maps URL (including short URLs) to place details.
+
+        Follows redirects, extracts place name + coordinates, and calls find_place.
+        """
+        logger.info("Resolving Google Maps URL", url=url)
+        try:
+            async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
+                response = await client.get(url)
+                expanded = str(response.url)
+        except Exception as e:
+            logger.warning("Failed to follow Maps URL", url=url, error=str(e))
+            return None
+
+        # Try extracting coordinates from the expanded URL
+        # Patterns: /@lat,lng  or !3dlat!4dlng or center=lat,lng
+        coord_match = re.search(r"/@(-?\d+\.\d+),(-?\d+\.\d+)", expanded)
+        if not coord_match:
+            coord_match = re.search(r"!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)", expanded)
+        if not coord_match:
+            logger.warning("Could not extract coordinates from Maps URL", expanded=expanded)
+            return None
+
+        lat, lng = float(coord_match.group(1)), float(coord_match.group(2))
+
+        # Try to extract place name from /place/NAME/ pattern
+        place_match = re.search(r"/place/([^/@]+)", expanded)
+        query = place_match.group(1).replace("+", " ") if place_match else ""
+
+        if query:
+            found = await self.find_place(query, lat, lng)
+            if found:
+                return {**found, "lat": lat, "lng": lng}
+
+        # Fallback: reverse geocode or return coordinates
+        return {"lat": lat, "lng": lng, "place_id": None, "name": query or None}
 
     def _parse_opening_periods(self, periods: list[dict]) -> dict[str, Any]:
         """Parse opening periods into hours by day."""

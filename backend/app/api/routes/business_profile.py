@@ -5,6 +5,7 @@ from supabase import Client
 from ..deps import get_supabase
 from ...services.business_profile_service import BusinessProfileService
 from ...repositories.business_profile_repository import TrackedCompetitorRepository
+from ...tools.location_scout.google_maps import GoogleMapsClient
 
 router = APIRouter(prefix="/business-profile", tags=["business-profile"])
 
@@ -15,6 +16,7 @@ class BusinessProfileRequest(BaseModel):
     business_name: str
     business_type: str
     location_address: str
+    google_maps_place_id: str | None = None
     target_customers: str | None = None
     business_description: str | None = None
 
@@ -36,6 +38,7 @@ async def save_profile(
         business_description=request.business_description,
         target_customers=request.target_customers,
         location_address=request.location_address,
+        location_place_id=request.google_maps_place_id,
         user_id=request.user_id,
     )
     return {"profile": profile}
@@ -62,6 +65,27 @@ async def get_profile(
     return {"profile": profile}
 
 
+class ResolveMapsUrlRequest(BaseModel):
+    url: str
+
+
+@router.post("/resolve-maps-url")
+async def resolve_maps_url(request: ResolveMapsUrlRequest):
+    """Resolve a Google Maps URL to place details."""
+    maps = GoogleMapsClient()
+    result = await maps.resolve_maps_url(request.url)
+    if not result:
+        raise HTTPException(status_code=400, detail="Could not resolve Google Maps URL")
+    # If we got a place_id, fetch full details
+    if result.get("place_id"):
+        details = await maps.get_place_details(result["place_id"])
+        if details:
+            result["name"] = details.get("name", result.get("name"))
+            result["rating"] = details.get("rating")
+            result["user_ratings_total"] = details.get("user_ratings_total")
+    return {"place": result}
+
+
 @router.delete("")
 async def delete_profile(
     session_id: str,
@@ -78,6 +102,7 @@ async def delete_profile(
 class AddCompetitorRequest(BaseModel):
     session_id: str
     name: str
+    place_id: str | None = None
     address: str | None = None
     rating: float | None = None
     review_count: int | None = None
@@ -103,8 +128,7 @@ async def add_competitor(
     if not profile:
         raise HTTPException(status_code=404, detail="Business profile not found")
 
-    # Generate a unique place_id for manually added competitors
-    place_id = f"manual-{uuid.uuid4()}"
+    place_id = request.place_id or f"manual-{uuid.uuid4()}"
 
     competitor = await competitor_repo.add_competitor(
         business_profile_id=profile["id"],

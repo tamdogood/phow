@@ -115,6 +115,17 @@ async def trigger_run(
         raise HTTPException(status_code=404, detail=str(e))
 
 
+@router.get("/results/{result_id}")
+async def get_result_detail(
+    result_id: str,
+    service: SearchGridService = Depends(get_search_grid_service),
+):
+    result = await service.get_result_detail(result_id)
+    if not result:
+        raise HTTPException(status_code=404, detail="Result not found")
+    return {"result": result}
+
+
 @router.get("/runs/{run_id}/results")
 async def get_run_results(
     run_id: str,
@@ -123,3 +134,13 @@ async def get_run_results(
 ):
     results = await service.get_run_results(run_id, keyword)
     return {"results": results}
+
+
+@router.get("/runs/{run_id}/competitors")
+async def get_run_competitors(
+    run_id: str,
+    keyword: str | None = None,
+    service: SearchGridService = Depends(get_search_grid_service),
+):
+    competitors = await service.get_aggregated_competitors(run_id, keyword)
+    return {"competitors": competitors}
