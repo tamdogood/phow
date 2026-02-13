@@ -125,3 +125,108 @@ export interface PostComment {
 export interface PostWithComments extends CommunityPost {
   comments: PostComment[];
 }
+
+export type ReviewSource = "google" | "yelp" | "meta";
+
+export interface ReviewSentiment {
+  sentiment_label: "positive" | "neutral" | "negative";
+  sentiment_score: number;
+  themes: string[];
+}
+
+export interface Review {
+  id: string;
+  source: ReviewSource;
+  external_review_id: string;
+  external_url: string | null;
+  reviewer_name: string | null;
+  rating: number;
+  title: string | null;
+  content: string | null;
+  review_created_at: string | null;
+  reply_status: "unreplied" | "replied";
+  response_published_at: string | null;
+  sentiment?: ReviewSentiment | null;
+}
+
+export interface ReviewResponseDraft {
+  id: string;
+  review_id: string;
+  tone: "professional" | "friendly" | "apologetic";
+  draft_text: string;
+  edited_text: string | null;
+  status: string;
+}
+
+export interface ReviewConnection {
+  source: ReviewSource;
+  status: "disconnected" | "pending" | "connected";
+  connected_at: string | null;
+  last_synced_at: string | null;
+  last_error: string | null;
+  has_refresh_token: boolean;
+  metadata: Record<string, unknown>;
+}
+
+export interface ReviewNotification {
+  id: string;
+  review_id: string | null;
+  type: string;
+  title: string;
+  body: string;
+  is_read: boolean;
+  created_at: string;
+}
+
+export interface AlertSettings {
+  low_rating_threshold: number;
+  instant_low_rating_enabled: boolean;
+  daily_digest_enabled: boolean;
+}
+
+export interface ReviewAnalyticsSummary {
+  window_days: number;
+  total_reviews: number;
+  replied_reviews: number;
+  response_rate: number;
+  avg_rating: number;
+  sentiment_distribution: Record<string, number>;
+}
+
+export interface ReviewTrendPoint {
+  date: string;
+  review_count: number;
+  avg_rating: number;
+  positive_count: number;
+  negative_count: number;
+}
+
+export interface ThemeMetric {
+  theme: string;
+  count: number;
+}
+
+export interface PlatformMetric {
+  source: ReviewSource | string;
+  review_count: number;
+  avg_rating: number;
+  response_rate: number;
+}
+
+export interface CompetitorComparison {
+  id: string;
+  name: string;
+  rating: number | null;
+  review_count: number | null;
+  price_level: number | null;
+  address: string | null;
+}
+
+export interface UsageSummary {
+  plan: string;
+  monthly_limit: number;
+  used: number;
+  remaining: number;
+  over_limit: boolean;
+  period_start: string;
+}

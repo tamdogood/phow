@@ -1,7 +1,8 @@
 from fastapi import Depends
 from supabase import create_client, Client
 from ..core.config import get_settings
-from ..services import ChatService, TrackingService
+from ..services.chat_service import ChatService
+from ..services.tracking_service import TrackingService
 from ..core.cache import get_cache, CacheManager
 
 _supabase_client: Client | None = None

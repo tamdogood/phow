@@ -1,5 +1,3 @@
-"""Market Research Tool - Unified tool combining Location Scout, Market Validator, and Competitor Analyzer."""
+"""Market Research package."""
 
-from .tool import MarketResearchTool
-
-__all__ = ["MarketResearchTool"]
+__all__ = []

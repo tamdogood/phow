@@ -5,7 +5,12 @@ import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { ChatMessage } from "@/components/chat/ChatMessage";
 import { ChatInput } from "@/components/chat/ChatInput";
-import { sendChatMessage, fetchConversations, updateConversationTitle } from "@/lib/api";
+import {
+  sendChatMessage,
+  fetchConversations,
+  updateConversationTitle,
+  fetchTools as fetchAvailableTools,
+} from "@/lib/api";
 import { getSessionId } from "@/lib/session";
 import { Conversation } from "@/types";
 
@@ -89,20 +94,15 @@ export default function AppPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    async function fetchTools() {
+    async function loadTools() {
       try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/tools`
-        );
-        if (response.ok) {
-          const data = await response.json();
-          setTools(data);
-        }
+        const data = await fetchAvailableTools();
+        setTools(data);
       } catch (error) {
         console.error("Failed to fetch tools:", error);
       }
     }
-    fetchTools();
+    loadTools();
   }, []);
 
   const loadConversations = useCallback(async () => {
@@ -284,6 +284,12 @@ export default function AppPage() {
                       className="px-4 py-2 text-white/70 hover:text-white text-sm font-medium transition-colors"
                     >
                       Dashboard
+                    </Link>
+                    <Link
+                      href="/reputation"
+                      className="px-4 py-2 text-white/70 hover:text-white text-sm font-medium transition-colors"
+                    >
+                      Reputation
                     </Link>
                     <Link
                       href="/profile"

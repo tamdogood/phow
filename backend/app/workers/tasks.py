@@ -425,4 +425,14 @@ celery_app.conf.beat_schedule = {
         "schedule": 86400,  # Every 24 hours
         "options": {"queue": "maintenance"},
     },
+    "sync-reviews-15-min": {
+        "task": "app.workers.reputation_tasks.sync_reviews_all_profiles",
+        "schedule": 900,
+        "options": {"queue": "maintenance"},
+    },
+    "refresh-google-tokens-10-min": {
+        "task": "app.workers.reputation_tasks.refresh_google_tokens",
+        "schedule": 600,
+        "options": {"queue": "maintenance"},
+    },
 }

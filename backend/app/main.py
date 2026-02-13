@@ -7,14 +7,15 @@ from .api.routes import (
     business_profile_router,
     dashboard_router,
     community_router,
+    reviews_router,
 )
 from .core.tool_registry import ToolRegistry
 from .core.cache import get_cache
 from .core.logging import setup_logging, get_logger
-from .tools.market_research import MarketResearchTool
-from .tools.social_media_coach import SocialMediaCoachTool
-from .tools.review_responder import ReviewResponderTool
-from .tools.business_advisor import BusinessAdvisorTool
+from .tools.market_research.tool import MarketResearchTool
+from .tools.social_media_coach.tool import SocialMediaCoachTool
+from .tools.review_responder.tool import ReviewResponderTool
+from .tools.business_advisor.tool import BusinessAdvisorTool
 
 logger = get_logger("main")
 
@@ -68,6 +69,7 @@ app.include_router(tools_router, prefix="/api")
 app.include_router(business_profile_router, prefix="/api")
 app.include_router(dashboard_router, prefix="/api")
 app.include_router(community_router, prefix="/api")
+app.include_router(reviews_router, prefix="/api")
 
 
 @app.get("/")

@@ -44,6 +44,25 @@ class Settings(BaseSettings):
     celery_broker_url: str = "redis://localhost:6379/1"
     celery_result_backend: str = "redis://localhost:6379/2"
 
+    # Reputation Hub Feature Flags
+    reputation_hub_enabled: bool = True
+    reputation_live_connectors_enabled: bool = True
+    reputation_oauth_enabled: bool = True
+
+    # Reputation Hub Security
+    reputation_token_encryption_key: str = ""
+
+    # Reputation Hub OAuth/Connector Config
+    google_oauth_client_id: str = ""
+    google_oauth_client_secret: str = ""
+    google_oauth_redirect_uri: str = ""
+    google_business_account_id: str = ""
+    google_business_location_id: str = ""
+    yelp_business_id: str = ""
+
+    # Reputation Hub Usage/Plan defaults
+    reputation_default_plan: str = "starter"
+
     # App settings
     debug: bool = False
     environment: str = "development"

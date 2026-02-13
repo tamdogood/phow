@@ -2,7 +2,7 @@ import json
 from fastapi import APIRouter, Depends
 from sse_starlette.sse import EventSourceResponse
 from ...models.chat import ChatRequest
-from ...services import ChatService
+from ...services.chat_service import ChatService
 from ..deps import get_chat_service
 
 router = APIRouter(prefix="/chat", tags=["chat"])

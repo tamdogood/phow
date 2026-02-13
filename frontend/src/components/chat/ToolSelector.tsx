@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { fetchTools } from "@/lib/api";
 
 interface Tool {
   id: string;
@@ -30,22 +31,17 @@ export function ToolSelector({ onSelectTool, selectedToolId }: ToolSelectorProps
   const [hoveredTool, setHoveredTool] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchTools() {
+    async function loadTools() {
       try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/tools`
-        );
-        if (response.ok) {
-          const data = await response.json();
-          setTools(data);
-        }
+        const data = await fetchTools();
+        setTools(data);
       } catch (error) {
         console.error("Failed to fetch tools:", error);
       } finally {
         setLoading(false);
       }
     }
-    fetchTools();
+    loadTools();
   }, []);
 
   if (loading) {

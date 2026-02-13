@@ -29,6 +29,7 @@ sse-starlette>=2.0.0
 # Utilities
 tenacity>=8.2.0  # Retry logic
 structlog>=24.1.0  # Better logging
+cryptography>=42.0.0
 numpy<2  # Required for torch/transformers compatibility
 
 # Location Intelligence & RAG

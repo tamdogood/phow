@@ -1,5 +1,3 @@
-"""Review Responder tool for generating responses to customer reviews."""
+"""Review Responder package."""
 
-from .tool import ReviewResponderTool
-
-__all__ = ["ReviewResponderTool"]
+__all__ = []

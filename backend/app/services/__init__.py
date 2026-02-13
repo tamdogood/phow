@@ -1,5 +1,3 @@
-from .chat_service import ChatService
-from .tracking_service import TrackingService
-from .community_service import CommunityService
+"""Service package exports are intentionally lazy to avoid heavy import side effects."""
 
-__all__ = ["ChatService", "TrackingService", "CommunityService"]
+__all__ = []

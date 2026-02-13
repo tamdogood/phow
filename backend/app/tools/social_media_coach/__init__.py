@@ -1,5 +1,3 @@
-"""Social Media Coach tool for generating social media content."""
+"""Social Media Coach package."""
 
-from .tool import SocialMediaCoachTool
-
-__all__ = ["SocialMediaCoachTool"]
+__all__ = []
