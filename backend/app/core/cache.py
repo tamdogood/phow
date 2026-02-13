@@ -111,20 +111,27 @@ def cached(ttl: int | None = None, key_prefix: str = ""):
         async def wrapper(*args, **kwargs):
             cache = get_cache()
 
-            # Generate cache key
+            # Skip self/cls for bound methods
+            cache_args = args[1:] if args and hasattr(args[0], func.__name__) else args
             key_parts = [key_prefix or func.__name__]
-            key_parts.extend(str(arg) for arg in args)
+            key_parts.extend(str(arg) for arg in cache_args)
             key_parts.extend(f"{k}:{v}" for k, v in sorted(kwargs.items()))
             cache_key = ":".join(key_parts)
 
-            # Try to get from cache
-            cached_value = await cache.get(cache_key)
-            if cached_value is not None:
-                return cached_value
+            try:
+                cached_value = await cache.get(cache_key)
+                if cached_value is not None:
+                    return cached_value
+            except Exception:
+                pass
 
-            # Execute function and cache result
             result = await func(*args, **kwargs)
-            await cache.set(cache_key, result, ttl)
+
+            try:
+                await cache.set(cache_key, result, ttl)
+            except Exception:
+                pass
+
             return result
 
         return wrapper

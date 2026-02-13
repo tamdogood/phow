@@ -31,6 +31,9 @@ export interface BusinessProfile {
   business_description: string | null;
   target_customers: string | null;
   location_address: string | null;
+  location_lat: number | null;
+  location_lng: number | null;
+  location_place_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -124,4 +127,49 @@ export interface PostComment {
 
 export interface PostWithComments extends CommunityPost {
   comments: PostComment[];
+}
+
+export interface SearchGridReport {
+  id: string;
+  business_profile_id: string;
+  name: string;
+  center_lat: number;
+  center_lng: number;
+  center_address: string | null;
+  place_id: string | null;
+  radius_km: number;
+  grid_size: number;
+  keywords: string[];
+  frequency: string;
+  status: string;
+  last_run_at: string | null;
+  created_at: string;
+}
+
+export interface SearchGridRun {
+  id: string;
+  report_id: string;
+  status: string;
+  avg_rank: number | null;
+  top3_pct: number | null;
+  points_completed: number;
+  points_total: number;
+  started_at: string;
+  completed_at: string | null;
+}
+
+export interface SearchGridResult {
+  keyword: string;
+  grid_row: number;
+  grid_col: number;
+  point_lat: number;
+  point_lng: number;
+  rank: number | null;
+  total_results: number;
+  top_result_name: string | null;
+}
+
+export interface SearchGridReportWithResults extends SearchGridReport {
+  latest_run: SearchGridRun | null;
+  results: SearchGridResult[];
 }

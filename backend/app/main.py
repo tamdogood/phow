@@ -7,6 +7,7 @@ from .api.routes import (
     business_profile_router,
     dashboard_router,
     community_router,
+    search_grid_router,
 )
 from .core.tool_registry import ToolRegistry
 from .core.cache import get_cache
@@ -68,6 +69,7 @@ app.include_router(tools_router, prefix="/api")
 app.include_router(business_profile_router, prefix="/api")
 app.include_router(dashboard_router, prefix="/api")
 app.include_router(community_router, prefix="/api")
+app.include_router(search_grid_router, prefix="/api")
 
 
 @app.get("/")

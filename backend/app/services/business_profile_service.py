@@ -8,6 +8,7 @@ from ..repositories.business_profile_repository import (
     MarketAnalysisRepository,
     CompetitorAnalysisRepository,
 )
+from ..tools.location_scout.google_maps import GoogleMapsClient
 from ..core.logging import get_logger
 
 logger = get_logger("business_profile")
@@ -21,6 +22,17 @@ class BusinessProfileService:
         self.competitor_repo = TrackedCompetitorRepository(db)
         self.market_repo = MarketAnalysisRepository(db)
         self.competitor_analysis_repo = CompetitorAnalysisRepository(db)
+        self.maps = GoogleMapsClient()
+
+    async def _geocode_address(self, address: str) -> tuple[float | None, float | None, str | None]:
+        """Geocode an address, returning (lat, lng, place_id) or (None, None, None)."""
+        try:
+            geo = await self.maps.geocode(address)
+            if geo:
+                return geo["lat"], geo["lng"], geo.get("place_id")
+        except Exception:
+            logger.warning("Geocoding failed for address", address=address)
+        return None, None, None
 
     async def create_or_update_profile(
         self,
@@ -36,6 +48,12 @@ class BusinessProfileService:
         user_id: str | None = None,
     ) -> dict[str, Any]:
         """Create a new business profile or update existing one for session/user."""
+        # Geocode address if coordinates not provided
+        if location_address and not (location_lat and location_lng):
+            location_lat, location_lng, location_place_id = await self._geocode_address(
+                location_address
+            )
+
         # Check if profile already exists - try user_id first, then session_id
         existing = None
         if user_id:

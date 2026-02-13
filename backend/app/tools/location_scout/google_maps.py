@@ -11,26 +11,20 @@ class GoogleMapsClient:
     """Client for Google Maps API."""
 
     BASE_URL = "https://maps.googleapis.com/maps/api"
-    _client: httpx.AsyncClient | None = None
 
     def __init__(self):
         settings = get_settings()
         self.api_key = settings.google_maps_api_key
 
-    def _get_client(self) -> httpx.AsyncClient:
-        """Get or create a reusable httpx client."""
-        if GoogleMapsClient._client is None:
-            GoogleMapsClient._client = httpx.AsyncClient()
-        return GoogleMapsClient._client
-
     @cached(ttl=7200, key_prefix="geocode")  # Cache for 2 hours - addresses don't change
     async def geocode(self, address: str) -> dict[str, Any] | None:
         """Convert an address to coordinates."""
         logger.info("Geocoding address", address=address)
-        response = await self._get_client().get(
-            f"{self.BASE_URL}/geocode/json",
-            params={"address": address, "key": self.api_key},
-        )
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"{self.BASE_URL}/geocode/json",
+                params={"address": address, "key": self.api_key},
+            )
         data = response.json()
         logger.debug("Geocode API response", status=data["status"])
 
@@ -75,10 +69,11 @@ class GoogleMapsClient:
         if keyword:
             params["keyword"] = keyword
 
-        response = await self._get_client().get(
-            f"{self.BASE_URL}/place/nearbysearch/json",
-            params=params,
-        )
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"{self.BASE_URL}/place/nearbysearch/json",
+                params=params,
+            )
         data = response.json()
         logger.debug("Nearby search API response", status=data["status"])
 
@@ -101,6 +96,31 @@ class GoogleMapsClient:
         logger.warning("Nearby search returned no results", status=data["status"])
         return []
 
+    @cached(ttl=7200, key_prefix="find_place")
+    async def find_place(self, query: str, lat: float, lng: float) -> dict[str, Any] | None:
+        """Find a specific business by name near a location. Returns the place_id of the listing."""
+        logger.info("Find place", query=query, lat=lat, lng=lng)
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"{self.BASE_URL}/place/findplacefromtext/json",
+                params={
+                    "input": query,
+                    "inputtype": "textquery",
+                    "locationbias": f"circle:5000@{lat},{lng}",
+                    "fields": "place_id,name,formatted_address",
+                    "key": self.api_key,
+                },
+            )
+        data = response.json()
+        if data.get("status") == "OK" and data.get("candidates"):
+            candidate = data["candidates"][0]
+            logger.info(
+                "Find place successful", place_id=candidate["place_id"], name=candidate.get("name")
+            )
+            return candidate
+        logger.warning("Find place failed", status=data.get("status"), query=query)
+        return None
+
     @cached(ttl=3600, key_prefix="place_detail")  # Cache for 1 hour - hours/reviews update
     async def get_place_details(self, place_id: str) -> dict[str, Any] | None:
         """Get detailed information about a place."""
@@ -117,14 +137,15 @@ class GoogleMapsClient:
             "current_opening_hours",
         ]
 
-        response = await self._get_client().get(
-            f"{self.BASE_URL}/place/details/json",
-            params={
-                "place_id": place_id,
-                "fields": ",".join(fields),
-                "key": self.api_key,
-            },
-        )
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"{self.BASE_URL}/place/details/json",
+                params={
+                    "place_id": place_id,
+                    "fields": ",".join(fields),
+                    "key": self.api_key,
+                },
+            )
         data = response.json()
         logger.debug("Place details API response", status=data["status"])
 

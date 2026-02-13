@@ -3,9 +3,9 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
-import { getDashboard, getCommunityFeed, triggerDashboardAnalysis, deleteCompetitor } from "@/lib/api";
+import { getDashboard, getCommunityFeed, triggerDashboardAnalysis, deleteCompetitor, fetchSearchGridReports } from "@/lib/api";
 import { getSessionId } from "@/lib/session";
-import { DashboardData, TrackedCompetitor, CommunityPost } from "@/types";
+import { DashboardData, TrackedCompetitor, CommunityPost, SearchGridReport } from "@/types";
 import { CommunityWidget } from "@/components/dashboard/CommunityWidget";
 import { AddCompetitorModal } from "@/components/dashboard/AddCompetitorModal";
 
@@ -233,6 +233,7 @@ export default function DashboardPage() {
   const [communityLoading, setCommunityLoading] = useState(true);
   const [analyzing, setAnalyzing] = useState(false);
   const [showAddCompetitor, setShowAddCompetitor] = useState(false);
+  const [gridReports, setGridReports] = useState<(SearchGridReport & { avg_rank?: number | null; top3_pct?: number | null; run_status?: string | null })[]>([]);
 
   const refreshDashboard = useCallback(async () => {
     const sessionId = getSessionId();
@@ -260,6 +261,12 @@ export default function DashboardPage() {
         ]);
         setData(dashboardData);
         setCommunityPosts(posts);
+
+        if (dashboardData.has_profile && dashboardData.business_profile?.id) {
+          fetchSearchGridReports(dashboardData.business_profile.id)
+            .then(setGridReports)
+            .catch(() => {});
+        }
 
         // Auto-trigger analysis if needed
         const shouldAnalyze =
@@ -372,6 +379,65 @@ export default function DashboardPage() {
 
               {/* Community Widget */}
               <CommunityWidget posts={communityPosts} loading={communityLoading} />
+
+              {/* Local Search Grid */}
+              <div className="dark-card p-6 mb-8">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-semibold text-white">Local Search Grid</h2>
+                  <Link href="/search-grid" className="text-blue-400 text-sm hover:underline">
+                    {gridReports.length > 0 ? "New Report" : "Set Up"}
+                  </Link>
+                </div>
+                {gridReports.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {gridReports.map((report) => (
+                      <Link
+                        key={report.id}
+                        href={`/search-grid/${report.id}`}
+                        className="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-colors"
+                      >
+                        <p className="text-white font-medium mb-1">{report.name}</p>
+                        <p className="text-white/40 text-xs mb-3">
+                          {report.keywords.length} keyword{report.keywords.length !== 1 ? "s" : ""} &middot;{" "}
+                          {report.status === "running" ? (
+                            <span className="text-amber-400">Running...</span>
+                          ) : report.status === "completed" ? (
+                            <span className="text-emerald-400">Completed</span>
+                          ) : (
+                            <span className="text-white/30">{report.status}</span>
+                          )}
+                        </p>
+                        <div className="flex gap-4 text-sm">
+                          {report.avg_rank != null && (
+                            <div>
+                              <span className="text-white/40">Avg Rank </span>
+                              <span className="text-white font-medium">{report.avg_rank}</span>
+                            </div>
+                          )}
+                          {report.top3_pct != null && (
+                            <div>
+                              <span className="text-white/40">Top 3 </span>
+                              <span className="text-emerald-400 font-medium">{report.top3_pct}%</span>
+                            </div>
+                          )}
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-6">
+                    <p className="text-white/40 mb-4">
+                      Monitor where your business ranks in local search results across a grid of locations.
+                    </p>
+                    <Link
+                      href="/search-grid"
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 text-white text-sm hover:bg-white/10 transition-all"
+                    >
+                      Set Up Local Search Grid
+                    </Link>
+                  </div>
+                )}
+              </div>
 
               {/* Score Cards */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
