@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { AppHeader } from "@/components/AppHeader";
 import { getCommunityFeed, createPost } from "@/lib/api";
 import { getSessionId } from "@/lib/session";
 import { CommunityPost } from "@/types";
@@ -225,28 +226,7 @@ export default function CommunityPage() {
       {/* Grid pattern overlay */}
       <div className="fixed inset-0 grid-pattern pointer-events-none" />
 
-      {/* Header */}
-      <header className="dark-header fixed top-0 left-0 right-0 z-50 px-6 py-4">
-        <div className="mx-auto max-w-4xl flex items-center justify-between">
-          <Link href="/" className="text-xl font-bold text-white hover:text-white/80 transition-colors tracking-tight">
-            PHOW
-          </Link>
-          <div className="flex items-center gap-3">
-            <Link
-              href="/dashboard"
-              className="px-4 py-2 text-white/70 hover:text-white text-sm font-medium transition-colors"
-            >
-              Dashboard
-            </Link>
-            <button
-              onClick={() => setShowModal(true)}
-              className="px-4 py-2 rounded-lg bg-white text-black text-sm font-medium hover:bg-white/90 transition-all"
-            >
-              New Post
-            </button>
-          </div>
-        </div>
-      </header>
+      <AppHeader maxWidth="max-w-4xl" />
 
       {/* Main Content */}
       <main className="relative z-10 pt-24 pb-12 px-6">

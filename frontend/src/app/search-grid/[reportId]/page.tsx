@@ -10,6 +10,7 @@ import {
   InfoWindow,
   OverlayView,
 } from "@react-google-maps/api";
+import { AppHeader } from "@/components/AppHeader";
 import {
   fetchSearchGridReport,
   updateSearchGridReport,
@@ -457,36 +458,7 @@ export default function SearchGridReportPage() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white">
-      {/* Header */}
-      <header className="dark-header fixed top-0 left-0 right-0 z-50 px-6 py-4">
-        <div className="mx-auto max-w-[1600px] flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link
-              href="/"
-              className="text-xl font-bold text-white hover:text-white/80 transition-colors tracking-tight"
-            >
-              PHOW
-            </Link>
-            <span className="text-white/30">/</span>
-            <Link
-              href="/search-grid"
-              className="text-sm text-white/50 hover:text-white transition-colors"
-            >
-              Search Grid
-            </Link>
-            <span className="text-white/30">/</span>
-            <span className="text-sm text-white/80 truncate max-w-[200px]">{report?.name}</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <Link href="/dashboard" className="text-sm text-white/50 hover:text-white transition-colors">
-              Dashboard
-            </Link>
-            <Link href="/app" className="text-sm text-white/50 hover:text-white transition-colors">
-              Chat
-            </Link>
-          </div>
-        </div>
-      </header>
+      <AppHeader maxWidth="max-w-[1600px]" />
 
       {/* Main layout */}
       <div className="pt-[72px] flex h-[calc(100vh-72px)]">

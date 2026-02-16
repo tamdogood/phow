@@ -3,6 +3,7 @@
 import { useState, useEffect, use } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { AppHeader } from "@/components/AppHeader";
 import { getPost, addComment, deletePost, deleteComment, updatePost } from "@/lib/api";
 import { getSessionId } from "@/lib/session";
 import { PostWithComments, PostComment } from "@/types";
@@ -178,20 +179,7 @@ export default function PostPage({ params }: { params: Promise<{ postId: string 
       {/* Grid pattern overlay */}
       <div className="fixed inset-0 grid-pattern pointer-events-none" />
 
-      {/* Header */}
-      <header className="dark-header fixed top-0 left-0 right-0 z-50 px-6 py-4">
-        <div className="mx-auto max-w-4xl flex items-center justify-between">
-          <Link href="/" className="text-xl font-bold text-white hover:text-white/80 transition-colors tracking-tight">
-            PHOW
-          </Link>
-          <Link
-            href="/community"
-            className="px-4 py-2 rounded-lg bg-white text-black text-sm font-medium hover:bg-white/90 transition-all"
-          >
-            Back to Community
-          </Link>
-        </div>
-      </header>
+      <AppHeader maxWidth="max-w-4xl" />
 
       {/* Main Content */}
       <main className="relative z-10 pt-24 pb-12 px-6">

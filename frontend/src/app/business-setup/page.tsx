@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useJsApiLoader } from "@react-google-maps/api";
+import { AppHeader } from "@/components/AppHeader";
 import { getSessionId } from "@/lib/session";
 import { saveBusinessProfile, getBusinessProfile, resolveMapsUrl } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
@@ -218,13 +219,7 @@ export default function BusinessSetupPage() {
     <div className="min-h-screen bg-[#0a0a0a] relative overflow-hidden">
       <div className="fixed inset-0 grid-pattern pointer-events-none" />
 
-      <header className="dark-header fixed top-0 left-0 right-0 z-50 px-6 py-4">
-        <div className="mx-auto max-w-6xl flex items-center justify-between">
-          <Link href="/" className="text-xl font-bold text-white hover:text-white/80 transition-colors tracking-tight">
-            PHOW
-          </Link>
-        </div>
-      </header>
+      <AppHeader />
 
       <main className="relative z-10 min-h-screen flex items-center justify-center px-6 pt-24 pb-12">
         <div className="max-w-xl w-full animate-fade-in-up">

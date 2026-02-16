@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
+import { AppHeader } from "@/components/AppHeader";
 import { getBusinessProfile, saveBusinessProfile } from "@/lib/api";
 import { BusinessProfile } from "@/types";
 
@@ -125,14 +126,7 @@ export default function ProfilePage() {
       {/* Grid pattern overlay */}
       <div className="fixed inset-0 grid-pattern pointer-events-none" />
 
-      {/* Header */}
-      <header className="dark-header fixed top-0 left-0 right-0 z-50 px-6 py-4">
-        <div className="mx-auto max-w-6xl flex items-center justify-between">
-          <Link href="/" className="text-xl font-bold text-white hover:text-white/80 transition-colors tracking-tight">
-            PHOW
-          </Link>
-        </div>
-      </header>
+      <AppHeader />
 
       {/* Main Content */}
       <main className="relative z-10 pt-24 pb-12 px-6">

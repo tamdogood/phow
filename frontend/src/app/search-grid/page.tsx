@@ -10,6 +10,7 @@ import {
   InfoWindow,
   OverlayView,
 } from "@react-google-maps/api";
+import { AppHeader } from "@/components/AppHeader";
 import { getSessionId } from "@/lib/session";
 import {
   getBusinessProfile,
@@ -280,49 +281,9 @@ export default function SearchGridPage() {
 
   return (
     <div className="h-screen bg-[#0a0a0a] flex flex-col overflow-hidden">
-      <header className="dark-header flex-shrink-0 px-6 py-3 z-50 border-b border-white/5">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link
-              href="/"
-              className="text-xl font-bold text-white hover:text-white/80 transition-colors tracking-tight"
-            >
-              PHOW
-            </Link>
-            <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded bg-white/10 text-[10px] font-mono text-white/60 uppercase tracking-wider">
-              Dashboard
-            </span>
-          </div>
-          <div className="flex items-center gap-3">
-            <Link
-              href="/dashboard"
-              className="px-4 py-2 text-white/70 hover:text-white text-sm font-medium transition-colors"
-            >
-              Dashboard
-            </Link>
-            <Link
-              href="/community"
-              className="px-4 py-2 text-white/70 hover:text-white text-sm font-medium transition-colors"
-            >
-              Community
-            </Link>
-            <Link
-              href="/business-setup"
-              className="px-4 py-2 text-white/70 hover:text-white text-sm font-medium transition-colors"
-            >
-              My Business
-            </Link>
-            <Link
-              href="/app"
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white text-black text-sm font-medium hover:bg-white/90 transition-all"
-            >
-              New Analysis
-            </Link>
-          </div>
-        </div>
-      </header>
+      <AppHeader />
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden pt-16">
         {/* Sidebar */}
         <aside className="w-[380px] flex-shrink-0 border-r border-white/5 overflow-y-auto bg-[#0a0a0a]">
           <div className="px-5 py-4 border-b border-white/5">

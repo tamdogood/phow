@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
+import { AppHeader } from "@/components/AppHeader";
 import { getDashboard, getCommunityFeed, triggerDashboardAnalysis, deleteCompetitor, fetchSearchGridReports } from "@/lib/api";
 import { getSessionId } from "@/lib/session";
 import { DashboardData, TrackedCompetitor, CommunityPost, SearchGridReport } from "@/types";
@@ -301,39 +302,7 @@ export default function DashboardPage() {
       {/* Grid pattern overlay */}
       <div className="fixed inset-0 grid-pattern pointer-events-none" />
 
-      {/* Header */}
-      <header className="dark-header fixed top-0 left-0 right-0 z-50 px-6 py-4">
-        <div className="mx-auto max-w-6xl flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link href="/" className="text-xl font-bold text-white hover:text-white/80 transition-colors tracking-tight">
-              PHOW
-            </Link>
-            <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded bg-white/10 text-[10px] font-mono text-white/60 uppercase tracking-wider">
-              Dashboard
-            </span>
-          </div>
-          <div className="flex items-center gap-3">
-            <Link
-              href="/community"
-              className="px-4 py-2 text-white/70 hover:text-white text-sm font-medium transition-colors"
-            >
-              Community
-            </Link>
-            <Link
-              href="/business-setup"
-              className="px-4 py-2 text-white/70 hover:text-white text-sm font-medium transition-colors"
-            >
-              My Business
-            </Link>
-            <Link
-              href="/app"
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white text-black text-sm font-medium hover:bg-white/90 transition-all"
-            >
-              New Analysis
-            </Link>
-          </div>
-        </div>
-      </header>
+      <AppHeader />
 
       {/* Main Content */}
       <main className="relative z-10 pt-24 pb-12 px-6">

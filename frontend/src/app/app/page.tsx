@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
+import { AppHeader } from "@/components/AppHeader";
 import { ChatMessage } from "@/components/chat/ChatMessage";
 import { ChatInput } from "@/components/chat/ChatInput";
 import { sendChatMessage, fetchConversations, updateConversationTitle } from "@/lib/api";
@@ -74,7 +75,7 @@ function detectTool(message: string): string {
 }
 
 export default function AppPage() {
-  const { user, loading: authLoading } = useAuth();
+  const { user } = useAuth();
   const [tools, setTools] = useState<Tool[]>([]);
   const [messages, setMessages] = useState<LocalMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -262,57 +263,7 @@ export default function AppPage() {
       {/* Grid pattern overlay */}
       <div className="fixed inset-0 grid-pattern pointer-events-none" />
 
-      {/* Header */}
-      <header className="dark-header fixed top-0 left-0 right-0 z-50 px-6 py-4">
-        <div className="mx-auto max-w-6xl flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link href="/" className="text-xl font-bold text-white hover:text-white/80 transition-colors tracking-tight">
-              PHOW
-            </Link>
-            <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded bg-white/10 text-[10px] font-mono text-white/60 uppercase tracking-wider">
-              AI Analytics
-            </span>
-          </div>
-
-          <div className="hidden md:flex items-center gap-3">
-            {!authLoading && (
-              <>
-                {user ? (
-                  <>
-                    <Link
-                      href="/dashboard"
-                      className="px-4 py-2 text-white/70 hover:text-white text-sm font-medium transition-colors"
-                    >
-                      Dashboard
-                    </Link>
-                    <Link
-                      href="/profile"
-                      className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white text-black text-sm font-medium hover:bg-white/90 transition-all"
-                    >
-                      {user.user_metadata?.full_name || user.email?.split("@")[0]}
-                    </Link>
-                  </>
-                ) : (
-                  <>
-                    <Link
-                      href="/auth/signin"
-                      className="px-4 py-2 text-white/70 hover:text-white text-sm font-medium transition-colors"
-                    >
-                      Sign In
-                    </Link>
-                    <Link
-                      href="/"
-                      className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white text-black text-sm font-medium hover:bg-white/90 transition-all"
-                    >
-                      Home
-                    </Link>
-                  </>
-                )}
-              </>
-            )}
-          </div>
-        </div>
-      </header>
+      <AppHeader />
 
       {/* Main Layout with Sidebars */}
       <div className="relative z-10 flex-1 flex pt-16 min-h-0">
