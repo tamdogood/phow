@@ -293,10 +293,7 @@ export default function DashboardPage() {
   }, [user]);
 
   return (
-    <div className="min-h-screen bg-white relative overflow-hidden">
-      {/* Grid pattern overlay */}
-      <div className="fixed inset-0 grid-pattern-light pointer-events-none" />
-
+    <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="light-header fixed top-0 left-0 right-0 z-50 px-6 py-4">
         <div className="mx-auto max-w-6xl flex items-center justify-between">
