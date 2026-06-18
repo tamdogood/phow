@@ -52,11 +52,7 @@ class LocationIntelligenceRepository(BaseRepository):
         include_expired: bool = False,
     ) -> list[dict[str, Any]]:
         """Get location intelligence by geohash prefix."""
-        query = (
-            self.db.table("location_intelligence")
-            .select("*")
-            .like("geohash", f"{geohash}%")
-        )
+        query = self.db.table("location_intelligence").select("*").like("geohash", f"{geohash}%")
 
         if data_type:
             query = query.eq("data_type", data_type)
@@ -259,9 +255,7 @@ class HealthInspectionRepository(BaseRepository):
         )
         return result.data[0] if result.data else {}
 
-    async def get_by_geohash(
-        self, geohash: str, limit: int = 50
-    ) -> list[dict[str, Any]]:
+    async def get_by_geohash(self, geohash: str, limit: int = 50) -> list[dict[str, Any]]:
         """Get health inspections by geohash prefix."""
         result = (
             self.db.table("health_inspections")
@@ -273,9 +267,7 @@ class HealthInspectionRepository(BaseRepository):
         )
         return result.data or []
 
-    async def get_by_business(
-        self, business_name: str, city: str
-    ) -> list[dict[str, Any]]:
+    async def get_by_business(self, business_name: str, city: str) -> list[dict[str, Any]]:
         """Get inspection history for a business."""
         result = (
             self.db.table("health_inspections")
@@ -351,11 +343,7 @@ class MenuDataRepository(BaseRepository):
         self, geohash: str, category: str | None = None, limit: int = 50
     ) -> list[dict[str, Any]]:
         """Get menu data by geohash."""
-        query = (
-            self.db.table("menu_data")
-            .select("*")
-            .like("geohash", f"{geohash}%")
-        )
+        query = self.db.table("menu_data").select("*").like("geohash", f"{geohash}%")
 
         if category:
             query = query.ilike("category", f"%{category}%")
@@ -410,9 +398,7 @@ class BusinessHistoryRepository(BaseRepository):
         )
         return result.data[0] if result.data else {}
 
-    async def get_by_address(
-        self, address: str, city: str
-    ) -> list[dict[str, Any]]:
+    async def get_by_address(self, address: str, city: str) -> list[dict[str, Any]]:
         """Get business history for an address."""
         result = (
             self.db.table("business_history")
@@ -436,13 +422,11 @@ class BusinessHistoryRepository(BaseRepository):
         )
         return result.data or []
 
-    async def get_failure_rate(self, geohash: str, business_type: str | None = None) -> dict[str, Any]:
+    async def get_failure_rate(
+        self, geohash: str, business_type: str | None = None
+    ) -> dict[str, Any]:
         """Calculate business failure statistics for an area."""
-        query = (
-            self.db.table("business_history")
-            .select("*")
-            .like("geohash", f"{geohash}%")
-        )
+        query = self.db.table("business_history").select("*").like("geohash", f"{geohash}%")
 
         if business_type:
             query = query.ilike("business_type", f"%{business_type}%")

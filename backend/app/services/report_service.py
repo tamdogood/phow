@@ -18,6 +18,7 @@ class ReportService:
         """Lazy load LLM service."""
         if self._llm_service is None:
             from ..core.llm import get_llm_service
+
             self._llm_service = get_llm_service()
         return self._llm_service
 
@@ -34,7 +35,9 @@ class ReportService:
         logger.info("Aggregating report data")
 
         # Extract metadata
-        location = analysis_results.get("location") or analysis_results.get("address", "Unknown location")
+        location = analysis_results.get("location") or analysis_results.get(
+            "address", "Unknown location"
+        )
         business_type = analysis_results.get("business_type", "Unknown business")
 
         # Build report sections
@@ -97,7 +100,9 @@ class ReportService:
 
         if financial := data.get("financial_summary"):
             if scenarios := financial.get("revenue_scenarios"):
-                summary["key_metrics"]["projected_revenue"] = scenarios.get("moderate", {}).get("annual_revenue")
+                summary["key_metrics"]["projected_revenue"] = scenarios.get("moderate", {}).get(
+                    "annual_revenue"
+                )
             if be := financial.get("break_even"):
                 summary["key_metrics"]["months_to_break_even"] = be.get("months_to_recover_startup")
 
@@ -120,8 +125,16 @@ class ReportService:
         competition = {}
 
         if competitors := data.get("competitors"):
-            competition["competitor_count"] = len(competitors) if isinstance(competitors, list) else competitors.get("total_found", 0)
-            competition["top_competitors"] = competitors[:5] if isinstance(competitors, list) else competitors.get("competitors", [])[:5]
+            competition["competitor_count"] = (
+                len(competitors)
+                if isinstance(competitors, list)
+                else competitors.get("total_found", 0)
+            )
+            competition["top_competitors"] = (
+                competitors[:5]
+                if isinstance(competitors, list)
+                else competitors.get("competitors", [])[:5]
+            )
 
         if swot := data.get("swot"):
             competition["swot"] = {
@@ -228,15 +241,19 @@ Guidelines:
 
             # Parse response
             import json
+
             result = json.loads(response.strip())
 
             return {
                 "summary_paragraphs": result.get("summary_paragraphs", []),
                 "key_findings": result.get("key_findings", []),
-                "recommendation": result.get("recommendation", {
-                    "verdict": self._determine_verdict(sections),
-                    "rationale": "Based on available analysis data",
-                }),
+                "recommendation": result.get(
+                    "recommendation",
+                    {
+                        "verdict": self._determine_verdict(sections),
+                        "rationale": "Based on available analysis data",
+                    },
+                ),
                 "metadata": metadata,
             }
 
@@ -253,7 +270,9 @@ Guidelines:
 
         if summary := sections.get("summary"):
             if score := summary.get("viability_score"):
-                context_parts.append(f"Viability Score: {score}/100 ({summary.get('viability_level', 'N/A')})")
+                context_parts.append(
+                    f"Viability Score: {score}/100 ({summary.get('viability_level', 'N/A')})"
+                )
             if metrics := summary.get("key_metrics"):
                 if tam := metrics.get("tam"):
                     context_parts.append(f"Total Addressable Market: ${tam:,.0f}")
@@ -267,8 +286,12 @@ Guidelines:
         if competition := sections.get("competition"):
             context_parts.append(f"Competitor Count: {competition.get('competitor_count', 'N/A')}")
             if swot := competition.get("swot"):
-                context_parts.append(f"Key Strengths: {', '.join(s.get('factor', s) if isinstance(s, dict) else s for s in swot.get('strengths', []))}")
-                context_parts.append(f"Key Threats: {', '.join(t.get('factor', t) if isinstance(t, dict) else t for t in swot.get('threats', []))}")
+                context_parts.append(
+                    f"Key Strengths: {', '.join(s.get('factor', s) if isinstance(s, dict) else s for s in swot.get('strengths', []))}"
+                )
+                context_parts.append(
+                    f"Key Threats: {', '.join(t.get('factor', t) if isinstance(t, dict) else t for t in swot.get('threats', []))}"
+                )
 
         if consumer := sections.get("consumer_insights"):
             if sentiment := consumer.get("sentiment"):
@@ -279,7 +302,9 @@ Guidelines:
 
         if financials := sections.get("financials"):
             if benchmarks := financials.get("industry_benchmarks"):
-                context_parts.append(f"Industry Avg Revenue: ${benchmarks.get('avg_revenue', 0):,.0f}")
+                context_parts.append(
+                    f"Industry Avg Revenue: ${benchmarks.get('avg_revenue', 0):,.0f}"
+                )
 
         return "\n".join(context_parts)
 
@@ -306,7 +331,9 @@ Guidelines:
         ]
 
         if viability:
-            paragraphs.append(f"The overall market viability score is {viability}/100, indicating a {level} opportunity.")
+            paragraphs.append(
+                f"The overall market viability score is {viability}/100, indicating a {level} opportunity."
+            )
 
         findings = []
         if metrics := summary_section.get("key_metrics"):
@@ -376,6 +403,7 @@ Guidelines:
             )
 
             import json
+
             result = json.loads(response.strip())
             return result.get("recommendations", [])
 
@@ -388,60 +416,72 @@ Guidelines:
         recommendations = []
 
         # Immediate actions
-        recommendations.append({
-            "title": "Conduct site visits",
-            "description": f"Visit the proposed location and observe foot traffic, parking, and customer flow at different times",
-            "rationale": "Direct observation validates data-driven analysis",
-            "priority": "high",
-            "category": "immediate_actions",
-        })
+        recommendations.append(
+            {
+                "title": "Conduct site visits",
+                "description": f"Visit the proposed location and observe foot traffic, parking, and customer flow at different times",
+                "rationale": "Direct observation validates data-driven analysis",
+                "priority": "high",
+                "category": "immediate_actions",
+            }
+        )
 
-        recommendations.append({
-            "title": "Analyze competitor pricing",
-            "description": "Document competitor prices, menus, and service offerings in detail",
-            "rationale": "Informs pricing strategy and differentiation opportunities",
-            "priority": "high",
-            "category": "immediate_actions",
-        })
+        recommendations.append(
+            {
+                "title": "Analyze competitor pricing",
+                "description": "Document competitor prices, menus, and service offerings in detail",
+                "rationale": "Informs pricing strategy and differentiation opportunities",
+                "priority": "high",
+                "category": "immediate_actions",
+            }
+        )
 
         # Strategic considerations
         if competition := sections.get("competition"):
             if competition.get("competitor_count", 0) > 10:
-                recommendations.append({
-                    "title": "Develop differentiation strategy",
-                    "description": "Create clear positioning to stand out in a competitive market",
-                    "rationale": f"High competition ({competition.get('competitor_count')} competitors) requires unique value proposition",
-                    "priority": "high",
-                    "category": "strategic_considerations",
-                })
+                recommendations.append(
+                    {
+                        "title": "Develop differentiation strategy",
+                        "description": "Create clear positioning to stand out in a competitive market",
+                        "rationale": f"High competition ({competition.get('competitor_count')} competitors) requires unique value proposition",
+                        "priority": "high",
+                        "category": "strategic_considerations",
+                    }
+                )
 
-        recommendations.append({
-            "title": "Build marketing launch plan",
-            "description": "Develop pre-launch buzz and grand opening strategy",
-            "rationale": "Strong launch builds initial customer base critical for break-even",
-            "priority": "medium",
-            "category": "strategic_considerations",
-        })
+        recommendations.append(
+            {
+                "title": "Build marketing launch plan",
+                "description": "Develop pre-launch buzz and grand opening strategy",
+                "rationale": "Strong launch builds initial customer base critical for break-even",
+                "priority": "medium",
+                "category": "strategic_considerations",
+            }
+        )
 
         # Risk mitigations
         summary = sections.get("summary", {})
         if months := summary.get("key_metrics", {}).get("months_to_break_even"):
             if months and months > 18:
-                recommendations.append({
-                    "title": "Secure adequate funding runway",
-                    "description": f"Ensure funding covers at least {months + 6} months of operations",
-                    "rationale": f"Break-even timeline of {months} months requires financial buffer",
-                    "priority": "high",
-                    "category": "risk_mitigations",
-                })
+                recommendations.append(
+                    {
+                        "title": "Secure adequate funding runway",
+                        "description": f"Ensure funding covers at least {months + 6} months of operations",
+                        "rationale": f"Break-even timeline of {months} months requires financial buffer",
+                        "priority": "high",
+                        "category": "risk_mitigations",
+                    }
+                )
 
-        recommendations.append({
-            "title": "Develop contingency plans",
-            "description": "Create backup plans for slow start scenarios including cost reduction options",
-            "rationale": "Market conditions may vary from projections",
-            "priority": "medium",
-            "category": "risk_mitigations",
-        })
+        recommendations.append(
+            {
+                "title": "Develop contingency plans",
+                "description": "Create backup plans for slow start scenarios including cost reduction options",
+                "rationale": "Market conditions may vary from projections",
+                "priority": "medium",
+                "category": "risk_mitigations",
+            }
+        )
 
         return recommendations
 

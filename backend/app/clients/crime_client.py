@@ -137,7 +137,9 @@ class CrimeClient:
             return self._empty_result(city)
 
         try:
-            crimes = await self._fetch_socrata_crimes(lat, lng, config, radius_meters, days_back, limit)
+            crimes = await self._fetch_socrata_crimes(
+                lat, lng, config, radius_meters, days_back, limit
+            )
             return self._analyze_crimes(crimes, city, radius_meters)
         except Exception as e:
             logger.error("Crime data fetch failed", error=str(e), city=city)
@@ -193,9 +195,7 @@ class CrimeClient:
         response = await self._get_client().get(url, params=params)
         return response.json() if response.status_code == 200 else []
 
-    def _analyze_crimes(
-        self, crimes: list[dict], city: str, radius_meters: int
-    ) -> dict[str, Any]:
+    def _analyze_crimes(self, crimes: list[dict], city: str, radius_meters: int) -> dict[str, Any]:
         """Analyze crime data and compute safety metrics."""
         if not crimes:
             return {

@@ -8,6 +8,12 @@ from .api.routes import (
     dashboard_router,
     community_router,
     search_grid_router,
+    feasibility_router,
+    radar_router,
+    daily_brief_router,
+    account_router,
+    action_inbox_router,
+    scenario_lab_router,
 )
 from .core.tool_registry import ToolRegistry
 from .core.cache import get_cache
@@ -70,6 +76,12 @@ app.include_router(business_profile_router, prefix="/api")
 app.include_router(dashboard_router, prefix="/api")
 app.include_router(community_router, prefix="/api")
 app.include_router(search_grid_router, prefix="/api")
+app.include_router(feasibility_router, prefix="/api")
+app.include_router(radar_router, prefix="/api")
+app.include_router(daily_brief_router, prefix="/api")
+app.include_router(account_router, prefix="/api")
+app.include_router(action_inbox_router, prefix="/api")
+app.include_router(scenario_lab_router, prefix="/api")
 
 
 @app.get("/")

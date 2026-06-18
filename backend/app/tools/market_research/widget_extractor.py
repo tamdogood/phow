@@ -15,9 +15,11 @@ WIDGET_REGISTRY = {}
 
 def register_widget(widget_type: str):
     """Decorator to register a widget extractor function."""
+
     def decorator(func):
         WIDGET_REGISTRY[widget_type] = func
         return func
+
     return decorator
 
 
@@ -46,10 +48,12 @@ class WidgetExtractor:
 
             try:
                 data = json.loads(json_str)
-                widgets.append({
-                    "type": widget_type,
-                    "data": data,
-                })
+                widgets.append(
+                    {
+                        "type": widget_type,
+                        "data": data,
+                    }
+                )
             except json.JSONDecodeError:
                 continue
 
@@ -161,7 +165,8 @@ def format_growth_projection_widget(projection_data: dict) -> dict:
 
     return {
         "widget_type": "growth_chart",
-        "base_value": projection_data.get("base_tam") or projection_data.get("current_market_size", 0),
+        "base_value": projection_data.get("base_tam")
+        or projection_data.get("current_market_size", 0),
         "growth_rate": projection_data.get("growth_rate_percent", 0),
         "chart_data": [
             {
@@ -263,8 +268,7 @@ def format_seasonality_widget(seasonality_data: dict) -> dict:
     return {
         "widget_type": "seasonality_chart",
         "chart_data": [
-            {"month": month, "index": index}
-            for month, index in monthly_indices.items()
+            {"month": month, "index": index} for month, index in monthly_indices.items()
         ],
         "peak_month": seasonality_data.get("peak_month"),
         "low_month": seasonality_data.get("low_month"),
@@ -650,7 +654,9 @@ def format_break_even_widget(break_even_data: dict) -> dict:
         "break_even_units": break_even_data.get("break_even_units", {}),
         "startup_recovery": {
             "startup_costs": break_even_data.get("startup_recovery", {}).get("startup_costs"),
-            "months_to_recover": break_even_data.get("startup_recovery", {}).get("months_to_recover"),
+            "months_to_recover": break_even_data.get("startup_recovery", {}).get(
+                "months_to_recover"
+            ),
         },
         "benchmark": break_even_data.get("benchmark_comparison", {}),
     }
@@ -732,8 +738,10 @@ def format_executive_summary_widget(summary_data: dict) -> dict:
     recommendation = summary_data.get("recommendation", {})
     return {
         "widget_type": "executive_summary",
-        "location": summary_data.get("location") or summary_data.get("metadata", {}).get("location", ""),
-        "business_type": summary_data.get("business_type") or summary_data.get("metadata", {}).get("business_type", ""),
+        "location": summary_data.get("location")
+        or summary_data.get("metadata", {}).get("location", ""),
+        "business_type": summary_data.get("business_type")
+        or summary_data.get("metadata", {}).get("business_type", ""),
         "summary_paragraphs": summary_data.get("summary_paragraphs", []),
         "key_findings": summary_data.get("key_findings", []),
         "recommendation": {

@@ -17,15 +17,17 @@ class CommunityPostRepository(BaseRepository):
     ) -> dict[str, Any]:
         result = (
             self.db.table("community_posts")
-            .insert({
-                "session_id": session_id,
-                "title": title,
-                "content": content,
-                "category": category,
-                "user_id": user_id,
-                "business_profile_id": business_profile_id,
-                "metadata": metadata,
-            })
+            .insert(
+                {
+                    "session_id": session_id,
+                    "title": title,
+                    "content": content,
+                    "category": category,
+                    "user_id": user_id,
+                    "business_profile_id": business_profile_id,
+                    "metadata": metadata,
+                }
+            )
             .execute()
         )
         return result.data[0] if result.data else {}
@@ -90,12 +92,7 @@ class CommunityPostRepository(BaseRepository):
             updates["content"] = content
         if not updates:
             return None
-        result = (
-            self.db.table("community_posts")
-            .update(updates)
-            .eq("id", post_id)
-            .execute()
-        )
+        result = self.db.table("community_posts").update(updates).eq("id", post_id).execute()
         return result.data[0] if result.data else None
 
     async def delete(self, post_id: str) -> bool:
@@ -126,13 +123,15 @@ class PostCommentRepository(BaseRepository):
     ) -> dict[str, Any]:
         result = (
             self.db.table("post_comments")
-            .insert({
-                "post_id": post_id,
-                "session_id": session_id,
-                "content": content,
-                "user_id": user_id,
-                "business_profile_id": business_profile_id,
-            })
+            .insert(
+                {
+                    "post_id": post_id,
+                    "session_id": session_id,
+                    "content": content,
+                    "user_id": user_id,
+                    "business_profile_id": business_profile_id,
+                }
+            )
             .execute()
         )
         return result.data[0] if result.data else {}

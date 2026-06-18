@@ -18,32 +18,102 @@ REGIONAL_SERIES = {
 # Based on typical retail/service industry patterns
 INDUSTRY_SEASONALITY = {
     "722515": {  # Coffee shops
-        1: 0.85, 2: 0.85, 3: 0.90, 4: 0.95, 5: 1.00, 6: 1.05,
-        7: 1.00, 8: 1.00, 9: 1.10, 10: 1.10, 11: 1.05, 12: 1.15,
+        1: 0.85,
+        2: 0.85,
+        3: 0.90,
+        4: 0.95,
+        5: 1.00,
+        6: 1.05,
+        7: 1.00,
+        8: 1.00,
+        9: 1.10,
+        10: 1.10,
+        11: 1.05,
+        12: 1.15,
     },
     "722511": {  # Full-service restaurants
-        1: 0.80, 2: 0.85, 3: 0.95, 4: 1.00, 5: 1.10, 6: 1.10,
-        7: 1.05, 8: 1.05, 9: 0.95, 10: 1.00, 11: 1.05, 12: 1.10,
+        1: 0.80,
+        2: 0.85,
+        3: 0.95,
+        4: 1.00,
+        5: 1.10,
+        6: 1.10,
+        7: 1.05,
+        8: 1.05,
+        9: 0.95,
+        10: 1.00,
+        11: 1.05,
+        12: 1.10,
     },
     "722513": {  # Fast food
-        1: 0.90, 2: 0.90, 3: 0.95, 4: 1.00, 5: 1.05, 6: 1.10,
-        7: 1.10, 8: 1.05, 9: 0.95, 10: 1.00, 11: 1.00, 12: 0.95,
+        1: 0.90,
+        2: 0.90,
+        3: 0.95,
+        4: 1.00,
+        5: 1.05,
+        6: 1.10,
+        7: 1.10,
+        8: 1.05,
+        9: 0.95,
+        10: 1.00,
+        11: 1.00,
+        12: 0.95,
     },
     "713940": {  # Fitness centers
-        1: 1.25, 2: 1.15, 3: 1.05, 4: 1.00, 5: 1.00, 6: 0.90,
-        7: 0.85, 8: 0.85, 9: 1.00, 10: 1.00, 11: 0.95, 12: 0.90,
+        1: 1.25,
+        2: 1.15,
+        3: 1.05,
+        4: 1.00,
+        5: 1.00,
+        6: 0.90,
+        7: 0.85,
+        8: 0.85,
+        9: 1.00,
+        10: 1.00,
+        11: 0.95,
+        12: 0.90,
     },
     "812112": {  # Beauty salons
-        1: 0.85, 2: 0.90, 3: 1.00, 4: 1.10, 5: 1.15, 6: 1.10,
-        7: 0.95, 8: 0.90, 9: 1.00, 10: 1.05, 11: 1.05, 12: 0.95,
+        1: 0.85,
+        2: 0.90,
+        3: 1.00,
+        4: 1.10,
+        5: 1.15,
+        6: 1.10,
+        7: 0.95,
+        8: 0.90,
+        9: 1.00,
+        10: 1.05,
+        11: 1.05,
+        12: 0.95,
     },
     "445110": {  # Grocery stores
-        1: 0.95, 2: 0.95, 3: 1.00, 4: 1.00, 5: 1.00, 6: 1.00,
-        7: 1.05, 8: 1.05, 9: 1.00, 10: 1.00, 11: 1.00, 12: 1.05,
+        1: 0.95,
+        2: 0.95,
+        3: 1.00,
+        4: 1.00,
+        5: 1.00,
+        6: 1.00,
+        7: 1.05,
+        8: 1.05,
+        9: 1.00,
+        10: 1.00,
+        11: 1.00,
+        12: 1.05,
     },
     "default": {
-        1: 0.90, 2: 0.90, 3: 0.95, 4: 1.00, 5: 1.05, 6: 1.05,
-        7: 1.00, 8: 1.00, 9: 1.00, 10: 1.05, 11: 1.05, 12: 1.05,
+        1: 0.90,
+        2: 0.90,
+        3: 0.95,
+        4: 1.00,
+        5: 1.05,
+        6: 1.05,
+        7: 1.00,
+        8: 1.00,
+        9: 1.00,
+        10: 1.05,
+        11: 1.05,
+        12: 1.05,
     },
 }
 
@@ -193,12 +263,8 @@ class EconomicService:
 
         # Calculate trend
         if len(observations) >= 12:
-            recent_avg = sum(
-                o["value"] for o in observations[:6] if o["value"]
-            ) / 6
-            older_avg = sum(
-                o["value"] for o in observations[6:12] if o["value"]
-            ) / 6
+            recent_avg = sum(o["value"] for o in observations[:6] if o["value"]) / 6
+            older_avg = sum(o["value"] for o in observations[6:12] if o["value"]) / 6
             change_pct = ((recent_avg - older_avg) / older_avg) * 100 if older_avg else 0
             trend = "growing" if change_pct > 2 else "stable" if change_pct > -2 else "declining"
         else:
@@ -239,9 +305,18 @@ class EconomicService:
         low_month = min(pattern.items(), key=lambda x: x[1])
 
         month_names = {
-            1: "January", 2: "February", 3: "March", 4: "April",
-            5: "May", 6: "June", 7: "July", 8: "August",
-            9: "September", 10: "October", 11: "November", 12: "December"
+            1: "January",
+            2: "February",
+            3: "March",
+            4: "April",
+            5: "May",
+            6: "June",
+            7: "July",
+            8: "August",
+            9: "September",
+            10: "October",
+            11: "November",
+            12: "December",
         }
 
         recommendations = []
@@ -275,6 +350,7 @@ class EconomicService:
             Entry timing analysis with recommendations
         """
         from .market_analysis_service import get_market_analysis_service
+
         market_service = get_market_analysis_service()
 
         # Get NAICS code
@@ -302,9 +378,18 @@ class EconomicService:
         avoid_months = [m for m, v in monthly_indices.items() if v < 0.9]
 
         month_names = {
-            1: "January", 2: "February", 3: "March", 4: "April",
-            5: "May", 6: "June", 7: "July", 8: "August",
-            9: "September", 10: "October", 11: "November", 12: "December"
+            1: "January",
+            2: "February",
+            3: "March",
+            4: "April",
+            5: "May",
+            6: "June",
+            7: "July",
+            8: "August",
+            9: "September",
+            10: "October",
+            11: "November",
+            12: "December",
         }
 
         # Generate timing recommendation
@@ -316,7 +401,9 @@ class EconomicService:
             timing_advice = "Conditions are favorable - consider entering market soon"
         elif economic_outlook == "challenging" or industry_trend < 0:
             timing_score = 45
-            timing_advice = "Consider waiting for improved conditions or focus on defensive positioning"
+            timing_advice = (
+                "Consider waiting for improved conditions or focus on defensive positioning"
+            )
         else:
             timing_score = 65
             timing_advice = "Conditions are stable - proceed with standard planning timeline"
@@ -329,8 +416,12 @@ class EconomicService:
             "avoid_months": [month_names[m] for m in avoid_months],
             "economic_context": {
                 "outlook": economic_outlook,
-                "unemployment": economic_snapshot.get("indicators", {}).get("unemployment", {}).get("value"),
-                "consumer_confidence": economic_snapshot.get("indicators", {}).get("consumer_confidence", {}).get("value"),
+                "unemployment": economic_snapshot.get("indicators", {})
+                .get("unemployment", {})
+                .get("value"),
+                "consumer_confidence": economic_snapshot.get("indicators", {})
+                .get("consumer_confidence", {})
+                .get("value"),
             },
             "industry_context": {
                 "growth_rate": industry_trend,

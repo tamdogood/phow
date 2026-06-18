@@ -7,18 +7,21 @@ from langchain_core.tools import tool
 def _get_consumer_analysis_service():
     """Lazy import for consumer analysis service."""
     from ...services.consumer_analysis_service import get_consumer_analysis_service
+
     return get_consumer_analysis_service()
 
 
 def _get_maps_client():
     """Lazy import for Google Maps client."""
     from ..location_scout.google_maps import GoogleMapsClient
+
     return GoogleMapsClient()
 
 
 def _get_competitor_tools():
     """Lazy import for competitor review analysis."""
     from ..competitor_analyzer.agent_tools import analyze_competitor_reviews
+
     return analyze_competitor_reviews
 
 
@@ -243,6 +246,7 @@ async def build_customer_profile(
     demographics = {}
     try:
         from ..market_validator.census_client import CensusClient
+
         census = CensusClient()
         demographics = await census.get_demographics(location["lat"], location["lng"])
     except Exception:
@@ -314,6 +318,7 @@ async def get_consumer_insights_summary(
     demographics = {}
     try:
         from ..market_validator.census_client import CensusClient
+
         census = CensusClient()
         demographics = await census.get_demographics(location["lat"], location["lng"])
     except Exception:
@@ -334,8 +339,12 @@ async def get_consumer_insights_summary(
             "top_aspects": list(sentiment.get("aspect_sentiments", {}).keys())[:3],
         },
         "top_themes": {
-            "positive": [t["theme"] for t in themes.get("themes", []) if t.get("sentiment") == "positive"][:3],
-            "negative": [t["theme"] for t in themes.get("themes", []) if t.get("sentiment") == "negative"][:3],
+            "positive": [
+                t["theme"] for t in themes.get("themes", []) if t.get("sentiment") == "positive"
+            ][:3],
+            "negative": [
+                t["theme"] for t in themes.get("themes", []) if t.get("sentiment") == "negative"
+            ][:3],
         },
         "top_pain_points": [pp["issue"] for pp in pain_points.get("pain_points", [])[:3]],
         "opportunities": pain_points.get("opportunities", [])[:3],
@@ -351,10 +360,12 @@ async def _gather_competitor_reviews(address: str, business_type: str) -> list[d
     """Gather reviews from competitors in the area."""
     try:
         analyze_reviews_tool = _get_competitor_tools()
-        result = await analyze_reviews_tool.ainvoke({
-            "address": address,
-            "business_type": business_type,
-        })
+        result = await analyze_reviews_tool.ainvoke(
+            {
+                "address": address,
+                "business_type": business_type,
+            }
+        )
 
         if "error" in result:
             return []
@@ -364,11 +375,13 @@ async def _gather_competitor_reviews(address: str, business_type: str) -> list[d
         for comp in result.get("competitors", []):
             sample_reviews = comp.get("sample_reviews", [])
             for review_text in sample_reviews:
-                reviews.append({
-                    "text": review_text,
-                    "rating": comp.get("rating", 3),
-                    "source": comp.get("name", "competitor"),
-                })
+                reviews.append(
+                    {
+                        "text": review_text,
+                        "rating": comp.get("rating", 3),
+                        "source": comp.get("name", "competitor"),
+                    }
+                )
 
         return reviews
 
@@ -387,14 +400,22 @@ def _generate_consumer_insights(
     # Sentiment insight
     sentiment_label = sentiment.get("sentiment_label", "neutral")
     if sentiment_label == "positive":
-        insights.append("Overall customer satisfaction is high - quality bar is set high in this market")
+        insights.append(
+            "Overall customer satisfaction is high - quality bar is set high in this market"
+        )
     elif sentiment_label == "negative":
-        insights.append("Customer satisfaction is low - opportunity to differentiate through quality")
+        insights.append(
+            "Customer satisfaction is low - opportunity to differentiate through quality"
+        )
 
     # Theme insight
-    positive_themes = [t["theme"] for t in themes.get("themes", []) if t.get("sentiment") == "positive"][:2]
+    positive_themes = [
+        t["theme"] for t in themes.get("themes", []) if t.get("sentiment") == "positive"
+    ][:2]
     if positive_themes:
-        insights.append(f"Customers value: {', '.join(positive_themes)} - match or exceed these expectations")
+        insights.append(
+            f"Customers value: {', '.join(positive_themes)} - match or exceed these expectations"
+        )
 
     # Pain point insight
     top_pain_points = pain_points.get("pain_points", [])[:2]
@@ -405,7 +426,9 @@ def _generate_consumer_insights(
     # Opportunity insight
     opportunities = pain_points.get("opportunities", [])
     if opportunities:
-        insights.append(f"Key opportunity: {opportunities[0].get('recommendation', 'Differentiate through quality')}")
+        insights.append(
+            f"Key opportunity: {opportunities[0].get('recommendation', 'Differentiate through quality')}"
+        )
 
     return insights if insights else ["Focus on consistent quality and excellent customer service"]
 

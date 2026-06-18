@@ -8,6 +8,7 @@ import { getDashboard, getCommunityFeed, triggerDashboardAnalysis, deleteCompeti
 import { getSessionId } from "@/lib/session";
 import { DashboardData, TrackedCompetitor, CommunityPost, SearchGridReport } from "@/types";
 import { CommunityWidget } from "@/components/dashboard/CommunityWidget";
+import { RadarWidget } from "@/components/dashboard/RadarWidget";
 import { AddCompetitorModal } from "@/components/dashboard/AddCompetitorModal";
 
 function ScoreCard({
@@ -348,6 +349,11 @@ export default function DashboardPage() {
 
               {/* Community Widget */}
               <CommunityWidget posts={communityPosts} loading={communityLoading} />
+
+              {/* Business Radar */}
+              {data.business_profile?.id && (
+                <RadarWidget businessProfileId={data.business_profile.id} />
+              )}
 
               {/* Local Search Grid */}
               <div className="dark-card p-6 mb-8">

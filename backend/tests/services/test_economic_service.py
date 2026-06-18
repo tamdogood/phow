@@ -24,7 +24,11 @@ class TestEconomicSnapshot:
         ) as mock_fred:
             mock_fred.return_value = {
                 "unemployment": {"value": 4.0, "date": "2024-01-01", "title": "Unemployment Rate"},
-                "consumer_confidence": {"value": 95, "date": "2024-01-01", "title": "Consumer Confidence"},
+                "consumer_confidence": {
+                    "value": 95,
+                    "date": "2024-01-01",
+                    "title": "Consumer Confidence",
+                },
                 "gdp": {"value": 25000, "date": "2024-01-01", "title": "GDP"},
                 "_interpretation": {"unemployment": "Healthy labor market"},
             }
@@ -161,9 +165,7 @@ class TestConsumerSpending:
     @pytest.mark.asyncio
     async def test_get_consumer_spending_trends(self, service):
         """Test getting consumer spending trends."""
-        with patch.object(
-            service.fred_client, "get_series", new_callable=AsyncMock
-        ) as mock_series:
+        with patch.object(service.fred_client, "get_series", new_callable=AsyncMock) as mock_series:
             mock_series.return_value = {
                 "latest_value": 500000,
                 "latest_date": "2024-01-01",

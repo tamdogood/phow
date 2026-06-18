@@ -7,12 +7,14 @@ from langchain_core.tools import tool
 def _get_financial_service():
     """Lazy import for financial analysis service."""
     from ...services.financial_analysis_service import get_financial_analysis_service
+
     return get_financial_analysis_service()
 
 
 def _get_maps_client():
     """Lazy import for Google Maps client."""
     from ..location_scout.google_maps import GoogleMapsClient
+
     return GoogleMapsClient()
 
 
@@ -29,6 +31,7 @@ async def _gather_market_data(address: str, business_type: str, location: dict) 
     # Try to get demographics
     try:
         from ..market_validator.census_client import CensusClient
+
         census = CensusClient()
         demographics = await census.get_demographics(location["lat"], location["lng"])
         if demographics:
@@ -39,11 +42,14 @@ async def _gather_market_data(address: str, business_type: str, location: dict) 
     # Try to get competitors
     try:
         from ..competitor_analyzer.agent_tools import find_competitors
-        result = await find_competitors.ainvoke({
-            "address": address,
-            "business_type": business_type,
-            "radius_meters": 1500,
-        })
+
+        result = await find_competitors.ainvoke(
+            {
+                "address": address,
+                "business_type": business_type,
+                "radius_meters": 1500,
+            }
+        )
         if "competitors" in result:
             market_data["competitors"] = result["competitors"]
     except Exception:
@@ -52,10 +58,9 @@ async def _gather_market_data(address: str, business_type: str, location: dict) 
     # Try to get market size
     try:
         from ...services.market_analysis_service import get_market_analysis_service
+
         market_service = get_market_analysis_service()
-        size = await market_service.calculate_market_size(
-            location, business_type, radius_miles=1.5
-        )
+        size = await market_service.calculate_market_size(location, business_type, radius_miles=1.5)
         market_data["som"] = size.get("som", {})
     except Exception:
         pass
@@ -64,6 +69,7 @@ async def _gather_market_data(address: str, business_type: str, location: dict) 
     try:
         from ...services.market_analysis_service import get_market_analysis_service
         from .naics_service import get_naics_service
+
         naics = get_naics_service()
         codes = naics.map_business_type(business_type)
         if codes:

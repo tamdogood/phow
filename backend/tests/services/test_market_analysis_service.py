@@ -36,9 +36,7 @@ class TestMarketSizeCalculator:
     @pytest.mark.asyncio
     async def test_calculate_market_size_coffee_shop(self, service, mock_demographics):
         """Test market size calculation for coffee shop."""
-        with patch.object(
-            service, "_get_area_demographics", new_callable=AsyncMock
-        ) as mock_demo:
+        with patch.object(service, "_get_area_demographics", new_callable=AsyncMock) as mock_demo:
             mock_demo.return_value = mock_demographics
 
             result = await service.calculate_market_size(
@@ -66,9 +64,7 @@ class TestMarketSizeCalculator:
     @pytest.mark.asyncio
     async def test_calculate_market_size_gym(self, service, mock_demographics):
         """Test market size for gym (lower participation rate)."""
-        with patch.object(
-            service, "_get_area_demographics", new_callable=AsyncMock
-        ) as mock_demo:
+        with patch.object(service, "_get_area_demographics", new_callable=AsyncMock) as mock_demo:
             mock_demo.return_value = mock_demographics
 
             result = await service.calculate_market_size(
@@ -86,9 +82,7 @@ class TestMarketSizeCalculator:
     @pytest.mark.asyncio
     async def test_capture_rate_by_competition(self, service, mock_demographics):
         """Test that SOM varies based on competition level."""
-        with patch.object(
-            service, "_get_area_demographics", new_callable=AsyncMock
-        ) as mock_demo:
+        with patch.object(service, "_get_area_demographics", new_callable=AsyncMock) as mock_demo:
             mock_demo.return_value = mock_demographics
 
             # Low competition
@@ -184,9 +178,7 @@ class TestMarketGrowthCalculator:
     @pytest.mark.asyncio
     async def test_project_market_size(self, service):
         """Test market size projections."""
-        result = await service.project_market_size(
-            current_tam=1000000, growth_rate=5.0, years=5
-        )
+        result = await service.project_market_size(current_tam=1000000, growth_rate=5.0, years=5)
 
         assert len(result["projections"]) == 5
         # Year 5 should be ~27.6% higher (1.05^5 - 1)
@@ -254,9 +246,7 @@ class TestLaborMarketAnalysis:
     @pytest.mark.asyncio
     async def test_analyze_labor_market(self, service, mock_demographics):
         """Test labor market analysis."""
-        with patch.object(
-            service, "_get_area_demographics", new_callable=AsyncMock
-        ) as mock_demo:
+        with patch.object(service, "_get_area_demographics", new_callable=AsyncMock) as mock_demo:
             mock_demo.return_value = mock_demographics
 
             with patch.object(
