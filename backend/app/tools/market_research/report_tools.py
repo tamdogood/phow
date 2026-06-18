@@ -7,6 +7,7 @@ from langchain_core.tools import tool
 def _get_report_service():
     """Lazy import for report service."""
     from ...services.report_service import get_report_service
+
     return get_report_service()
 
 
@@ -152,7 +153,9 @@ async def get_executive_summary(
     if projected_revenue is not None:
         report_data["sections"]["summary"]["key_metrics"]["projected_revenue"] = projected_revenue
     if months_to_break_even is not None:
-        report_data["sections"]["summary"]["key_metrics"]["months_to_break_even"] = months_to_break_even
+        report_data["sections"]["summary"]["key_metrics"][
+            "months_to_break_even"
+        ] = months_to_break_even
 
     # Add competition section
     if competitor_count is not None or strengths or threats:
@@ -250,7 +253,9 @@ async def get_key_recommendations(
     }
 
     if months_to_break_even is not None:
-        report_data["sections"]["summary"]["key_metrics"]["months_to_break_even"] = months_to_break_even
+        report_data["sections"]["summary"]["key_metrics"][
+            "months_to_break_even"
+        ] = months_to_break_even
 
     # Add competition section
     if competitor_count is not None or strengths or weaknesses or opportunities or threats:
@@ -290,9 +295,15 @@ async def get_key_recommendations(
         "recommendations": recommendations,
         "total_recommendations": len(recommendations),
         "by_category": {
-            "immediate_actions": [r for r in recommendations if r.get("category") == "immediate_actions"],
-            "strategic_considerations": [r for r in recommendations if r.get("category") == "strategic_considerations"],
-            "risk_mitigations": [r for r in recommendations if r.get("category") == "risk_mitigations"],
+            "immediate_actions": [
+                r for r in recommendations if r.get("category") == "immediate_actions"
+            ],
+            "strategic_considerations": [
+                r for r in recommendations if r.get("category") == "strategic_considerations"
+            ],
+            "risk_mitigations": [
+                r for r in recommendations if r.get("category") == "risk_mitigations"
+            ],
         },
         "by_priority": {
             "high": [r for r in recommendations if r.get("priority") == "high"],

@@ -11,12 +11,14 @@ if TYPE_CHECKING:
 def _get_market_analysis_service():
     """Lazy import to avoid circular dependency."""
     from ...services.market_analysis_service import get_market_analysis_service
+
     return get_market_analysis_service()
 
 
 def _get_naics_service():
     """Lazy import for NAICS service."""
     from .naics_service import get_naics_service
+
     return get_naics_service()
 
 
@@ -68,7 +70,9 @@ async def calculate_market_size(
 
 
 @tool
-async def get_industry_profile(naics_code: str | None = None, business_type: str | None = None) -> dict[str, Any]:
+async def get_industry_profile(
+    naics_code: str | None = None, business_type: str | None = None
+) -> dict[str, Any]:
     """
     Get comprehensive industry profile including size, growth trends, and economic context.
 

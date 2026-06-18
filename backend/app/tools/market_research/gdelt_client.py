@@ -121,8 +121,16 @@ class GDELTClient:
 
             # Calculate trend direction
             if len(timeline) >= 2:
-                recent = sum(t.get("value", 0) for t in timeline[:3]) / 3 if len(timeline) >= 3 else timeline[0].get("value", 0)
-                older = sum(t.get("value", 0) for t in timeline[-3:]) / 3 if len(timeline) >= 3 else timeline[-1].get("value", 0)
+                recent = (
+                    sum(t.get("value", 0) for t in timeline[:3]) / 3
+                    if len(timeline) >= 3
+                    else timeline[0].get("value", 0)
+                )
+                older = (
+                    sum(t.get("value", 0) for t in timeline[-3:]) / 3
+                    if len(timeline) >= 3
+                    else timeline[-1].get("value", 0)
+                )
                 if older > 0:
                     trend_change = ((recent - older) / older) * 100
                 else:
@@ -133,12 +141,13 @@ class GDELTClient:
             return {
                 "theme": theme,
                 "days_analyzed": days_back,
-                "trend_direction": "increasing" if trend_change > 10 else "decreasing" if trend_change < -10 else "stable",
+                "trend_direction": (
+                    "increasing"
+                    if trend_change > 10
+                    else "decreasing" if trend_change < -10 else "stable"
+                ),
                 "trend_change_percent": round(trend_change, 1),
-                "timeline": [
-                    {"date": t.get("date"), "volume": t.get("value")}
-                    for t in timeline
-                ],
+                "timeline": [{"date": t.get("date"), "volume": t.get("value")} for t in timeline],
                 "average_daily_mentions": (
                     sum(t.get("value", 0) for t in timeline) / len(timeline) if timeline else 0
                 ),
@@ -190,8 +199,7 @@ class GDELTClient:
                     "positive" if avg_tone > 2 else "negative" if avg_tone < -2 else "neutral"
                 ),
                 "tone_timeline": [
-                    {"date": t.get("date"), "tone": t.get("value")}
-                    for t in timeline
+                    {"date": t.get("date"), "tone": t.get("value")} for t in timeline
                 ],
                 "interpretation": self._interpret_tone(avg_tone),
             }

@@ -12,18 +12,21 @@ if TYPE_CHECKING:
 def _get_economic_service():
     """Lazy import for economic service."""
     from ...services.economic_service import get_economic_service
+
     return get_economic_service()
 
 
 def _get_market_analysis_service():
     """Lazy import for market analysis service."""
     from ...services.market_analysis_service import get_market_analysis_service
+
     return get_market_analysis_service()
 
 
 def _get_naics_service():
     """Lazy import for NAICS service."""
     from .naics_service import get_naics_service
+
     return get_naics_service()
 
 
@@ -258,9 +261,7 @@ async def get_economic_summary(
     }
 
 
-def _generate_economic_insights(
-    economic: dict, trends: dict, timing: dict
-) -> list[str]:
+def _generate_economic_insights(economic: dict, trends: dict, timing: dict) -> list[str]:
     """Generate key insights from economic data."""
     insights = []
 

@@ -36,9 +36,7 @@ class MenuScraper:
                     "url": url,
                     "render_js": "true",
                 }
-                response = await self._get_client().get(
-                    self.proxy_url, params=proxy_params
-                )
+                response = await self._get_client().get(self.proxy_url, params=proxy_params)
             else:
                 # Direct fetch (may be blocked)
                 headers = {
@@ -230,9 +228,7 @@ class MenuScraper:
         city_lower = city.lower()
 
         benchmarks = PRICING_BENCHMARKS.get(biz_type, {})
-        multiplier = next(
-            (v for k, v in CITY_MULTIPLIERS.items() if k in city_lower), 1.0
-        )
+        multiplier = next((v for k, v in CITY_MULTIPLIERS.items() if k in city_lower), 1.0)
 
         adjusted = {}
         for item, prices in benchmarks.items():

@@ -54,9 +54,7 @@ class BusinessProfileService:
 
         # Geocode address if coordinates still not provided
         if location_address and not (location_lat and location_lng):
-            location_lat, location_lng, geo_place_id = await self._geocode_address(
-                location_address
-            )
+            location_lat, location_lng, geo_place_id = await self._geocode_address(location_address)
             if not location_place_id:
                 location_place_id = geo_place_id
 

@@ -70,6 +70,7 @@ class BLSClient:
         series_id = f"ENU{area_code}00{naics_code.zfill(6)[:6]}"
 
         import datetime
+
         current_year = datetime.datetime.now().year
         start_year = current_year - 5
 
@@ -98,7 +99,9 @@ class BLSClient:
                     }
                     for d in series_data
                 ],
-                "latest_value": float(series_data[0]["value"].replace(",", "")) if series_data else None,
+                "latest_value": (
+                    float(series_data[0]["value"].replace(",", "")) if series_data else None
+                ),
             }
         except Exception as e:
             logger.error("BLS employment request failed", error=str(e))
@@ -129,6 +132,7 @@ class BLSClient:
         ]
 
         import datetime
+
         current_year = datetime.datetime.now().year
 
         try:
@@ -202,6 +206,7 @@ class BLSClient:
         series_id = f"CES{ces_code}"
 
         import datetime
+
         current_year = datetime.datetime.now().year
         start_year = current_year - 10
 

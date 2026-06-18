@@ -7,7 +7,13 @@ celery_app = Celery(
     "phow",
     broker=settings.celery_broker_url,
     backend=settings.celery_result_backend,
-    include=["app.workers.tasks", "app.workers.search_grid_tasks"],
+    include=[
+        "app.workers.tasks",
+        "app.workers.search_grid_tasks",
+        "app.workers.feasibility_tasks",
+        "app.workers.radar_tasks",
+        "app.workers.daily_brief_tasks",
+    ],
 )
 
 # Celery configuration

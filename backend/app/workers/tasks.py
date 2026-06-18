@@ -70,6 +70,7 @@ def collect_crime_data(self, city: str, state: str, lat: float, lng: float) -> d
     logger.info("Collecting crime data", city=city, state=state)
 
     try:
+
         async def _collect():
             client = get_crime_client()
             db = get_supabase()
@@ -115,7 +116,9 @@ def collect_crime_data(self, city: str, state: str, lat: float, lng: float) -> d
 
 
 @celery_app.task(bind=True, max_retries=3)
-def collect_health_inspections(self, city: str, state: str, lat: float, lng: float) -> dict[str, Any]:
+def collect_health_inspections(
+    self, city: str, state: str, lat: float, lng: float
+) -> dict[str, Any]:
     """
     Collect health inspection data for a city.
 
@@ -131,6 +134,7 @@ def collect_health_inspections(self, city: str, state: str, lat: float, lng: flo
     logger.info("Collecting health inspections", city=city, state=state)
 
     try:
+
         async def _collect():
             client = get_health_inspection_client()
             db = get_supabase()
@@ -176,7 +180,9 @@ def collect_health_inspections(self, city: str, state: str, lat: float, lng: flo
 
 
 @celery_app.task(bind=True, max_retries=3)
-def collect_walkscore(self, lat: float, lng: float, city: str, address: str | None = None) -> dict[str, Any]:
+def collect_walkscore(
+    self, lat: float, lng: float, city: str, address: str | None = None
+) -> dict[str, Any]:
     """
     Collect Walk Score data for a location.
 
@@ -192,6 +198,7 @@ def collect_walkscore(self, lat: float, lng: float, city: str, address: str | No
     logger.info("Collecting Walk Score", lat=lat, lng=lng, city=city)
 
     try:
+
         async def _collect():
             client = get_walkscore_client()
             db = get_supabase()
@@ -248,6 +255,7 @@ def collect_search_trends(self, keywords: list[str], city: str | None = None) ->
     logger.info("Collecting search trends", keywords=keywords, city=city)
 
     try:
+
         async def _collect():
             client = get_trends_client()
             db = get_supabase()
@@ -424,5 +432,13 @@ celery_app.conf.beat_schedule = {
         "task": "app.workers.tasks.cleanup_expired_data",
         "schedule": 86400,  # Every 24 hours
         "options": {"queue": "maintenance"},
+    },
+    "dispatch-due-radar-scans": {
+        "task": "app.workers.radar_tasks.dispatch_due_radar_scans",
+        "schedule": 3600,  # Hourly: dispatch scans for businesses whose radar is due
+    },
+    "dispatch-due-daily-briefs": {
+        "task": "app.workers.daily_brief_tasks.dispatch_due_daily_briefs",
+        "schedule": 3600,  # Hourly: generate today's brief for businesses that lack one
     },
 }

@@ -107,7 +107,7 @@ class MarketAnalysisService:
 
         # Estimate total market population (within radius)
         # Using population density scaling based on radius
-        area_sq_miles = math.pi * (radius_miles ** 2)
+        area_sq_miles = math.pi * (radius_miles**2)
         # Assume average US density of ~94 people/sq mile for metro areas
         # Adjust based on location type (urban = 3x, suburban = 1x, rural = 0.3x)
         density_multiplier = self._estimate_density_multiplier(demographics)
@@ -349,11 +349,13 @@ class MarketAnalysisService:
 
         for year in range(1, years + 1):
             projected = current_tam * ((1 + rate) ** year)
-            projections.append({
-                "year": year,
-                "projected_tam": round(projected, -3),
-                "formatted": f"${projected:,.0f}",
-            })
+            projections.append(
+                {
+                    "year": year,
+                    "projected_tam": round(projected, -3),
+                    "formatted": f"${projected:,.0f}",
+                }
+            )
 
         return {
             "base_tam": current_tam,
@@ -387,9 +389,7 @@ class MarketAnalysisService:
             "naics_code": naics_code,
             "industry_name": naics_info.get("title") if naics_info else "Unknown",
             "description": naics_info.get("description") if naics_info else "",
-            "hierarchy": [
-                {"code": h["code"], "title": h["title"]} for h in hierarchy
-            ],
+            "hierarchy": [{"code": h["code"], "title": h["title"]} for h in hierarchy],
             "employment": {
                 "current": employment.get("latest_value"),
                 "growth_rate": trends.get("cagr_percent"),
@@ -407,9 +407,7 @@ class MarketAnalysisService:
         }
 
     @cached(ttl=86400, key_prefix="labor_market")
-    async def analyze_labor_market(
-        self, location: dict, business_type: str
-    ) -> dict[str, Any]:
+    async def analyze_labor_market(self, location: dict, business_type: str) -> dict[str, Any]:
         """
         Analyze labor availability and wages for a business type.
 
@@ -473,7 +471,11 @@ class MarketAnalysisService:
             },
             "hiring_difficulty": {
                 "score": hiring_difficulty,
-                "level": "difficult" if hiring_difficulty > 70 else "moderate" if hiring_difficulty > 40 else "easy",
+                "level": (
+                    "difficult"
+                    if hiring_difficulty > 70
+                    else "moderate" if hiring_difficulty > 40 else "easy"
+                ),
                 "factors": self._get_hiring_factors(unemployment, hiring_difficulty),
             },
             "recommendations": self._get_hiring_recommendations(hiring_difficulty, wage_data),
@@ -523,9 +525,7 @@ class MarketAnalysisService:
 
         return factors
 
-    def _get_hiring_recommendations(
-        self, difficulty: int, wage_data: dict
-    ) -> list[str]:
+    def _get_hiring_recommendations(self, difficulty: int, wage_data: dict) -> list[str]:
         """Generate hiring recommendations."""
         recs = []
 
@@ -553,6 +553,7 @@ class MarketAnalysisService:
             Trend analysis with direction, confidence, and signals
         """
         from ..tools.market_research.gdelt_client import get_gdelt_client
+
         gdelt_client = get_gdelt_client()
 
         # Get employment trends
@@ -564,7 +565,9 @@ class MarketAnalysisService:
 
         # Search for industry news
         keywords = naics_info.get("keywords", []) if naics_info else []
-        search_term = keywords[0] if keywords else industry_name.split()[0] if industry_name else "business"
+        search_term = (
+            keywords[0] if keywords else industry_name.split()[0] if industry_name else "business"
+        )
 
         # GDELT client expects a list of keywords and uses the "days_back" parameter
         news_data = await gdelt_client.search_industry_news([search_term], days_back=30)
@@ -634,6 +637,7 @@ class MarketAnalysisService:
             Emerging trends and opportunities
         """
         from ..tools.market_research.gdelt_client import get_gdelt_client
+
         gdelt_client = get_gdelt_client()
 
         # Get trending topics related to business type

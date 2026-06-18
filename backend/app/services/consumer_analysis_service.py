@@ -32,7 +32,13 @@ JOURNEY_STAGES = [
     {
         "stage": "awareness",
         "description": "How customers discover the business",
-        "touchpoints": ["social media", "word of mouth", "search engines", "advertising", "walking by"],
+        "touchpoints": [
+            "social media",
+            "word of mouth",
+            "search engines",
+            "advertising",
+            "walking by",
+        ],
     },
     {
         "stage": "consideration",
@@ -68,6 +74,7 @@ class ConsumerAnalysisService:
         """Lazy load LLM service."""
         if self._llm_service is None:
             from ..core.llm import get_llm_service
+
             self._llm_service = get_llm_service()
         return self._llm_service
 
@@ -173,15 +180,41 @@ class ConsumerAnalysisService:
         themes = {}
 
         positive_keywords = [
-            "friendly", "fast", "clean", "fresh", "quality", "delicious",
-            "great service", "love", "best", "amazing", "excellent",
-            "convenient", "cozy", "recommend", "perfect", "wonderful",
+            "friendly",
+            "fast",
+            "clean",
+            "fresh",
+            "quality",
+            "delicious",
+            "great service",
+            "love",
+            "best",
+            "amazing",
+            "excellent",
+            "convenient",
+            "cozy",
+            "recommend",
+            "perfect",
+            "wonderful",
         ]
 
         negative_keywords = [
-            "slow", "rude", "dirty", "expensive", "overpriced", "cold",
-            "wait", "crowded", "small", "noisy", "disappointing",
-            "mediocre", "average", "poor service", "terrible", "worst",
+            "slow",
+            "rude",
+            "dirty",
+            "expensive",
+            "overpriced",
+            "cold",
+            "wait",
+            "crowded",
+            "small",
+            "noisy",
+            "disappointing",
+            "mediocre",
+            "average",
+            "poor service",
+            "terrible",
+            "worst",
         ]
 
         for review in reviews:
@@ -288,7 +321,7 @@ class ConsumerAnalysisService:
                                 }
                             pain_points[category]["frequency"] += 1
                             # Lower rating = higher severity
-                            pain_points[category]["severity"] += (4 - rating)
+                            pain_points[category]["severity"] += 4 - rating
                             if len(pain_points[category]["examples"]) < 2:
                                 pain_points[category]["examples"].append(text[:150])
                             break
@@ -438,9 +471,7 @@ class ConsumerAnalysisService:
 
         return insights
 
-    def _get_stage_opportunities(
-        self, stage: str, business_type: str, insights: dict
-    ) -> list[str]:
+    def _get_stage_opportunities(self, stage: str, business_type: str, insights: dict) -> list[str]:
         """Get opportunities for a journey stage."""
         opportunities = {
             "awareness": [
@@ -477,36 +508,44 @@ class ConsumerAnalysisService:
         moments = []
 
         # First impression
-        moments.append({
-            "moment": "First Impression",
-            "stage": "experience",
-            "impact": "high",
-            "description": "Initial impression sets expectations for entire visit",
-        })
+        moments.append(
+            {
+                "moment": "First Impression",
+                "stage": "experience",
+                "impact": "high",
+                "description": "Initial impression sets expectations for entire visit",
+            }
+        )
 
         # Service interaction
-        moments.append({
-            "moment": "Service Interaction",
-            "stage": "purchase",
-            "impact": "high",
-            "description": "Staff interaction significantly impacts satisfaction",
-        })
+        moments.append(
+            {
+                "moment": "Service Interaction",
+                "stage": "purchase",
+                "impact": "high",
+                "description": "Staff interaction significantly impacts satisfaction",
+            }
+        )
 
         # Product delivery
-        moments.append({
-            "moment": "Product Quality",
-            "stage": "experience",
-            "impact": "high",
-            "description": "Core product experience drives loyalty decisions",
-        })
+        moments.append(
+            {
+                "moment": "Product Quality",
+                "stage": "experience",
+                "impact": "high",
+                "description": "Core product experience drives loyalty decisions",
+            }
+        )
 
         # Problem resolution
-        moments.append({
-            "moment": "Problem Resolution",
-            "stage": "experience",
-            "impact": "critical",
-            "description": "How problems are handled can create loyal advocates or detractors",
-        })
+        moments.append(
+            {
+                "moment": "Problem Resolution",
+                "stage": "experience",
+                "impact": "critical",
+                "description": "How problems are handled can create loyal advocates or detractors",
+            }
+        )
 
         return moments
 
@@ -541,9 +580,7 @@ class ConsumerAnalysisService:
         dominant_age = self._get_dominant_age_group(age_distribution)
 
         # Build persona
-        persona = self._build_persona(
-            business_type, income_segment, dominant_age, demographics
-        )
+        persona = self._build_persona(business_type, income_segment, dominant_age, demographics)
 
         # Extract behavioral insights from reviews
         behavioral_insights = {}
@@ -551,8 +588,16 @@ class ConsumerAnalysisService:
             sentiment = self.analyze_sentiment(reviews)
             themes = self.extract_themes(reviews)
             behavioral_insights = {
-                "key_drivers": [t["theme"] for t in themes.get("themes", [])[:5] if t.get("sentiment") == "positive"],
-                "pain_points": [t["theme"] for t in themes.get("themes", [])[:5] if t.get("sentiment") == "negative"],
+                "key_drivers": [
+                    t["theme"]
+                    for t in themes.get("themes", [])[:5]
+                    if t.get("sentiment") == "positive"
+                ],
+                "pain_points": [
+                    t["theme"]
+                    for t in themes.get("themes", [])[:5]
+                    if t.get("sentiment") == "negative"
+                ],
                 "average_satisfaction": sentiment.get("average_rating"),
             }
 
@@ -662,35 +707,43 @@ class ConsumerAnalysisService:
         # Channel recommendations
         channels = persona.get("channels", [])
         if channels:
-            recommendations.append({
-                "area": "Marketing Channels",
-                "recommendation": f"Focus on {', '.join(channels[:2])} for reaching target customers",
-                "priority": "high",
-            })
+            recommendations.append(
+                {
+                    "area": "Marketing Channels",
+                    "recommendation": f"Focus on {', '.join(channels[:2])} for reaching target customers",
+                    "priority": "high",
+                }
+            )
 
         # Messaging recommendations
         values = persona.get("values", [])
         if values:
-            recommendations.append({
-                "area": "Messaging",
-                "recommendation": f"Emphasize {', '.join(values[:2])} in marketing materials",
-                "priority": "high",
-            })
+            recommendations.append(
+                {
+                    "area": "Messaging",
+                    "recommendation": f"Emphasize {', '.join(values[:2])} in marketing materials",
+                    "priority": "high",
+                }
+            )
 
         # Pricing recommendations
         price_sensitivity = persona.get("price_sensitivity", "moderate")
         if price_sensitivity in ["high", "very high"]:
-            recommendations.append({
-                "area": "Pricing Strategy",
-                "recommendation": "Consider value bundles, loyalty discounts, or happy hour specials",
-                "priority": "high",
-            })
+            recommendations.append(
+                {
+                    "area": "Pricing Strategy",
+                    "recommendation": "Consider value bundles, loyalty discounts, or happy hour specials",
+                    "priority": "high",
+                }
+            )
         elif price_sensitivity == "low":
-            recommendations.append({
-                "area": "Pricing Strategy",
-                "recommendation": "Focus on premium experience; price is less of a barrier",
-                "priority": "medium",
-            })
+            recommendations.append(
+                {
+                    "area": "Pricing Strategy",
+                    "recommendation": "Focus on premium experience; price is less of a barrier",
+                    "priority": "medium",
+                }
+            )
 
         return recommendations
 

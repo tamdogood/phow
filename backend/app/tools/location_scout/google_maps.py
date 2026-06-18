@@ -138,6 +138,7 @@ class GoogleMapsClient:
             "price_level",
             "user_ratings_total",
             "current_opening_hours",
+            "business_status",
         ]
 
         async with httpx.AsyncClient(timeout=30.0) as client:

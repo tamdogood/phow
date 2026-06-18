@@ -331,10 +331,11 @@ class MarketResearchAgent:
                 return f"\n<!--POSITIONING_DATA:{json.dumps(positioning_data)}-->\n"
 
             # Market size data (TAM/SAM/SOM)
-            if tool_name in ["calculate_market_size", "get_market_sizing_summary"] and "tam" in tool_result:
-                widget = create_market_size_widget(
-                    tool_result.get("market_size", tool_result)
-                )
+            if (
+                tool_name in ["calculate_market_size", "get_market_sizing_summary"]
+                and "tam" in tool_result
+            ):
+                widget = create_market_size_widget(tool_result.get("market_size", tool_result))
                 logger.info("Yielded market size data")
                 return f"\n{widget}\n"
 
@@ -357,7 +358,10 @@ class MarketResearchAgent:
                 return f"\n{widget}\n"
 
             # Economic snapshot data
-            if tool_name in ["get_economic_indicators", "get_economic_summary"] and "indicators" in tool_result:
+            if (
+                tool_name in ["get_economic_indicators", "get_economic_summary"]
+                and "indicators" in tool_result
+            ):
                 widget = create_economic_snapshot_widget(
                     tool_result.get("economic_conditions", tool_result)
                 )
@@ -443,7 +447,11 @@ class MarketResearchAgent:
                 return f"\n{widget}\n"
 
             # Revenue projection data
-            if tool_name in ["project_revenue", "get_financial_summary"] and "projections" in tool_result or "revenue_scenarios" in tool_result:
+            if (
+                tool_name in ["project_revenue", "get_financial_summary"]
+                and "projections" in tool_result
+                or "revenue_scenarios" in tool_result
+            ):
                 widget = create_financial_projection_widget(tool_result)
                 logger.info("Yielded financial projection data")
                 return f"\n{widget}\n"

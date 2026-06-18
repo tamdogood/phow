@@ -230,15 +230,17 @@ class HealthInspectionClient:
                 if grade:
                     grades[grade] = grades.get(grade, 0) + 1
 
-            restaurants.append({
-                "name": name,
-                "address": insp.get(address_field, ""),
-                "score": score,
-                "grade": grade,
-                "inspection_date": insp.get(date_field),
-                "lat": insp.get(config["lat_field"]),
-                "lng": insp.get(config["lng_field"]),
-            })
+            restaurants.append(
+                {
+                    "name": name,
+                    "address": insp.get(address_field, ""),
+                    "score": score,
+                    "grade": grade,
+                    "inspection_date": insp.get(date_field),
+                    "lat": insp.get(config["lat_field"]),
+                    "lng": insp.get(config["lng_field"]),
+                }
+            )
 
         avg_score = sum(scores) / len(scores) if scores else None
         total_restaurants = len(restaurants)

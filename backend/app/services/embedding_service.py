@@ -30,9 +30,7 @@ class EmbeddingService:
     async def generate_embedding(self, text: str) -> list[float]:
         """Generate embedding for a single text."""
         loop = asyncio.get_event_loop()
-        embedding = await loop.run_in_executor(
-            None, lambda: self.embeddings.embed_query(text)
-        )
+        embedding = await loop.run_in_executor(None, lambda: self.embeddings.embed_query(text))
         return embedding
 
     async def generate_embeddings_batch(self, texts: list[str]) -> list[list[float]]:
@@ -89,7 +87,10 @@ class EmbeddingService:
             lat=lat,
             lng=lng,
             city=city,
-            metadata={"total_crimes": crime_data.get("total_crimes"), "safety_score": crime_data.get("safety_score")},
+            metadata={
+                "total_crimes": crime_data.get("total_crimes"),
+                "safety_score": crime_data.get("safety_score"),
+            },
         )
 
     def _format_crime_content(self, crime_data: dict[str, Any]) -> str:
@@ -122,7 +123,10 @@ class EmbeddingService:
             lat=lat,
             lng=lng,
             city=city,
-            metadata={"avg_score": inspection_data.get("avg_score"), "health_rating": inspection_data.get("health_rating")},
+            metadata={
+                "avg_score": inspection_data.get("avg_score"),
+                "health_rating": inspection_data.get("health_rating"),
+            },
         )
 
     def _format_health_content(self, data: dict[str, Any]) -> str:

@@ -49,9 +49,7 @@ def calculate_score(
             advantage = 10
         else:
             avg_rating = sum(p["rating"] for p in rated) / len(rated)
-            avg_reviews = (
-                sum(p.get("user_ratings_total") or 0 for p in rated) / len(rated)
-            )
+            avg_reviews = sum(p.get("user_ratings_total") or 0 for p in rated) / len(rated)
             rating_diff = (user_rating - avg_rating) / 5.0  # Normalized [-1, 1]
             review_diff = 0
             if avg_reviews > 0 and user_reviews:
@@ -145,16 +143,18 @@ def run_search_grid(self, report_id: str) -> dict[str, Any]:
                             if p["place_id"] in seen_ids:
                                 continue
                             seen_ids.add(p["place_id"])
-                            nearby_places.append({
-                                "name": p["name"],
-                                "place_id": p["place_id"],
-                                "rating": p.get("rating"),
-                                "user_ratings_total": p.get("user_ratings_total"),
-                                "vicinity": p.get("vicinity"),
-                                "lat": p.get("lat"),
-                                "lng": p.get("lng"),
-                                "business_status": p.get("business_status"),
-                            })
+                            nearby_places.append(
+                                {
+                                    "name": p["name"],
+                                    "place_id": p["place_id"],
+                                    "rating": p.get("rating"),
+                                    "user_ratings_total": p.get("user_ratings_total"),
+                                    "vicinity": p.get("vicinity"),
+                                    "lat": p.get("lat"),
+                                    "lng": p.get("lng"),
+                                    "business_status": p.get("business_status"),
+                                }
+                            )
 
                         if place_id:
                             for i, place in enumerate(nearby[:20]):

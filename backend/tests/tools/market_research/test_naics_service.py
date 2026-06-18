@@ -114,13 +114,22 @@ class TestNAICSDataIntegrity:
         """Test that all business type mappings point to valid codes."""
         for business_type, codes in service.mappings.items():
             for code in codes:
-                assert code in service.codes, f"Mapping '{business_type}' points to invalid code: {code}"
+                assert (
+                    code in service.codes
+                ), f"Mapping '{business_type}' points to invalid code: {code}"
 
     def test_common_business_types_mapped(self, service):
         """Test that common business types are mapped."""
         common_types = [
-            "coffee shop", "restaurant", "gym", "salon", "bakery",
-            "bar", "pet store", "daycare", "dry cleaner"
+            "coffee shop",
+            "restaurant",
+            "gym",
+            "salon",
+            "bakery",
+            "bar",
+            "pet store",
+            "daycare",
+            "dry cleaner",
         ]
         for bt in common_types:
             codes = service.map_business_type(bt)

@@ -84,9 +84,7 @@ class TrendsClient:
             logger.error("Trends API failed", error=str(e))
             return {"error": str(e), "data": []}
 
-    def _fetch_interest(
-        self, keywords: list[str], geo: str, timeframe: str
-    ) -> dict[str, Any]:
+    def _fetch_interest(self, keywords: list[str], geo: str, timeframe: str) -> dict[str, Any]:
         """Synchronous fetch for interest over time."""
         self._pytrends.build_payload(keywords, cat=0, timeframe=timeframe, geo=geo)
         df = self._pytrends.interest_over_time()
@@ -111,9 +109,7 @@ class TrendsClient:
         }
 
     @cached(ttl=86400, key_prefix="trends_related")
-    async def get_related_queries(
-        self, keyword: str, city: str | None = None
-    ) -> dict[str, Any]:
+    async def get_related_queries(self, keyword: str, city: str | None = None) -> dict[str, Any]:
         """
         Get related and rising queries for a keyword.
 
@@ -133,9 +129,7 @@ class TrendsClient:
 
         try:
             loop = asyncio.get_event_loop()
-            result = await loop.run_in_executor(
-                None, lambda: self._fetch_related(keyword, geo)
-            )
+            result = await loop.run_in_executor(None, lambda: self._fetch_related(keyword, geo))
             return result
         except Exception as e:
             logger.error("Related queries failed", error=str(e))

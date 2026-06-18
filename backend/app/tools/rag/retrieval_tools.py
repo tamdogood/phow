@@ -45,17 +45,27 @@ async def search_location_intelligence(
     # Determine which data sources to query based on query content
     query_lower = query.lower()
 
-    if not data_types or "walkscore" in (data_types or []) or any(
-        kw in query_lower for kw in ["walk", "transit", "bike", "walkable", "accessibility"]
+    if (
+        not data_types
+        or "walkscore" in (data_types or [])
+        or any(kw in query_lower for kw in ["walk", "transit", "bike", "walkable", "accessibility"])
     ):
         walk_data = await get_walkscore_client().get_score(latitude, longitude)
         if walk_data:
-            results.append(f"**Walk Score**: {walk_data.get('walkscore')} ({walk_data.get('walkscore_description')})")
-            results.append(f"**Transit Score**: {walk_data.get('transit_score')} ({walk_data.get('transit_description')})")
-            results.append(f"**Bike Score**: {walk_data.get('bike_score')} ({walk_data.get('bike_description')})")
+            results.append(
+                f"**Walk Score**: {walk_data.get('walkscore')} ({walk_data.get('walkscore_description')})"
+            )
+            results.append(
+                f"**Transit Score**: {walk_data.get('transit_score')} ({walk_data.get('transit_description')})"
+            )
+            results.append(
+                f"**Bike Score**: {walk_data.get('bike_score')} ({walk_data.get('bike_description')})"
+            )
 
-    if not data_types or "crime" in (data_types or []) or any(
-        kw in query_lower for kw in ["crime", "safety", "safe", "dangerous", "security"]
+    if (
+        not data_types
+        or "crime" in (data_types or [])
+        or any(kw in query_lower for kw in ["crime", "safety", "safe", "dangerous", "security"])
     ):
         crime_data = await get_crime_client().get_crimes_nearby(latitude, longitude, city)
         if crime_data.get("total_crimes", 0) > 0 or crime_data.get("safety_score"):
@@ -65,10 +75,17 @@ async def search_location_intelligence(
             results.append(f"- Crime rate: {crime_data.get('crime_rate', 'unknown')}")
             results.append(f"- Recommendation: {crime_data.get('recommendation', 'N/A')}")
 
-    if not data_types or "health" in (data_types or []) or any(
-        kw in query_lower for kw in ["health", "inspection", "hygiene", "sanitary", "restaurant"]
+    if (
+        not data_types
+        or "health" in (data_types or [])
+        or any(
+            kw in query_lower
+            for kw in ["health", "inspection", "hygiene", "sanitary", "restaurant"]
+        )
     ):
-        health_data = await get_health_inspection_client().get_inspections_nearby(latitude, longitude, city)
+        health_data = await get_health_inspection_client().get_inspections_nearby(
+            latitude, longitude, city
+        )
         if health_data.get("total_restaurants", 0) > 0:
             results.append(f"\n**Health Inspections** ({city}):")
             results.append(f"- Restaurants analyzed: {health_data.get('total_restaurants')}")
@@ -138,7 +155,9 @@ async def get_crime_data(
     # Check if city is supported
     supported = client.get_supported_cities()
     if not any(s in city.lower() for s in supported):
-        return f"Crime data not available for {city}. Supported cities: {', '.join(supported[:10])}..."
+        return (
+            f"Crime data not available for {city}. Supported cities: {', '.join(supported[:10])}..."
+        )
 
     data = await client.get_crimes_nearby(latitude, longitude, city, radius_meters)
 
@@ -190,7 +209,9 @@ async def get_health_inspections(
 
     supported = client.get_supported_cities()
     if not any(s in city.lower() for s in supported):
-        return f"Health inspection data not available for {city}. Supported: {', '.join(supported)}."
+        return (
+            f"Health inspection data not available for {city}. Supported: {', '.join(supported)}."
+        )
 
     data = await client.get_inspections_nearby(latitude, longitude, city, radius_meters)
 
@@ -215,7 +236,9 @@ async def get_health_inspections(
     if data.get("restaurants"):
         result.append("\n**Sample Restaurants:**")
         for r in data["restaurants"][:5]:
-            score_str = f"Score: {r.get('score')}" if r.get("score") else f"Grade: {r.get('grade', 'N/A')}"
+            score_str = (
+                f"Score: {r.get('score')}" if r.get("score") else f"Grade: {r.get('grade', 'N/A')}"
+            )
             result.append(f"  - {r.get('name', 'Unknown')}: {score_str}")
 
     return "\n".join(result)

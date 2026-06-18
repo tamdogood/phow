@@ -116,9 +116,7 @@ class TestPortersFiveForces:
         """Test basic Five Forces analysis."""
         location = {"address": "Test Address"}
 
-        result = await service.analyze_five_forces(
-            "coffee shop", location, sample_market_data
-        )
+        result = await service.analyze_five_forces("coffee shop", location, sample_market_data)
 
         assert "forces" in result
         forces = result["forces"]
@@ -133,9 +131,7 @@ class TestPortersFiveForces:
         """Test that each force has proper scoring."""
         location = {"address": "Test Address"}
 
-        result = await service.analyze_five_forces(
-            "coffee shop", location, sample_market_data
-        )
+        result = await service.analyze_five_forces("coffee shop", location, sample_market_data)
 
         for force_name, force_data in result["forces"].items():
             assert "score" in force_data
@@ -149,9 +145,7 @@ class TestPortersFiveForces:
         """Test overall industry attractiveness assessment."""
         location = {"address": "Test Address"}
 
-        result = await service.analyze_five_forces(
-            "coffee shop", location, sample_market_data
-        )
+        result = await service.analyze_five_forces("coffee shop", location, sample_market_data)
 
         overall = result["overall"]
         assert "attractiveness_score" in overall

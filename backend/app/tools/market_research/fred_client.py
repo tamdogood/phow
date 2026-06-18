@@ -126,9 +126,7 @@ class FREDClient:
             return {"error": str(e)}
 
     @cached(ttl=86400, key_prefix="fred_regional")  # 24 hours
-    async def get_regional_data(
-        self, series_id: str, region_type: str = "state"
-    ) -> dict[str, Any]:
+    async def get_regional_data(self, series_id: str, region_type: str = "state") -> dict[str, Any]:
         """
         Get regional data for a series (state-level breakdown).
 
@@ -144,11 +142,56 @@ class FREDClient:
 
         # State unemployment series follow pattern: {STATE}UR (e.g., TXUR for Texas)
         state_codes = [
-            "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA",
-            "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD",
-            "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ",
-            "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC",
-            "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY",
+            "AL",
+            "AK",
+            "AZ",
+            "AR",
+            "CA",
+            "CO",
+            "CT",
+            "DE",
+            "FL",
+            "GA",
+            "HI",
+            "ID",
+            "IL",
+            "IN",
+            "IA",
+            "KS",
+            "KY",
+            "LA",
+            "ME",
+            "MD",
+            "MA",
+            "MI",
+            "MN",
+            "MS",
+            "MO",
+            "MT",
+            "NE",
+            "NV",
+            "NH",
+            "NJ",
+            "NM",
+            "NY",
+            "NC",
+            "ND",
+            "OH",
+            "OK",
+            "OR",
+            "PA",
+            "RI",
+            "SC",
+            "SD",
+            "TN",
+            "TX",
+            "UT",
+            "VT",
+            "VA",
+            "WA",
+            "WV",
+            "WI",
+            "WY",
         ]
 
         regional_data = {}
@@ -211,23 +254,37 @@ class FREDClient:
         if "unemployment" in indicators and indicators["unemployment"].get("value"):
             rate = indicators["unemployment"]["value"]
             if rate < 4:
-                interpretations["unemployment"] = "Very tight labor market - hiring may be challenging"
+                interpretations["unemployment"] = (
+                    "Very tight labor market - hiring may be challenging"
+                )
             elif rate < 5:
-                interpretations["unemployment"] = "Healthy labor market - moderate hiring conditions"
+                interpretations["unemployment"] = (
+                    "Healthy labor market - moderate hiring conditions"
+                )
             elif rate < 7:
-                interpretations["unemployment"] = "Elevated unemployment - larger talent pool available"
+                interpretations["unemployment"] = (
+                    "Elevated unemployment - larger talent pool available"
+                )
             else:
-                interpretations["unemployment"] = "High unemployment - economic stress, but hiring easier"
+                interpretations["unemployment"] = (
+                    "High unemployment - economic stress, but hiring easier"
+                )
 
         # Consumer confidence interpretation
         if "consumer_confidence" in indicators and indicators["consumer_confidence"].get("value"):
             conf = indicators["consumer_confidence"]["value"]
             if conf > 100:
-                interpretations["consumer_confidence"] = "High consumer optimism - favorable for discretionary spending"
+                interpretations["consumer_confidence"] = (
+                    "High consumer optimism - favorable for discretionary spending"
+                )
             elif conf > 80:
-                interpretations["consumer_confidence"] = "Moderate consumer confidence - stable spending expected"
+                interpretations["consumer_confidence"] = (
+                    "Moderate consumer confidence - stable spending expected"
+                )
             else:
-                interpretations["consumer_confidence"] = "Low consumer confidence - cautious spending environment"
+                interpretations["consumer_confidence"] = (
+                    "Low consumer confidence - cautious spending environment"
+                )
 
         # CPI interpretation
         if "cpi" in indicators and indicators["cpi"].get("value"):

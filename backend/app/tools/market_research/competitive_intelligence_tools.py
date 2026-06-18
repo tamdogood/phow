@@ -7,18 +7,21 @@ from langchain_core.tools import tool
 def _get_competitive_analysis_service():
     """Lazy import for competitive analysis service."""
     from ...services.competitive_analysis_service import get_competitive_analysis_service
+
     return get_competitive_analysis_service()
 
 
 def _get_maps_client():
     """Lazy import for Google Maps client."""
     from ..location_scout.google_maps import GoogleMapsClient
+
     return GoogleMapsClient()
 
 
 def _get_competitor_tools():
     """Lazy import for competitor finder function."""
     from ..competitor_analyzer.agent_tools import find_competitors
+
     return find_competitors
 
 
@@ -152,11 +155,13 @@ async def estimate_market_shares(
 
     # Get competitors using existing tool
     find_competitors_tool = _get_competitor_tools()
-    competitor_result = await find_competitors_tool.ainvoke({
-        "address": address,
-        "business_type": business_type,
-        "radius_meters": radius_meters,
-    })
+    competitor_result = await find_competitors_tool.ainvoke(
+        {
+            "address": address,
+            "business_type": business_type,
+            "radius_meters": radius_meters,
+        }
+    )
 
     if "error" in competitor_result:
         return competitor_result
@@ -210,11 +215,13 @@ async def analyze_pricing_landscape(
 
     # Get competitors
     find_competitors_tool = _get_competitor_tools()
-    competitor_result = await find_competitors_tool.ainvoke({
-        "address": address,
-        "business_type": business_type,
-        "radius_meters": radius_meters,
-    })
+    competitor_result = await find_competitors_tool.ainvoke(
+        {
+            "address": address,
+            "business_type": business_type,
+            "radius_meters": radius_meters,
+        }
+    )
 
     if "error" in competitor_result:
         return competitor_result
@@ -269,11 +276,13 @@ async def benchmark_competitors(
 
     # Get competitors
     find_competitors_tool = _get_competitor_tools()
-    competitor_result = await find_competitors_tool.ainvoke({
-        "address": address,
-        "business_type": business_type,
-        "radius_meters": 1500,
-    })
+    competitor_result = await find_competitors_tool.ainvoke(
+        {
+            "address": address,
+            "business_type": business_type,
+            "radius_meters": 1500,
+        }
+    )
 
     if "error" in competitor_result:
         return competitor_result
@@ -348,7 +357,9 @@ async def get_competitive_intelligence_summary(
         "swot_summary": {
             "assessment": swot.get("assessment", {}),
             "top_strength": swot.get("strengths", [{}])[0] if swot.get("strengths") else None,
-            "top_opportunity": swot.get("opportunities", [{}])[0] if swot.get("opportunities") else None,
+            "top_opportunity": (
+                swot.get("opportunities", [{}])[0] if swot.get("opportunities") else None
+            ),
             "top_threat": swot.get("threats", [{}])[0] if swot.get("threats") else None,
         },
         "five_forces_summary": five_forces.get("overall", {}),
@@ -367,13 +378,17 @@ async def _gather_market_data(address: str, business_type: str, location: dict) 
     """Gather market data from various sources for analysis."""
     # Get competitors
     find_competitors_tool = _get_competitor_tools()
-    competitor_result = await find_competitors_tool.ainvoke({
-        "address": address,
-        "business_type": business_type,
-        "radius_meters": 1500,
-    })
+    competitor_result = await find_competitors_tool.ainvoke(
+        {
+            "address": address,
+            "business_type": business_type,
+            "radius_meters": 1500,
+        }
+    )
 
-    competitors = competitor_result.get("competitors", []) if "error" not in competitor_result else []
+    competitors = (
+        competitor_result.get("competitors", []) if "error" not in competitor_result else []
+    )
 
     # Try to get additional market data (with graceful degradation)
     market_data = {
@@ -387,6 +402,7 @@ async def _gather_market_data(address: str, business_type: str, location: dict) 
     # Try to get demographics
     try:
         from ..market_validator.census_client import CensusClient
+
         census = CensusClient()
         demographics = await census.get_demographics(location["lat"], location["lng"])
         if demographics:
@@ -397,6 +413,7 @@ async def _gather_market_data(address: str, business_type: str, location: dict) 
     # Try to get economic data
     try:
         from ...services.economic_service import get_economic_service
+
         economic_service = get_economic_service()
         economic = await economic_service.get_economic_snapshot()
         market_data["economic"] = economic
@@ -407,6 +424,7 @@ async def _gather_market_data(address: str, business_type: str, location: dict) 
     try:
         from ...services.market_analysis_service import get_market_analysis_service
         from .naics_service import get_naics_service
+
         naics_service = get_naics_service()
         market_service = get_market_analysis_service()
         codes = naics_service.map_business_type(business_type)
@@ -449,14 +467,20 @@ def _generate_competitive_insights(
     elif concentration.get("level") == "concentrated":
         leader = market_shares.get("market_leader", {})
         if leader:
-            insights.append(f"Market led by {leader.get('name', 'dominant player')} - niche positioning recommended")
+            insights.append(
+                f"Market led by {leader.get('name', 'dominant player')} - niche positioning recommended"
+            )
 
     # Pricing insight
     gaps = pricing.get("pricing_gaps", [])
     if gaps:
         insights.append(f"Pricing opportunity: {gaps[0]}")
 
-    return insights if insights else ["Standard competitive conditions - differentiation through quality recommended"]
+    return (
+        insights
+        if insights
+        else ["Standard competitive conditions - differentiation through quality recommended"]
+    )
 
 
 # List of all competitive intelligence tools

@@ -19,7 +19,13 @@ class FinancialAnalysisService:
     def benchmarks(self) -> dict:
         """Lazy load industry benchmarks."""
         if self._benchmarks is None:
-            benchmarks_path = Path(__file__).parent.parent / "tools" / "market_research" / "data" / "industry_benchmarks.json"
+            benchmarks_path = (
+                Path(__file__).parent.parent
+                / "tools"
+                / "market_research"
+                / "data"
+                / "industry_benchmarks.json"
+            )
             with open(benchmarks_path) as f:
                 self._benchmarks = json.load(f)
         return self._benchmarks
@@ -29,6 +35,7 @@ class FinancialAnalysisService:
         """Lazy load NAICS service."""
         if self._naics_service is None:
             from ..tools.market_research.naics_service import get_naics_service
+
             self._naics_service = get_naics_service()
         return self._naics_service
 
@@ -94,7 +101,9 @@ class FinancialAnalysisService:
         competition_factor = max(0.6, 1 - (competition * 0.03))  # Each competitor reduces by 3%
         population_factor = min(1.2, max(0.8, population / 50000))
 
-        adjusted_transactions = int(daily_transactions * income_factor * competition_factor * population_factor)
+        adjusted_transactions = int(
+            daily_transactions * income_factor * competition_factor * population_factor
+        )
 
         # Calculate projections
         daily_revenue = adjusted_transactions * avg_ticket
@@ -124,7 +133,9 @@ class FinancialAnalysisService:
             "benchmark_comparison": {
                 "industry_avg": benchmark.get("avg_revenue_per_location", 500000),
                 "industry_range": benchmark.get("revenue_range", {}),
-                "vs_industry_avg": round((annual_revenue / benchmark.get("avg_revenue_per_location", 500000)) * 100, 1),
+                "vs_industry_avg": round(
+                    (annual_revenue / benchmark.get("avg_revenue_per_location", 500000)) * 100, 1
+                ),
             },
             "confidence": self._calculate_projection_confidence(market_data),
         }
@@ -175,7 +186,9 @@ class FinancialAnalysisService:
 
         # Get monthly revenue
         if revenue_projection:
-            monthly_revenue = revenue_projection.get("projections", {}).get("monthly_revenue", 50000)
+            monthly_revenue = revenue_projection.get("projections", {}).get(
+                "monthly_revenue", 50000
+            )
         else:
             monthly_revenue = benchmark.get("avg_revenue_per_location", 500000) / 12
 
@@ -300,7 +313,9 @@ class FinancialAnalysisService:
                 "revenue_change": int(new_revenue - base_revenue),
                 "revenue_change_percent": round(((new_revenue / base_revenue) - 1) * 100, 1),
                 "profit_change": int(new_profit - base_profit),
-                "profit_change_percent": round(((new_profit / base_profit) - 1) * 100, 1) if base_profit > 0 else 0,
+                "profit_change_percent": (
+                    round(((new_profit / base_profit) - 1) * 100, 1) if base_profit > 0 else 0
+                ),
             },
             "modifications_applied": modifications,
         }
@@ -375,13 +390,17 @@ class FinancialAnalysisService:
         # Determine level
         if overall_score >= 70:
             level = "strong"
-            recommendation = "Financial projections support business viability. Proceed with confidence."
+            recommendation = (
+                "Financial projections support business viability. Proceed with confidence."
+            )
         elif overall_score >= 50:
             level = "moderate"
             recommendation = "Viable with proper execution. Focus on operational efficiency."
         else:
             level = "challenging"
-            recommendation = "Financial challenges present. Consider cost reduction or differentiation."
+            recommendation = (
+                "Financial challenges present. Consider cost reduction or differentiation."
+            )
 
         return {
             "business_type": business_type,
@@ -435,34 +454,52 @@ class FinancialAnalysisService:
         risks = []
 
         if scores.get("revenue_potential", 0) < 50:
-            risks.append({
-                "factor": "Revenue potential",
-                "severity": "high",
-                "description": "Projected revenue below industry average",
-            })
+            risks.append(
+                {
+                    "factor": "Revenue potential",
+                    "severity": "high",
+                    "description": "Projected revenue below industry average",
+                }
+            )
 
         if scores.get("break_even_timeline", 0) < 50:
-            risks.append({
-                "factor": "Break-even timeline",
-                "severity": "medium",
-                "description": "Longer than typical break-even period",
-            })
+            risks.append(
+                {
+                    "factor": "Break-even timeline",
+                    "severity": "medium",
+                    "description": "Longer than typical break-even period",
+                }
+            )
 
         if scores.get("competition_impact", 0) < 50:
-            risks.append({
-                "factor": "Competition",
-                "severity": "medium",
-                "description": "High competition may impact market share",
-            })
+            risks.append(
+                {
+                    "factor": "Competition",
+                    "severity": "medium",
+                    "description": "High competition may impact market share",
+                }
+            )
 
         if scores.get("market_growth", 0) < 40:
-            risks.append({
-                "factor": "Market growth",
-                "severity": "medium",
-                "description": "Industry showing slow or negative growth",
-            })
+            risks.append(
+                {
+                    "factor": "Market growth",
+                    "severity": "medium",
+                    "description": "Industry showing slow or negative growth",
+                }
+            )
 
-        return risks if risks else [{"factor": "None significant", "severity": "low", "description": "No major risk factors identified"}]
+        return (
+            risks
+            if risks
+            else [
+                {
+                    "factor": "None significant",
+                    "severity": "low",
+                    "description": "No major risk factors identified",
+                }
+            ]
+        )
 
     def get_financial_summary(
         self,
@@ -554,7 +591,9 @@ class FinancialAnalysisService:
             elif months <= 24:
                 insights.append(f"Typical break-even timeline ({months} months)")
             else:
-                insights.append(f"Extended break-even timeline ({months} months) - ensure adequate funding")
+                insights.append(
+                    f"Extended break-even timeline ({months} months) - ensure adequate funding"
+                )
 
         # Viability insight
         score = viability.get("viability_score", 50)
