@@ -14,6 +14,7 @@ from .api.routes import (
     account_router,
     action_inbox_router,
     scenario_lab_router,
+    reviews_router,
 )
 from .core.tool_registry import ToolRegistry
 from .core.cache import get_cache
@@ -82,6 +83,7 @@ app.include_router(daily_brief_router, prefix="/api")
 app.include_router(account_router, prefix="/api")
 app.include_router(action_inbox_router, prefix="/api")
 app.include_router(scenario_lab_router, prefix="/api")
+app.include_router(reviews_router, prefix="/api")
 
 
 @app.get("/")

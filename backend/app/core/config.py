@@ -15,6 +15,15 @@ class Settings(BaseSettings):
     # Google Maps
     google_maps_api_key: str = ""
 
+    # Google Business Profile (Reputation Hub)
+    google_oauth_client_id: str = ""
+    google_oauth_client_secret: str = ""
+    google_oauth_redirect_uri: str = "http://localhost:8000/api/reviews/connect/google/callback"
+    review_token_encryption_key: str = ""  # Fernet key for OAuth tokens at rest
+
+    # Frontend (used for OAuth redirects back to the app)
+    frontend_url: str = "http://localhost:3000"
+
     # Yelp Fusion API
     yelp_api_key: str = ""
 

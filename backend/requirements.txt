@@ -19,6 +19,9 @@ langgraph>=0.0.20
 supabase>=2.0.0
 postgrest>=0.13.0
 
+# Security
+cryptography>=42.0.0  # Fernet encryption for stored OAuth tokens
+
 # Caching & Background Tasks
 redis>=5.0.0
 celery>=5.3.0

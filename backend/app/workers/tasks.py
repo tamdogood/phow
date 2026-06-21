@@ -441,4 +441,8 @@ celery_app.conf.beat_schedule = {
         "task": "app.workers.daily_brief_tasks.dispatch_due_daily_briefs",
         "schedule": 3600,  # Hourly: generate today's brief for businesses that lack one
     },
+    "sync-google-reviews": {
+        "task": "app.workers.reputation_tasks.sync_all_reviews",
+        "schedule": 900,  # Every 15 minutes: pull new reviews for connected locations
+    },
 }

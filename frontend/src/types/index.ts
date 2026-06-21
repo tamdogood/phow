@@ -201,3 +201,118 @@ export interface SearchGridReportWithResults extends SearchGridReport {
   latest_run: SearchGridRun | null;
   results: SearchGridResult[];
 }
+
+export type ReviewSource =
+  | "google"
+  | "yelp"
+  | "meta"
+  | "youtube"
+  | "aggregator"
+  | "web";
+
+export type ReviewSentimentLabel = "positive" | "neutral" | "negative" | "mixed";
+
+export interface ReviewSentiment {
+  sentiment_label: ReviewSentimentLabel;
+  confidence: number;
+  themes: string[];
+}
+
+export interface Review {
+  id: string;
+  source: ReviewSource;
+  content_type: "review" | "mention";
+  status: "new" | "needs_response" | "responded" | "closed" | "archived";
+  urgency: "low" | "medium" | "high" | "critical";
+  author_name: string | null;
+  content: string | null;
+  rating: number | null;
+  item_url: string | null;
+  published_at: string | null;
+  sentiment: ReviewSentiment | null;
+  metadata?: Record<string, unknown>;
+}
+
+export interface ReviewConnection {
+  id: string;
+  source: ReviewSource;
+  status: string;
+  external_account_id: string | null;
+  external_location_id: string | null;
+  last_synced_at: string | null;
+  created_at: string | null;
+}
+
+export interface ReviewResponseDraft {
+  id: string;
+  tone: "professional" | "friendly" | "apologetic";
+  draft_text: string;
+  model_version?: string | null;
+}
+
+export interface ReviewAnalyticsSummary {
+  total_items: number;
+  avg_rating: number | null;
+  response_rate: number | null;
+  sentiment_breakdown: {
+    positive: number;
+    neutral: number;
+    negative: number;
+    mixed?: number;
+  };
+}
+
+export interface ReviewTrendPoint {
+  date: string;
+  positive: number;
+  neutral: number;
+  negative: number;
+  avg_rating: number | null;
+}
+
+export interface ThemeMetric {
+  theme: string;
+  count: number;
+  sentiment: ReviewSentimentLabel | null;
+}
+
+export interface PlatformMetric {
+  source: ReviewSource;
+  volume: number;
+  avg_rating: number | null;
+  response_rate: number | null;
+}
+
+export interface CompetitorComparison {
+  id?: string;
+  name: string;
+  source?: ReviewSource;
+  avg_rating?: number | null;
+  review_count?: number | null;
+  delta_rating?: number | null;
+  delta_review_count?: number | null;
+}
+
+export interface ReviewNotification {
+  id: string;
+  type: string;
+  title: string;
+  message: string | null;
+  is_read: boolean;
+  created_at: string | null;
+}
+
+export interface AlertSettings {
+  low_rating_threshold: number;
+  enable_email_digest: boolean;
+  digest_frequency: "daily" | "weekly";
+  enable_realtime_alerts: boolean;
+}
+
+export interface UsageSummary {
+  plan: string;
+  drafts_generated: number;
+  drafts_limit: number;
+  sync_runs: number;
+  sync_runs_limit: number;
+}

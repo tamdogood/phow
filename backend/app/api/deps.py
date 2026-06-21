@@ -2,6 +2,7 @@ from fastapi import Depends
 from supabase import create_client, Client
 from ..core.config import get_settings
 from ..services import ChatService, TrackingService
+from ..services.reputation_service import ReputationService
 from ..core.cache import get_cache, CacheManager
 
 _supabase_client: Client | None = None
@@ -24,6 +25,11 @@ def get_tracking_service(db: Client = Depends(get_supabase)) -> TrackingService:
 def get_chat_service(db: Client = Depends(get_supabase)) -> ChatService:
     """Dependency for ChatService."""
     return ChatService(db)
+
+
+def get_reputation_service(db: Client = Depends(get_supabase)) -> ReputationService:
+    """Dependency for ReputationService (Reputation Hub)."""
+    return ReputationService(db)
 
 
 def get_cache_manager() -> CacheManager:

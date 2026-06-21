@@ -10,6 +10,7 @@ from .daily_brief import router as daily_brief_router
 from .account import router as account_router
 from .action_inbox import router as action_inbox_router
 from .scenario_lab import router as scenario_lab_router
+from .reviews import router as reviews_router
 
 __all__ = [
     "chat_router",
@@ -24,4 +25,5 @@ __all__ = [
     "account_router",
     "action_inbox_router",
     "scenario_lab_router",
+    "reviews_router",
 ]
