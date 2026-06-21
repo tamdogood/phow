@@ -9,6 +9,7 @@ import { getSessionId } from "@/lib/session";
 import { DashboardData, TrackedCompetitor, CommunityPost, SearchGridReport } from "@/types";
 import { CommunityWidget } from "@/components/dashboard/CommunityWidget";
 import { RadarWidget } from "@/components/dashboard/RadarWidget";
+import { ReputationWidget } from "@/components/dashboard/ReputationWidget";
 import { AddCompetitorModal } from "@/components/dashboard/AddCompetitorModal";
 
 function ScoreCard({
@@ -353,6 +354,11 @@ export default function DashboardPage() {
               {/* Business Radar */}
               {data.business_profile?.id && (
                 <RadarWidget businessProfileId={data.business_profile.id} />
+              )}
+
+              {/* Reputation Hub */}
+              {data.business_profile?.id && (
+                <ReputationWidget businessProfileId={data.business_profile.id} />
               )}
 
               {/* Local Search Grid */}

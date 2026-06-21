@@ -67,6 +67,7 @@ export function AppHeader({ maxWidth = "max-w-6xl" }: { maxWidth?: string }) {
                 <nav className="hidden md:flex items-center gap-1">
                   <NavLink href="/dashboard">Dashboard</NavLink>
                   <NavLink href="/radar">Radar</NavLink>
+                  <NavLink href="/reviews">Reputation</NavLink>
                   <NavLink href="/app">Chat</NavLink>
                 </nav>
                 <Link
