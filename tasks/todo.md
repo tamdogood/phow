@@ -13,10 +13,28 @@ Goal: implement the prioritized feature plan + the monetization layer that makes
 
 ## Iteration 2+ — buildable now (no secrets) + items needing external creds
 - [x] **Scenario Lab** ✅ (SaaS iter 2) — `scenario_lab_service` + `POST /api/scenario-lab/run`; transparent what-if (price/rent/food-cost/covers → profit/margin/break-even); 8 tests; suite **149 green**
-- [ ] **Review Autopilot** (draft replies; pure draft logic testable; SEND needs GBP OAuth)
+- [x] **Review Autopilot → Reputation Hub (GBP)** — shipped this iteration (see Iteration 3 below)
 - [ ] **Demand Forecast** (events + weather + seasonality) — needs events/weather API
 - [ ] **GBP Optimizer**, **Weekly Business Review**, **email/Slack digest** (Resend), **grounded "ask about my business" chat**
 - [ ] Frontend: DailyBriefHero, Action Inbox, pricing page, entitlement-aware UI
+
+## Iteration 3 — Reputation Hub on Google Business Profile ✅ (backend verified)
+
+The "Protect your reputation" Hub: connect Google Business Profile via OAuth, auto-sync reviews,
+unified inbox, AI reply drafts (3 tones), publish replies to Google, sentiment + analytics.
+A manual "Add review" path makes it usable before Google API access is approved.
+
+- [x] Migration `014_reputation_hub.sql` — `review_connections` + `reviews` (sentiment & response folded in; 2 tables)
+- [x] `core/crypto.py` (Fernet) + config (GBP OAuth, encryption key, `frontend_url`) + `cryptography` dep + `.env.example`
+- [x] `clients/google_business_client.py` — OAuth + Accounts/Locations/Reviews(v4)/Reply + review normalization
+- [x] `repositories/review_repository.py` + `services/reputation_service.py` (reuses keyword sentiment classifier; LLM for drafts)
+- [x] `api/routes/reviews.py` (10 routes) + `deps` + `main` + `routes/__init__`
+- [x] `workers/reputation_tasks.py` `sync_all_reviews` + 15-min beat + celery include
+- [x] Frontend: `lib/reviews-api.ts`, `app/reviews/page.tsx`, dashboard `ReputationWidget`, AppHeader "Reputation" nav
+- [x] `tests/services/test_reputation_service.py` (10): normalize, draft-parse, sentiment, analytics, OAuth url
+- [x] Verify: black ✅ (154 files) · `import app.main` ✅ (67 routes, 10 review) · pytest ✅ **159 passed**
+
+**Review (iter 3):** Shipped the Google-first Reputation Hub end to end on the backend — the item previously flagged as "Review Autopilot — SEND needs GBP OAuth." Kept minimal per house style: 2 tables (sentiment + owner response folded into `reviews`), reused the existing keyword sentiment classifier, Fernet-encrypted tokens at rest. **Verified here:** backend import, formatting, 159 tests (incl. 10 new offline tests). **Not verifiable here:** live Google OAuth/sync/publish (needs Google API allowlisting + `business.manage` verification + creds), Supabase `014` apply, and the frontend build (no node_modules; gitignored `src/lib`). **To ship:** apply `014`; set `GOOGLE_OAUTH_*` + `REVIEW_TOKEN_ENCRYPTION_KEY` + `FRONTEND_URL`; request Google Business Profile API access; `npm install && npm run build`; commit `frontend/src/lib/reviews-api.ts`. **Pre-approval:** the manual "Add review" path exercises sentiment→draft→publish locally. **Next:** Yelp read-lite + deep-link reply; multi-location; daily digest email; surface Hub "needs reply" in the Daily Brief / Action Inbox.
 
 ---
 
