@@ -659,6 +659,124 @@ summary:focus-visible {
   font-size: 12px !important;
 }
 
+/* ============================================================
+   LANDING PAGE — "Dovetail" design system
+   Blueprint grid under a black moon: near-black canvas, white
+   type, one soft-indigo spark (#6798ff). Depth via luminance,
+   never shadow. All classes are additive + landing-scoped.
+   ============================================================ */
+:root {
+  --dt-indigo: #6798ff;
+  --dt-indigo-soft: rgba(103, 152, 255, 0.14);
+  --dt-canvas: #0a0a0a;
+  --dt-card: #141414;
+  --dt-elevated: #1e1e1e;
+  --dt-border: #1e1e1e;
+  --dt-border-strong: #313131;
+  --dt-ash: #a7a7a7;
+  --dt-mist: #7c7c7c;
+}
+
+/* Blueprint grid — faint graph paper that recedes behind content */
+.dt-grid {
+  background-image:
+    linear-gradient(to right, rgba(120, 140, 185, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(120, 140, 185, 0.05) 1px, transparent 1px);
+  background-size: 48px 48px;
+  -webkit-mask-image: radial-gradient(115% 95% at 50% 0%, #000 38%, transparent 92%);
+  mask-image: radial-gradient(115% 95% at 50% 0%, #000 38%, transparent 92%);
+}
+
+/* Indigo command-center glow, top-anchored */
+.dt-glow {
+  background:
+    radial-gradient(58% 48% at 50% -8%, rgba(103, 152, 255, 0.18), transparent 70%),
+    radial-gradient(40% 36% at 88% 8%, rgba(103, 152, 255, 0.07), transparent 70%);
+}
+
+/* The one chromatic note */
+.text-indigo-spark { color: var(--dt-indigo); }
+
+/* Content card — elevation through luminance, hover lifts a step */
+.dt-card {
+  background: var(--dt-card);
+  border: 1px solid var(--dt-border);
+  border-radius: 8px;
+  transition: border-color 0.3s ease, background 0.3s ease, transform 0.3s ease;
+}
+.dt-card-hover:hover {
+  border-color: var(--dt-border-strong);
+  background: #181818;
+  transform: translateY(-3px);
+}
+
+/* Scroll reveal */
+.dt-reveal {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 0.75s cubic-bezier(0.22, 0.61, 0.3, 1),
+    transform 0.75s cubic-bezier(0.22, 0.61, 0.3, 1);
+  will-change: opacity, transform;
+}
+.dt-reveal.dt-in { opacity: 1; transform: none; }
+
+/* Headline shimmer — white sheet with a passing indigo glint */
+@keyframes dt-shimmer { to { background-position: -200% center; } }
+.dt-shimmer {
+  background: linear-gradient(100deg, #ffffff 40%, #6798ff 50%, #ffffff 60%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: dt-shimmer 7s linear infinite;
+}
+
+/* Infinite marquee (trust strip) */
+@keyframes dt-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.dt-marquee { animation: dt-marquee 38s linear infinite; }
+.dt-marquee-mask {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+
+/* Radar sweep */
+@keyframes dt-radar { to { transform: rotate(360deg); } }
+.dt-radar-sweep { animation: dt-radar 4.5s linear infinite; transform-origin: center; }
+
+/* Bar chart grow-in */
+@keyframes dt-bar-grow { from { transform: scaleY(0.04); } to { transform: scaleY(1); } }
+.dt-bar { transform-origin: bottom; animation: dt-bar-grow 0.9s cubic-bezier(0.22, 0.61, 0.3, 1) both; }
+
+/* Live ping */
+@keyframes dt-ping { 0% { transform: scale(1); opacity: 0.7; } 70%, 100% { transform: scale(2.6); opacity: 0; } }
+.dt-ping { animation: dt-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite; }
+
+/* Typewriter caret */
+@keyframes dt-blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+.dt-caret { display: inline-block; width: 7px; height: 1.05em; transform: translateY(2px); background: var(--dt-indigo); animation: dt-blink 1s step-end infinite; }
+
+/* Gentle float for hero accent chips */
+@keyframes dt-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+.dt-float { animation: dt-float 6s ease-in-out infinite; }
+.dt-float-slow { animation: dt-float 8.5s ease-in-out infinite; }
+
+/* Conic ring spin (feature accents) */
+@keyframes dt-spin { to { transform: rotate(360deg); } }
+.dt-spin-slow { animation: dt-spin 14s linear infinite; }
+
+/* Animated gradient border ring used on the hero preview */
+@keyframes dt-orbit { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .dt-reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+  .dt-shimmer, .dt-marquee, .dt-radar-sweep, .dt-bar, .dt-ping,
+  .dt-caret, .dt-float, .dt-float-slow, .dt-spin-slow {
+    animation: none !important;
+  }
+  .dt-shimmer { -webkit-text-fill-color: #fff; color: #fff; }
+}
+
 /* --- Feasibility study: print / PDF export --- */
 @media print {
   body {

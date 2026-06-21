@@ -1,74 +1,69 @@
 "use client";
 
-import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
+import { Quote, Star } from "lucide-react";
+import { Reveal } from "./Reveal";
 
-const testimonials = [
+const TESTIMONIALS = [
   {
-    quote: "PHOW helped me find the perfect location for my coffee shop. The foot traffic analysis was spot-on, and I'm now seeing 40% more customers than I projected.",
+    quote:
+      "PHOW flagged a new café two blocks away the week it opened. I adjusted my morning specials before it cost me a single regular.",
     author: "Sarah Chen",
-    role: "Owner, Bean & Leaf Coffee",
-    avatar: "SC",
-    color: "from-sky-500 to-blue-600",
+    role: "Owner · Bean & Leaf Coffee",
+    initials: "SC",
   },
   {
-    quote: "Before launching my fitness studio, I used the Market Validator to understand demand. It saved me from opening in an oversaturated area.",
-    author: "Marcus Johnson",
-    role: "Founder, FitFlow Studio",
-    avatar: "MJ",
-    color: "from-violet-500 to-purple-600",
+    quote:
+      "The feasibility study talked me out of a corner I'd have signed a five-year lease on. That one 'no' was worth a year of subscriptions.",
+    author: "Mateo Alvarez",
+    role: "Owner · Casa Mateo",
+    initials: "MA",
   },
   {
-    quote: "The Competitor Analyzer showed me gaps in the local market I never knew existed. I positioned my bakery perfectly and hit profitability in month three.",
+    quote:
+      "The daily brief is the first thing I read with my coffee. It caught my rating slipping and drafted the replies — back to 4.7 in a month.",
     author: "Emily Rodriguez",
-    role: "Owner, Sweet Rise Bakery",
-    avatar: "ER",
-    color: "from-orange-500 to-rose-600",
+    role: "Owner · Sweet Rise Bakery",
+    initials: "ER",
   },
 ];
 
 export function TestimonialsSection() {
-  const { ref, isVisible } = useIntersectionObserver<HTMLElement>({ threshold: 0.1 });
-
   return (
-    <section ref={ref} className="relative z-10 py-24 px-6">
-      <div className="mx-auto max-w-6xl">
-        {/* Section Header */}
-        <div className={`text-center mb-16 animate-on-scroll ${isVisible ? "visible" : ""}`}>
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Loved by Business Owners
-          </h2>
-          <p className="text-lg text-white/60 max-w-2xl mx-auto">
-            See how PHOW is helping entrepreneurs make smarter decisions every day.
+    <section className="px-6 py-20 lg:py-28">
+      <div className="mx-auto max-w-[1200px]">
+        <Reveal className="max-w-2xl mx-auto text-center">
+          <p className="font-mono text-[12px] tracking-[0.12em] text-[#a7a7a7] uppercase">
+            Loved by owners
           </p>
-        </div>
+          <h2 className="mt-5 text-[32px] sm:text-[40px] font-medium leading-[1.12] tracking-[-0.025em] text-white">
+            The watchtower indie owners didn&apos;t know they could afford
+          </h2>
+        </Reveal>
 
-        {/* Testimonial Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {testimonials.map((testimonial, index) => (
-            <div
-              key={testimonial.author}
-              className={`glass-card p-8 animate-on-scroll ${isVisible ? "visible" : ""}`}
-              style={{ transitionDelay: `${(index + 1) * 100}ms` }}
-            >
-              {/* Quote */}
-              <div className="mb-6">
-                <svg className="w-8 h-8 text-sky-500/30" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
-                </svg>
-              </div>
-              <p className="text-white/80 mb-6 leading-relaxed">{testimonial.quote}</p>
-
-              {/* Author */}
-              <div className="flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${testimonial.color} flex items-center justify-center text-white font-semibold`}>
-                  {testimonial.avatar}
+        <div className="mt-14 grid md:grid-cols-3 gap-5">
+          {TESTIMONIALS.map((t, i) => (
+            <Reveal key={t.author} delay={i * 110}>
+              <figure className="dt-card dt-card-hover h-full p-7 flex flex-col">
+                <Quote className="w-7 h-7 text-[#6798ff]/40" />
+                <blockquote className="mt-4 flex-1 text-[15px] leading-[1.65] text-white/90">
+                  {t.quote}
+                </blockquote>
+                <div className="mt-6 flex">
+                  {[0, 1, 2, 3, 4].map((s) => (
+                    <Star key={s} className="w-3.5 h-3.5 fill-[#6798ff] text-[#6798ff]" />
+                  ))}
                 </div>
-                <div>
-                  <p className="text-white font-medium">{testimonial.author}</p>
-                  <p className="text-white/50 text-sm">{testimonial.role}</p>
-                </div>
-              </div>
-            </div>
+                <figcaption className="mt-5 flex items-center gap-3 pt-5 border-t border-[#1a1a1a]">
+                  <span className="grid place-items-center w-10 h-10 rounded-full bg-[#1e1e1e] text-[13px] font-medium text-white">
+                    {t.initials}
+                  </span>
+                  <div>
+                    <p className="text-[14px] font-medium text-white">{t.author}</p>
+                    <p className="text-[12.5px] text-[#7c7c7c]">{t.role}</p>
+                  </div>
+                </figcaption>
+              </figure>
+            </Reveal>
           ))}
         </div>
       </div>

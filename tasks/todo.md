@@ -75,3 +75,18 @@ Plan: `~/.claude/plans/...` · Docs: `docs/BUSINESS_RADAR.md`, `docs/FEASIBILITY
 **To ship:** apply `010_business_radar.sql`; run backend + `celery worker` + `celery beat` (Redis up); `cd frontend && npm install && npm run build` on a machine with `src/lib`; smoke-test `/radar` (Scan now → triaged alerts). Commit `frontend/src/lib/` (now un-ignored).
 
 **Next:** beachhead shadcn migration; competitor-move + local/macro collectors; email digest; embedding-based dedup; "Ask about this alert" chat.
+
+---
+
+## Landing page redesign — "Dovetail" world-class rebuild (DONE — per request, 2026-06-20)
+
+Goal: rebuild `/` as a world-class, viral, animated landing page in the **Dovetail** style (`.context/attachments/.../pasted_text...txt`): near-black `#0a0a0a` canvas, blueprint grid, white Inter type, JetBrains Mono eyebrows, a single soft-indigo `#6798ff` accent, depth via luminance (no shadows), 8px radii.
+
+- [x] **Design system** (additive in `globals.css`): Dovetail tokens + `.dt-grid` (masked blueprint), `.dt-glow`, `.dt-card`/`-hover`, `.dt-reveal`, keyframes (shimmer, marquee, radar sweep, bar-grow, ping, typewriter caret, float, spin) + full `prefers-reduced-motion` guards.
+- [x] **Primitives:** `Reveal` (IO scroll-in) + `CountUp` (eased, rAF, in-view).
+- [x] **`CommandCenterPreview`** — self-contained animated product hero (live dot, tabs, Daily-Brief signal rows, grow-in bar chart, streaming AI insight w/ caret, floating chips). No Google-Maps/API dependency.
+- [x] **Sections (real F&B positioning):** Header (pill nav + promo strip), Hero, LogoStrip (source marquee), WedgeSection ("they watch your inbox…"), StatsSection (count-ups), FeaturesSection (Feasibility/Radar/Daily Brief/Reputation/Competitor/Local Rank), HowItWorks, CostCompareSection (viral agency-vs-PHOW scale bars), Testimonials, Pricing (3 tiers), CTASection, Footer (multi-column).
+- [x] Removed orphaned `DemoSection.tsx` + `HeroMapDemo.tsx`; updated `index.ts` + `page.tsx`.
+- [x] **Verified:** `npm run build` ✓ (`/` static) · `npm run lint` ✓ (0 issues in `landing/`) · SSR content markers present · headless-Chrome screenshots (desktop + full page + mobile) · CDP overflow probe @390px = **0 px overflow** (h1 fits 342/342) · dev log clean (no hydration/runtime errors).
+
+**Review:** replaced the generic multi-color landing with a cohesive monochrome+indigo command-center aesthetic and sharp "AI analyst & 24/7 market watchtower for indie F&B" positioning (per `docs/SAAS_STRATEGY.md`). Animation is tasteful and reduced-motion-safe; the cost-comparison bar + floating savings chip are the shareable hooks. **Note:** lint errors exist in pre-existing files (AuthContext, CompetitorWidget, SocialMediaCoachWidget, api-mock) — untouched, out of scope.

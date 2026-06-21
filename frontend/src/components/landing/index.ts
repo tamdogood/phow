@@ -1,6 +1,12 @@
 export { Header } from "./Header";
 export { Footer } from "./Footer";
 export { HeroSection } from "./HeroSection";
-export { DemoSection } from "./DemoSection";
+export { LogoStrip } from "./LogoStrip";
+export { WedgeSection } from "./WedgeSection";
+export { StatsSection } from "./StatsSection";
 export { FeaturesSection } from "./FeaturesSection";
+export { HowItWorksSection } from "./HowItWorksSection";
+export { CostCompareSection } from "./CostCompareSection";
+export { TestimonialsSection } from "./TestimonialsSection";
+export { PricingSection } from "./PricingSection";
 export { CTASection } from "./CTASection";

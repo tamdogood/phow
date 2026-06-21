@@ -1,89 +1,95 @@
 "use client";
 
 import Link from "next/link";
+import { ArrowRight, Star } from "lucide-react";
+import { CommandCenterPreview } from "./CommandCenterPreview";
 
 export function HeroSection() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center px-6 pt-20">
-      <div className="relative z-10 max-w-4xl text-center">
-        {/* Badge */}
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#1a1a1a] border border-white/10 mb-8 animate-fade-in-up">
-          <span className="text-sm">📍</span>
-          <span className="text-xs font-mono text-white/70 uppercase tracking-wider">PHOW</span>
-        </div>
-
-        {/* Main Headline */}
-        <h1
-          className="text-5xl md:text-7xl font-bold text-white mb-6 tracking-tight animate-fade-in-up"
-          style={{ animationDelay: "0.1s" }}
-        >
-          AI-Powered Analytics
-          <br />
-          for Small <span className="text-accent-blue">Business</span>
-        </h1>
-
-        {/* Subtitle */}
-        <p
-          className="text-lg md:text-xl text-white/50 max-w-2xl mx-auto mb-10 animate-fade-in-up"
-          style={{ animationDelay: "0.2s" }}
-        >
-          Location analysis, market validation, and competitive
-          intelligence—powered by AI.
-        </p>
-
-        {/* CTAs */}
-        <div
-          className="flex flex-wrap gap-4 justify-center mb-8 animate-fade-in-up"
-          style={{ animationDelay: "0.3s" }}
-        >
-          <Link
-            href="/app"
-            className="inline-flex items-center gap-2 px-6 py-3.5 rounded-lg bg-white text-black font-semibold hover:bg-white/90 transition-all"
+    <section className="relative px-6 pt-32 lg:pt-40 pb-20">
+      <div className="mx-auto max-w-[1200px] grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.08fr)] gap-12 xl:gap-16 items-center">
+        {/* Copy */}
+        <div className="max-w-xl">
+          {/* Eyebrow */}
+          <div
+            className="inline-flex items-center gap-2 rounded-full border border-[#1e1e1e] bg-[#0e0e0e] pl-2.5 pr-3 py-1.5 animate-fade-in-up"
+            style={{ opacity: 0 }}
           >
-            Get Started Free
-            <span className="px-2 py-0.5 rounded bg-black/10 text-xs font-mono">FREE</span>
-          </Link>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#6798ff]" />
+            <span className="font-mono text-[11px] tracking-[0.1em] text-[#a7a7a7] uppercase">
+              Vertical AI for independent F&amp;B
+            </span>
+          </div>
+
+          {/* Headline */}
+          <h1
+            className="mt-6 text-[33px] sm:text-[48px] lg:text-[60px] font-medium leading-[1.05] tracking-[-0.03em] text-balance text-white animate-fade-in-up"
+            style={{ opacity: 0, animationDelay: "0.08s" }}
+          >
+            Run your restaurant.
+            <br />
+            PHOW <span className="dt-shimmer">watches the market.</span>
+          </h1>
+
+          {/* Subtext */}
+          <p
+            className="mt-6 text-[16px] sm:text-[17px] leading-[1.6] text-[#a7a7a7] animate-fade-in-up"
+            style={{ opacity: 0, animationDelay: "0.16s" }}
+          >
+            The AI analyst and 24/7 market watchtower for indie cafés and restaurants.
+            Feasibility studies, competitor moves, reputation, and a daily brief over your
+            real signals — the intelligence chains pay{" "}
+            <span className="text-white">$15,000</span> for, for the price of two coffees.
+          </p>
+
+          {/* CTAs */}
+          <div
+            className="mt-8 flex flex-wrap items-center gap-3 animate-fade-in-up"
+            style={{ opacity: 0, animationDelay: "0.24s" }}
+          >
+            <Link
+              href="/app"
+              className="group inline-flex items-center gap-2 rounded-lg bg-white px-5 py-3 text-[15px] font-medium text-[#0a0a0a] hover:bg-white/90 transition-colors"
+            >
+              Start free
+              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+            </Link>
+            <a
+              href="#how"
+              className="inline-flex items-center gap-2 rounded-lg border border-[#313131] px-5 py-3 text-[15px] font-medium text-white hover:border-[#454545] hover:bg-white/[0.03] transition-colors"
+            >
+              See how it works
+            </a>
+          </div>
+
+          {/* Microcopy */}
+          <p
+            className="mt-6 font-mono text-[11px] tracking-[0.06em] text-[#7c7c7c] uppercase animate-fade-in-up"
+            style={{ opacity: 0, animationDelay: "0.32s" }}
+          >
+            No credit card · Free during beta · Built for F&amp;B owners
+          </p>
+
+          {/* Mini trust */}
+          <div
+            className="mt-6 flex items-center gap-3 animate-fade-in-up"
+            style={{ opacity: 0, animationDelay: "0.4s" }}
+          >
+            <div className="flex">
+              {[0, 1, 2, 3, 4].map((i) => (
+                <Star key={i} className="w-4 h-4 fill-[#6798ff] text-[#6798ff]" />
+              ))}
+            </div>
+            <span className="text-[13px] text-[#a7a7a7]">
+              Loved by early independent owners
+            </span>
+          </div>
         </div>
 
-        {/* Monospace Tagline */}
-        <p
-          className="font-mono text-sm md:text-base text-white/40 tracking-wider mb-10 animate-fade-in-up"
-          style={{ animationDelay: "0.4s" }}
-        >
-          Free forever. No credit card. Built for small business owners.
-        </p>
-
-        {/* Trust Indicators */}
-        <div
-          className="flex flex-wrap items-center justify-center gap-6 md:gap-8 animate-fade-in-up"
-          style={{ animationDelay: "0.5s" }}
-        >
-          <div className="flex items-center gap-2 text-white/50">
-            <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-            </svg>
-            <span className="font-mono text-xs uppercase tracking-widest">AI-Powered</span>
-          </div>
-          <div className="flex items-center gap-2 text-white/50">
-            <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-            </svg>
-            <span className="font-mono text-xs uppercase tracking-widest">Real-Time Data</span>
-          </div>
-          <div className="flex items-center gap-2 text-white/50">
-            <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-            </svg>
-            <span className="font-mono text-xs uppercase tracking-widest">Free to Start</span>
-          </div>
+        {/* Product preview */}
+        <div className="animate-fade-in-up" style={{ opacity: 0, animationDelay: "0.3s" }}>
+          <CommandCenterPreview />
         </div>
-      </div>
-
-      {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce z-10">
-        <svg className="w-6 h-6 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-        </svg>
       </div>
     </section>
   );

@@ -1,74 +1,101 @@
 "use client";
 
-import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
+import {
+  FileSearch,
+  Radar,
+  Newspaper,
+  MessageSquareReply,
+  Crosshair,
+  TrendingUp,
+  LucideIcon,
+} from "lucide-react";
+import { Reveal } from "./Reveal";
 
-const features = [
+interface Feature {
+  Icon: LucideIcon;
+  name: string;
+  desc: string;
+  radar?: boolean;
+}
+
+const FEATURES: Feature[] = [
   {
-    id: "location_scout",
-    step: 1,
-    name: "Choose a Location",
-    description: "Enter any address and get instant AI analysis of foot traffic, demographics, and competition density.",
-    color: "#3B82F6",
+    Icon: FileSearch,
+    name: "Feasibility Study",
+    desc: "A go / no-go verdict on any location or concept — nine sourced domains, scored and explained, in minutes.",
   },
   {
-    id: "market_validator",
-    step: 2,
-    name: "Validate Your Market",
-    description: "Understand market size, demand trends, and growth potential before making investment decisions.",
-    color: "#8B5CF6",
+    Icon: Radar,
+    name: "Business Radar",
+    desc: "We scan your market daily and surface what moved: a new rival, a closure nearby, local news that hits your category.",
+    radar: true,
   },
   {
-    id: "competitor_analyzer",
-    step: 3,
-    name: "Analyze Competitors",
-    description: "Get deep insights into competitor strategies, pricing, and customer reviews to find market gaps.",
-    color: "#F97316",
+    Icon: Newspaper,
+    name: "Daily Brief",
+    desc: "One short morning read over your real signals — local rank, rating drift, competitor moves and cost pressure.",
   },
   {
-    id: "get_insights",
-    step: 4,
-    name: "Get AI Insights",
-    description: "Receive personalized recommendations and actionable insights powered by advanced AI analysis.",
-    color: "#22C55E",
+    Icon: MessageSquareReply,
+    name: "Reputation Hub",
+    desc: "Watch your Google rating drift the moment it happens, then draft on-brand replies in your own voice.",
+  },
+  {
+    Icon: Crosshair,
+    name: "Competitor Tracking",
+    desc: "Follow rivals' pricing, hours, menus and review velocity over time — and get pinged when they change.",
+  },
+  {
+    Icon: TrendingUp,
+    name: "Local Rank",
+    desc: "See exactly where you land for the searches that send diners your way — then climb the ones that matter.",
   },
 ];
 
 export function FeaturesSection() {
-  const { ref, isVisible } = useIntersectionObserver<HTMLElement>({ threshold: 0.1 });
-
   return (
-    <section ref={ref} className="relative z-10 py-24 px-6">
-      <div className="relative z-10 mx-auto max-w-6xl">
-        {/* Section Header */}
-        <div className={`text-center mb-16 animate-on-scroll ${isVisible ? "visible" : ""}`}>
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            How It Works
-          </h2>
-          <p className="text-lg text-white/50 max-w-2xl mx-auto">
-            Four simple steps to smarter business decisions.
+    <section id="platform" className="px-6 py-20 lg:py-28 scroll-mt-24">
+      <div className="mx-auto max-w-[1200px]">
+        <Reveal className="max-w-2xl mx-auto text-center">
+          <p className="font-mono text-[12px] tracking-[0.12em] text-[#a7a7a7] uppercase">
+            Platform
           </p>
-        </div>
+          <h2 className="mt-5 text-[32px] sm:text-[40px] font-medium leading-[1.12] tracking-[-0.025em] text-white">
+            Everything an analyst would do — on autopilot
+          </h2>
+          <p className="mt-5 text-[16px] leading-[1.6] text-[#a7a7a7]">
+            Six tools, one continuously-updated picture of your market. Each runs on your own
+            location&apos;s live data, not generic industry averages.
+          </p>
+        </Reveal>
 
-        {/* Feature Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {features.map((feature, index) => (
-            <div
-              key={feature.id}
-              className={`relative p-8 rounded-xl bg-[#111] border border-white/5 hover:border-white/10 transition-all animate-on-scroll ${isVisible ? "visible" : ""}`}
-              style={{ transitionDelay: `${(index + 1) * 100}ms` }}
-            >
-              {/* Step Number */}
-              <div
-                className="w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold mb-6"
-                style={{ backgroundColor: `${feature.color}20`, color: feature.color }}
-              >
-                {feature.step}
+        <div className="mt-14 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {FEATURES.map((f, i) => (
+            <Reveal key={f.name} delay={(i % 3) * 90}>
+              <div className="dt-card dt-card-hover group relative h-full overflow-hidden p-6">
+                <div className="relative inline-grid place-items-center w-11 h-11 rounded-[10px] bg-[#6798ff]/12">
+                  {f.radar && (
+                    <span
+                      className="dt-radar-sweep absolute inset-0 rounded-[10px]"
+                      style={{
+                        background:
+                          "conic-gradient(from 0deg, transparent 0deg, rgba(103,152,255,0.55) 40deg, transparent 80deg)",
+                      }}
+                      aria-hidden
+                    />
+                  )}
+                  <f.Icon className="relative w-5 h-5 text-[#6798ff]" strokeWidth={1.75} />
+                </div>
+
+                <h3 className="mt-5 text-[17px] font-medium text-white tracking-tight">
+                  {f.name}
+                </h3>
+                <p className="mt-2 text-[14.5px] leading-[1.6] text-[#a7a7a7]">{f.desc}</p>
+
+                {/* hairline that warms on hover */}
+                <span className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#6798ff]/0 to-transparent transition-all duration-300 group-hover:via-[#6798ff]/40" />
               </div>
-
-              {/* Content */}
-              <h3 className="text-xl font-semibold text-white mb-3">{feature.name}</h3>
-              <p className="text-white/50 leading-relaxed">{feature.description}</p>
-            </div>
+            </Reveal>
           ))}
         </div>
       </div>
