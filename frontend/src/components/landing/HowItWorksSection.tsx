@@ -1,69 +1,65 @@
 "use client";
 
-import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
+import { MapPin, Radar, Sunrise } from "lucide-react";
+import { Reveal } from "./Reveal";
 
-const steps = [
+const STEPS = [
   {
-    number: 1,
-    title: "Choose a Tool",
-    description: "Select from our suite of AI-powered analytics tools based on what you need—location analysis, market validation, or competitor research.",
-    icon: "🛠️",
+    n: "01",
+    Icon: MapPin,
+    title: "Add your storefront",
+    desc: "Drop your address or paste your Google listing. We pull your baseline in seconds.",
   },
   {
-    number: 2,
-    title: "Describe Your Business",
-    description: "Tell us about your business idea, target market, and goals. Our AI understands context and tailors insights to your specific situation.",
-    icon: "💬",
+    n: "02",
+    Icon: Radar,
+    title: "We start watching",
+    desc: "Radar scans your market daily and builds your competitor, rank and rating baselines.",
   },
   {
-    number: 3,
-    title: "Get Actionable Insights",
-    description: "Receive data-driven recommendations, visualizations, and step-by-step guidance to make confident business decisions.",
-    icon: "✨",
+    n: "03",
+    Icon: Sunrise,
+    title: "Read your brief, act",
+    desc: "Each morning: what changed, why it matters, and the single move worth making today.",
   },
 ];
 
 export function HowItWorksSection() {
-  const { ref, isVisible } = useIntersectionObserver<HTMLElement>({ threshold: 0.1 });
-
   return (
-    <section ref={ref} className="relative z-10 py-24 px-6 bg-slate-900/30">
-      <div className="mx-auto max-w-6xl">
-        {/* Section Header */}
-        <div className={`text-center mb-16 animate-on-scroll ${isVisible ? "visible" : ""}`}>
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            How It Works
-          </h2>
-          <p className="text-lg text-white/60 max-w-2xl mx-auto">
-            Get started in minutes. No complex setup, no learning curve—just actionable insights.
+    <section id="how" className="px-6 py-20 lg:py-28 border-y border-[#141414] bg-[#0c0c0c] scroll-mt-24">
+      <div className="mx-auto max-w-[1200px]">
+        <Reveal className="max-w-2xl mx-auto text-center">
+          <p className="font-mono text-[12px] tracking-[0.12em] text-[#a7a7a7] uppercase">
+            How it works
           </p>
-        </div>
+          <h2 className="mt-5 text-[32px] sm:text-[40px] font-medium leading-[1.12] tracking-[-0.025em] text-white">
+            From signup to your first decision in minutes
+          </h2>
+        </Reveal>
 
-        {/* Steps */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {steps.map((step, index) => (
-            <div
-              key={step.number}
-              className={`relative text-center animate-on-scroll ${isVisible ? "visible" : ""}`}
-              style={{ transitionDelay: `${(index + 1) * 150}ms` }}
-            >
-              {/* Connector Line (hidden on mobile and last item) */}
-              {index < steps.length - 1 && (
-                <div className="hidden md:block absolute top-12 left-[60%] w-[80%] h-px bg-gradient-to-r from-sky-500/50 to-transparent" />
-              )}
+        <div className="relative mt-16 grid md:grid-cols-3 gap-10 md:gap-6">
+          {/* connector line */}
+          <div className="hidden md:block absolute top-6 left-[16.66%] right-[16.66%] h-px bg-gradient-to-r from-[#1e1e1e] via-[#313131] to-[#1e1e1e]" />
 
-              {/* Number Circle */}
-              <div className="relative inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-sky-500/20 to-blue-600/20 border border-sky-500/30 mb-6">
-                <span className="text-4xl">{step.icon}</span>
-                <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-sky-500/30">
-                  {step.number}
+          {STEPS.map((s, i) => (
+            <Reveal key={s.n} delay={i * 120}>
+              <div className="relative">
+                <div className="flex items-center gap-3">
+                  <span className="relative z-10 grid place-items-center w-12 h-12 rounded-full border border-[#262626] bg-[#0a0a0a]">
+                    <s.Icon className="w-5 h-5 text-[#6798ff]" strokeWidth={1.75} />
+                  </span>
+                  <span className="font-mono text-[12px] tracking-[0.15em] text-[#6798ff]">
+                    {s.n}
+                  </span>
                 </div>
+                <h3 className="mt-5 text-[19px] font-medium text-white tracking-tight">
+                  {s.title}
+                </h3>
+                <p className="mt-2 text-[15px] leading-[1.6] text-[#a7a7a7] max-w-xs">
+                  {s.desc}
+                </p>
               </div>
-
-              {/* Content */}
-              <h3 className="text-xl font-semibold text-white mb-3">{step.title}</h3>
-              <p className="text-white/60 max-w-xs mx-auto">{step.description}</p>
-            </div>
+            </Reveal>
           ))}
         </div>
       </div>
